@@ -643,15 +643,15 @@
     <div class="container">
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-number">5M+</div>
+                <div class="stat-number">{{ monthly_readers_formatted }}</div>
                 <div class="stat-label">Monthly Readers</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">10K+</div>
+                <div class="stat-number">{{ total_articles_formatted }}</div>
                 <div class="stat-label">Articles Published</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">50+</div>
+                <div class="stat-number">{{ expert_journalists }}+</div>
                 <div class="stat-label">Expert Journalists</div>
             </div>
             <div class="stat-item">
@@ -670,58 +670,88 @@
             Our diverse team of journalists, editors, and analysts brings decades of combined experience in news reporting.
         </p>
         <div class="team-grid">
-            <div class="team-member">
-                <div class="team-photo">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="team-info">
-                    <div class="team-name">Sarah Johnson</div>
-                    <div class="team-role">Editor-in-Chief</div>
-                    <div class="team-social">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            {% if team_members %}
+                {% for member in team_members %}
+                <div class="team-member">
+                    <div class="team-photo">
+                        {% if member.photo %}
+                            <img src="{{ member.photo.url }}" alt="{{ member.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">{{ member.name }}</div>
+                        <div class="team-role">{{ member.get_role_display }}</div>
+                        <div class="team-social">
+                            {% if member.twitter_url %}
+                                <a href="{{ member.twitter_url }}" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
+                            {% endif %}
+                            {% if member.linkedin_url %}
+                                <a href="{{ member.linkedin_url }}" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
+                            {% endif %}
+                            {% if member.email %}
+                                <a href="mailto:{{ member.email }}" title="Email {{ member.name }}"><i class="fas fa-envelope"></i></a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="team-member">
-                <div class="team-photo">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="team-info">
-                    <div class="team-name">Michael Chen</div>
-                    <div class="team-role">Tech Editor</div>
-                    <div class="team-social">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback team members if none in database -->
+                <div class="team-member">
+                    <div class="team-photo">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">Sarah Johnson</div>
+                        <div class="team-role">Editor-in-Chief</div>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="team-member">
-                <div class="team-photo">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="team-info">
-                    <div class="team-name">Emily Rodriguez</div>
-                    <div class="team-role">Political Analyst</div>
-                    <div class="team-social">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <div class="team-member">
+                    <div class="team-photo">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">Michael Chen</div>
+                        <div class="team-role">Tech Editor</div>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="team-member">
-                <div class="team-photo">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="team-info">
-                    <div class="team-name">David Park</div>
-                    <div class="team-role">Business Reporter</div>
-                    <div class="team-social">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <div class="team-member">
+                    <div class="team-photo">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">Emily Rodriguez</div>
+                        <div class="team-role">Political Analyst</div>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="team-member">
+                    <div class="team-photo">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">David Park</div>
+                        <div class="team-role">Business Reporter</div>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
