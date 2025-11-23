@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - NewsPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --accent-color: #0f3460;
+            --highlight-color: #e94560;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+
+        .top-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .top-bar-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: var(--highlight-color);
+        }
+
+        /* Main Navigation */
+        .main-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-decoration: none;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--highlight-color), var(--accent-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-menu a::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--highlight-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--highlight-color);
+        }
+
+        .nav-menu a:hover::before,
+        .nav-menu a.active::before {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-trigger {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .search-trigger:hover {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        .subscribe-btn {
+            padding: 10px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .subscribe-btn:hover {
+            background: var(--highlight-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Hero Section */
+        .hero-about {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,165.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') bottom center no-repeat;
+            background-size: cover;
+        }
+
+        .hero-about h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .hero-about p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        /* About Content */
+        .about-content {
+            padding: 80px 0;
+        }
+
+        .about-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 60px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .about-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+        }
+
+        .about-section p {
+            font-size: 17px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Values Grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .value-card {
+            background: var(--bg-secondary);
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .value-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--highlight-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 30px;
+            color: white;
+        }
+
+        .value-card h3 {
+            font-size: 22px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .value-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--primary-color);
+            color: white;
+            padding: 80px 0;
+            margin: 60px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--highlight-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .team-member {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .team-photo {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+
+        .team-info {
+            padding: 24px;
+        }
+
+        .team-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .team-role {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .team-social {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .team-social a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .team-social a:hover {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-color);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 0 30px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-content p {
+            margin-bottom: 20px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .social-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            background: var(--highlight-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .values-grid, .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-about h1 {
+                font-size: 36px;
+            }
+            .hero-about p {
+                font-size: 16px;
+            }
+            .about-section {
+                padding: 30px;
+            }
+            .values-grid, .team-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container">
+        <div class="top-bar-content">
+            <div class="top-bar-left">
+                <div class="top-bar-date">
+                    <i class="far fa-calendar-alt"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Navigation -->
+<nav class="main-nav">
+    <div class="container">
+        <div class="nav-wrapper">
+            <a href="/" class="logo">
+                <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
+                <span>NewsPortal</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/category/business/">Business</a></li>
+                <li><a href="/category/political/">Political</a></li>
+                <li><a href="/category/tech/">Technology</a></li>
+                <li><a href="/category/education/">Education</a></li>
+                <li><a href="/about/" class="active">About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="search-trigger" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="subscribe-btn">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-about">
+    <div class="container">
+        <h1>About NewsPortal</h1>
+        <p>Your trusted source for in-depth journalism, breaking news, and expert analysis since 2020</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<div class="container about-content">
+    
+    <!-- Mission Section -->
+    <div class="about-section">
+        <h2>Our Mission</h2>
+        <p>
+            At NewsPortal, we believe in the power of quality journalism to inform, educate, and empower our readers. 
+            Our mission is to deliver accurate, unbiased, and comprehensive news coverage that matters to you.
+        </p>
+        <p>
+            We are committed to upholding the highest standards of journalistic integrity, providing context and analysis 
+            that helps you understand the world around you. From breaking news to in-depth investigative reports, we strive 
+            to be your go-to source for trustworthy information.
+        </p>
+    </div>
+
+    <!-- Values -->
+    <div class="about-section">
+        <h2>Our Core Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3>Integrity</h3>
+                <p>We maintain the highest ethical standards in all our reporting, ensuring accuracy and fairness.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3>Transparency</h3>
+                <p>We're open about our sources, methods, and potential conflicts of interest.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Independence</h3>
+                <p>Our editorial decisions are free from commercial or political influence.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- History -->
+    <div class="about-section">
+        <h2>Our Story</h2>
+        <p>
+            Founded in 2020, NewsPortal emerged from a simple idea: to create a news platform that prioritizes truth, 
+            context, and community engagement. What started as a small team of dedicated journalists has grown into a 
+            comprehensive news organization covering everything from local stories to global events.
+        </p>
+        <p>
+            Today, we serve millions of readers worldwide, providing them with the news and analysis they need to stay 
+            informed and engaged. Our team of experienced journalists, editors, and analysts work around the clock to 
+            bring you the stories that matter most.
+        </p>
+    </div>
+
+</div>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">5M+</div>
+                <div class="stat-label">Monthly Readers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Articles Published</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Expert Journalists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">News Coverage</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<div class="container about-content">
+    <div class="about-section">
+        <h2>Meet Our Team</h2>
+        <p style="margin-bottom: 40px;">
+            Our diverse team of journalists, editors, and analysts brings decades of combined experience in news reporting.
+        </p>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="team-photo">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="team-info">
+                    <div class="team-name">Sarah Johnson</div>
+                    <div class="team-role">Editor-in-Chief</div>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="team-photo">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="team-info">
+                    <div class="team-name">Michael Chen</div>
+                    <div class="team-role">Tech Editor</div>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="team-photo">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="team-info">
+                    <div class="team-name">Emily Rodriguez</div>
+                    <div class="team-role">Political Analyst</div>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="team-photo">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="team-info">
+                    <div class="team-name">David Park</div>
+                    <div class="team-role">Business Reporter</div>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <h3 style="font-size: 28px; font-weight: 900; color: white; margin-bottom: 16px;">NewsPortal</h3>
+            <p>Your trusted source for quality journalism and expert analysis.</p>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 NewsPortal. All rights reserved. Committed to truth and transparency.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Current Date
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const now = new Date();
+    document.getElementById('currentDate').textContent = 
+        `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+</script>
+
+</body>
+</html>

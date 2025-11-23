@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ news.title }} - NewsPortal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --accent-color: #0f3460;
+            --highlight-color: #e94560;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+
+        .top-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .top-bar-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .social-links a:hover {
+            color: var(--highlight-color);
+        }
+
+        /* Main Navigation */
+        .main-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-decoration: none;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--highlight-color), var(--accent-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-menu a::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--highlight-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--highlight-color);
+        }
+
+        .nav-menu a:hover::before {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-trigger, .mobile-menu-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .search-trigger:hover {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            background: var(--bg-primary);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumbs-list {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumbs-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumbs-list a:hover {
+            color: var(--highlight-color);
+        }
+
+        .breadcrumbs-separator {
+            color: var(--text-light);
+        }
+
+        .breadcrumbs-current {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Article Header */
+        .article-header {
+            background: var(--bg-primary);
+            padding: 60px 0 40px;
+        }
+
+        .article-category-badge {
+            display: inline-block;
+            background: var(--highlight-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+        }
+
+        .article-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            font-family: 'Playfair Display', serif;
+            max-width: 900px;
+        }
+
+        .article-subtitle {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 800px;
+            font-weight: 400;
+        }
+
+        .article-meta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .article-author-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .author-avatar-large {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .author-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .author-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .article-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--highlight-color);
+            color: var(--highlight-color);
+        }
+
+        .action-btn.share {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.share:hover {
+            background: var(--highlight-color);
+            border-color: var(--highlight-color);
+        }
+
+        /* Main Content Layout */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 60px;
+            padding: 60px 0;
+        }
+
+        /* Article Content */
+        .article-content {
+            background: var(--bg-primary);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .featured-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .article-body {
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .article-body p {
+            margin-bottom: 24px;
+        }
+
+        .article-body h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 48px 0 24px;
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .article-body h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 36px 0 20px;
+            color: var(--primary-color);
+        }
+
+        .article-body blockquote {
+            border-left: 4px solid var(--highlight-color);
+            padding: 24px 32px;
+            margin: 32px 0;
+            background: var(--bg-tertiary);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 24px 0;
+            padding-left: 32px;
+        }
+
+        .article-body li {
+            margin-bottom: 12px;
+        }
+
+        .article-tags {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .tags-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .tag {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        /* Author Bio Section */
+        .author-bio {
+            background: var(--bg-tertiary);
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 48px;
+        }
+
+        .author-bio-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .author-bio-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 28px;
+        }
+
+        .author-bio-info h4 {
+            font-size: 20px;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+        }
+
+        .author-bio-title {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .author-bio-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .author-social {
+            display: flex;
+            gap: 12px;
+        }
+
+        .author-social a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .author-social a:hover {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        /* Share Section */
+        .share-section {
+            background: var(--bg-primary);
+            padding: 32px;
+            border-radius: 12px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .share-section h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .share-btn.facebook { background: #1877f2; }
+        .share-btn.twitter { background: #1da1f2; }
+        .share-btn.linkedin { background: #0077b5; }
+        .share-btn.email { background: var(--primary-color); }
+
+        /* Comments Section */
+        .comments-section {
+            background: var(--bg-primary);
+            padding: 48px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+
+        .comments-header {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--primary-color);
+        }
+
+        .comment-form {
+            margin-bottom: 48px;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 120px;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+        }
+
+        .comment-submit {
+            padding: 12px 32px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .comment-submit:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+        }
+
+        .comment {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comment:last-child {
+            border-bottom: none;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comment-time {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .comment-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Sidebar */
+        .article-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-widget {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .widget-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--primary-color);
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--bg-tertiary);
+        }
+
+        /* Table of Contents */
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 12px;
+        }
+
+        .toc-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .toc-list a:hover {
+            background: var(--bg-tertiary);
+            color: var(--highlight-color);
+            transform: translateX(4px);
+        }
+
+        /* Related Articles */
+        .related-article {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            padding: 12px;
+            margin: -12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .related-article:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .related-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .related-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .related-info a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .related-info a:hover {
+            color: var(--highlight-color);
+        }
+
+        .related-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* Newsletter Widget */
+        .newsletter-widget {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+
+        .newsletter-widget .widget-title {
+            color: white;
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .newsletter-text {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .newsletter-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .newsletter-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .newsletter-form button {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-color);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .article-sidebar {
+                position: static;
+            }
+
+            .article-content {
+                padding: 40px;
+            }
+
+            .article-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .article-content {
+                padding: 24px;
+            }
+
+            .article-title {
+                font-size: 28px;
+            }
+
+            .article-subtitle {
+                font-size: 16px;
+            }
+
+            .article-body {
+                font-size: 16px;
+            }
+
+            .featured-image {
+                height: 300px;
+            }
+
+            .article-meta-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .author-bio {
+                padding: 24px;
+            }
+
+            .comments-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container">
+        <div class="top-bar-content">
+            <div class="top-bar-left">
+                <div class="top-bar-date">
+                    <i class="far fa-calendar-alt"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Navigation -->
+<nav class="main-nav">
+    <div class="container">
+        <div class="nav-wrapper">
+            <a href="/" class="logo">
+                <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
+                <span>NewsPortal</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/category/business/">Business</a></li>
+                <li><a href="/category/political/">Political</a></li>
+                <li><a href="/category/tech/">Technology</a></li>
+                <li><a href="/category/education/">Education</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="search-trigger"><i class="fas fa-search"></i></button>
+                <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="breadcrumbs-list">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+            <span class="breadcrumbs-separator">/</span>
+            <a href="/category/{{ news.category|default:'news'|lower }}/">{{ news.category|default:"News" }}</a>
+            <span class="breadcrumbs-separator">/</span>
+            <span class="breadcrumbs-current">Article</span>
+        </div>
+    </div>
+</div>
+
+<!-- Article Header -->
+<div class="article-header">
+    <div class="container">
+        <span class="article-category-badge">{{ news.category|default:"NEWS" }}</span>
+        <h1 class="article-title">{{ news.title }}</h1>
+        <p class="article-subtitle">{{ news.content|slice:":200" }}...</p>
+        
+        <div class="article-meta-bar">
+            <div class="article-author-section">
+                <div class="author-avatar-large">JD</div>
+                <div class="author-details">
+                    <h3>John Doe</h3>
+                    <div class="author-meta">
+                        <div class="meta-item">
+                            <i class="far fa-calendar"></i>
+                            <span>{{ news.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="far fa-clock"></i>
+                            <span>8 min read</span>
+                        </div>
+                        {% if news.updated_at != news.created_at %}
+                        <div class="meta-item">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Updated {{ news.updated_at|date:"M d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-actions">
+                <button class="action-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
+                <button class="action-btn share" onclick="shareArticle()">
+                    <i class="fas fa-share-alt"></i>
+                    Share
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="content-layout">
+        
+        <!-- Article Content -->
+        <main>
+            <article class="article-content">
+                {% if news.image %}
+                    <img src="{{ news.image.url }}" 
+                         alt="{{ news.title }}" 
+                         class="featured-image">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&h=500&fit=crop" 
+                         alt="{{ news.title }}" 
+                         class="featured-image">
+                {% endif %}
+
+                <div class="article-body">
+                    {{ news.content|linebreaks }}
+
+                    <!-- Additional content sections can go here -->
+                    <h2>Understanding the Impact</h2>
+                    <p>This development represents a significant shift in the landscape, with far-reaching implications for stakeholders across the industry. Experts suggest that the ripple effects will be felt for years to come.</p>
+
+                    <blockquote>
+                        "This is a transformative moment that will reshape how we think about the future of this sector." - Industry Expert
+                    </blockquote>
+
+                    <h3>Key Takeaways</h3>
+                    <ul>
+                        <li>Major policy changes are on the horizon</li>
+                        <li>Industry leaders are adapting to new realities</li>
+                        <li>Consumer behavior is evolving rapidly</li>
+                        <li>Technology continues to be a driving force</li>
+                    </ul>
+
+                    <h3>Looking Ahead</h3>
+                    <p>As we move forward, it's clear that adaptability and innovation will be crucial for success. Organizations that can pivot quickly and embrace change will be best positioned for the challenges ahead.</p>
+                </div>
+
+                <!-- Tags -->
+                <div class="article-tags">
+                    <span class="tags-label">Tags:</span>
+                    <a href="/category/{{ news.category }}/" class="tag">{{ news.get_category_display }}</a>
+                    <a href="#" class="tag">Breaking</a>
+                    <a href="#" class="tag">Analysis</a>
+                    <a href="#" class="tag">Featured</a>
+                </div>
+            </article>
+
+            <!-- Author Bio -->
+            <div class="author-bio">
+                <div class="author-bio-header">
+                    <div class="author-bio-avatar">JD</div>
+                    <div class="author-bio-info">
+                        <h4>John Doe</h4>
+                        <p class="author-bio-title">Senior Editor & Journalist</p>
+                    </div>
+                </div>
+                <p class="author-bio-text">
+                    John is an award-winning journalist with over 15 years of experience covering global affairs, 
+                    technology, and business. His investigative reporting has earned him recognition from leading 
+                    journalism organizations worldwide.
+                </p>
+                <div class="author-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Share Section -->
+            <div class="share-section">
+                <h4>Share This Article</h4>
+                <div class="share-buttons">
+                    <a href="#" class="share-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        Facebook
+                    </a>
+                    <a href="#" class="share-btn twitter">
+                        <i class="fab fa-twitter"></i>
+                        Twitter
+                    </a>
+                    <a href="#" class="share-btn linkedin">
+                        <i class="fab fa-linkedin-in"></i>
+                        LinkedIn
+                    </a>
+                    <a href="mailto:?subject={{ news.title }}" class="share-btn email">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h3 class="comments-header">Comments (24)</h3>
+
+                <form class="comment-form">
+                    <textarea placeholder="Join the discussion..."></textarea>
+                    <button type="submit" class="comment-submit">Post Comment</button>
+                </form>
+
+                <div class="comments-list">
+                    <div class="comment">
+                        <div class="comment-header">
+                            <div class="comment-avatar">SA</div>
+                            <div>
+                                <div class="comment-author">Sarah Anderson</div>
+                                <div class="comment-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <p class="comment-text">
+                            Excellent analysis! This really puts things into perspective. Looking forward to seeing how this develops.
+                        </p>
+                    </div>
+
+                    <div class="comment">
+                        <div class="comment-header">
+                            <div class="comment-avatar">MJ</div>
+                            <div>
+                                <div class="comment-author">Michael Johnson</div>
+                                <div class="comment-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        <p class="comment-text">
+                            Great piece of journalism. The depth of research here is impressive.
+                        </p>
+                    </div>
+
+                    <div class="comment">
+                        <div class="comment-header">
+                            <div class="comment-avatar">EL</div>
+                            <div>
+                                <div class="comment-author">Emily Liu</div>
+                                <div class="comment-time">1 day ago</div>
+                            </div>
+                        </div>
+                        <p class="comment-text">
+                            This is exactly the kind of in-depth reporting we need more of. Thank you for this comprehensive coverage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="article-sidebar">
+            
+            <!-- Table of Contents -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Table of Contents</h3>
+                <ul class="toc-list">
+                    <li><a href="#intro">Introduction</a></li>
+                    <li><a href="#impact">Understanding the Impact</a></li>
+                    <li><a href="#key-takeaways">Key Takeaways</a></li>
+                    <li><a href="#looking-ahead">Looking Ahead</a></li>
+                </ul>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Related Articles</h3>
+                
+                <div class="related-article">
+                    <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=80&h=80&fit=crop" 
+                         alt="Related" class="related-thumbnail">
+                    <div class="related-info">
+                        <h4><a href="#">Technology Disruption: What's Coming Next</a></h4>
+                        <div class="related-date">Nov 20, 2024</div>
+                    </div>
+                </div>
+
+                <div class="related-article">
+                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=80&h=80&fit=crop" 
+                         alt="Related" class="related-thumbnail">
+                    <div class="related-info">
+                        <h4><a href="#">Market Analysis: Key Trends to Watch</a></h4>
+                        <div class="related-date">Nov 19, 2024</div>
+                    </div>
+                </div>
+
+                <div class="related-article">
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=80&h=80&fit=crop" 
+                         alt="Related" class="related-thumbnail">
+                    <div class="related-info">
+                        <h4><a href="#">Policy Changes: What You Need to Know</a></h4>
+                        <div class="related-date">Nov 18, 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="sidebar-widget newsletter-widget">
+                <h3 class="widget-title">Stay Informed</h3>
+                <p class="newsletter-text">
+                    Get our best stories delivered to your inbox weekly.
+                </p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+
+            <!-- Ad Space -->
+            <div class="sidebar-widget" style="background: var(--bg-tertiary); text-align: center; padding: 40px 24px;">
+                <p style="color: var(--text-light); font-size: 11px; margin-bottom: 12px;">ADVERTISEMENT</p>
+                <div style="background: var(--border-color); height: 250px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-light); font-size: 14px;">
+                    300 × 250
+                </div>
+            </div>
+
+        </aside>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/about/">About</a>
+                <a href="/contact/">Contact</a>
+                <a href="/privacy/">Privacy</a>
+                <a href="/terms/">Terms</a>
+                <a href="/advertise/">Advertise</a>
+            </div>
+            <p class="footer-copyright">
+                &copy; 2024 NewsPortal. All rights reserved.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Current Date
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const now = new Date();
+    document.getElementById('currentDate').textContent = 
+        `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+    // Share Function
+    function shareArticle() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: window.location.href
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            alert('Share functionality will copy the URL to clipboard');
+            navigator.clipboard.writeText(window.location.href);
+        }
+    }
+
+    // Comment Form
+    document.querySelector('.comment-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Comment functionality will be implemented with backend integration');
+        e.target.reset();
+    });
+
+    // Newsletter Form
+    document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = e.target.querySelector('input[type="email"]').value;
+        alert(`Thank you for subscribing! We'll send our newsletter to ${email}`);
+        e.target.reset();
+    });
+
+    // Smooth Scroll for TOC
+    document.querySelectorAll('.toc-list a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(e.target.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Read Progress Bar (optional enhancement)
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        // You can add a progress bar element and update its width here
+    });
+</script>
+
+</body>
+</html>

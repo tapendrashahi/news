@@ -1,0 +1,75 @@
+/* style.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header & navigation */
+header {
+    background-color: #222;
+    color: #fff;
+    padding: 15px 0;
+    text-align: center;
+}
+
+header nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+header nav a:hover {
+    color: #f39c12;
+}
+
+/* Main content */
+main {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* News list */
+ul.news-list {
+    list-style: none;
+    padding: 0;
+}
+
+ul.news-list li {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+ul.news-list li img {
+    max-width: 300px;
+    display: block;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #fff;
+    padding: 15px 0;
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #333;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 2em;
+}
