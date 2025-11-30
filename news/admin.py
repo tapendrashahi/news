@@ -4,11 +4,12 @@ from django.utils.html import format_html
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'category', 'created_at', 'preview_image')
-    list_filter = ('category', 'created_at', 'author')
-    search_fields = ('title', 'content', 'author__name')
-    fields = ('title', 'content', 'category', 'author', 'image', 'preview_image_display')
+    list_display = ('title', 'author', 'category', 'visibility', 'publish_date', 'created_at', 'preview_image')
+    list_filter = ('category', 'visibility', 'created_at', 'author')
+    search_fields = ('title', 'content', 'slug', 'tags', 'excerpt', 'author__name')
+    fields = ('title', 'slug', 'content', 'excerpt', 'category', 'tags', 'author', 'meta_description', 'visibility', 'publish_date', 'image', 'preview_image_display')
     readonly_fields = ('preview_image_display',)
+    prepopulated_fields = {'slug': ('title',)}
 
     def preview_image(self, obj):
         if obj.image:

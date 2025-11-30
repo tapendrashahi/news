@@ -4,115 +4,812 @@
 {% block page_title %}{% if is_edit %}Edit{% else %}Create New{% endif %} Article{% endblock %}
 
 {% block content %}
-<div class="table-card" style="max-width: 1000px; margin: 0 auto;">
-    <div class="table-header">
-        <div>
-            <h3>
-                <i class="fas fa-{% if is_edit %}edit{% else %}plus-circle{% endif %}"></i> 
-                {% if is_edit %}Edit{% else %}Create New{% endif %} Article
-            </h3>
-            <p style="color: #6c757d; font-size: 13px; margin-top: 4px;">
-                {% if is_edit %}Update article details and content{% else %}Add a new article to your news portal{% endif %}
-            </p>
+<div class="wp-editor-container">
+    <div class="wp-header">
+        <div class="wp-header-left">
+            <h1>
+                <i class="fas fa-{% if is_edit %}edit{% else %}pen-nib{% endif %}"></i>
+                {% if is_edit %}Edit Article{% else %}Add New Article{% endif %}
+            </h1>
         </div>
-        <a href="{% url 'custom_admin:news_list' %}" class="btn btn-sm" style="background: #6c757d; color: white;">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </a>
+        <div class="wp-header-actions">
+            <a href="{% url 'custom_admin:news_list' %}" class="btn-secondary-wp">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button type="submit" form="articleForm" class="btn-primary-wp">
+                <i class="fas fa-{% if is_edit %}check{% else %}paper-plane{% endif %}"></i>
+                {% if is_edit %}Update{% else %}Publish{% endif %}
+            </button>
+        </div>
     </div>
 
-    <div class="form-container">
-        <form method="post" enctype="multipart/form-data" class="admin-form">
-            {% csrf_token %}
-
-            <!-- Basic Information Section -->
-            <div class="form-section">
-                <h4 class="section-title">
-                    <i class="fas fa-info-circle"></i> Basic Information
-                </h4>
+    <form method="post" enctype="multipart/form-data" id="articleForm" class="wp-form">
+        {% csrf_token %}
+        
+        <div class="wp-editor-layout">
+            <!-- Main Content Area -->
+            <div class="wp-main-content">
                 
-                <div class="form-group">
-                    <label><i class="fas fa-heading"></i> Article Title *</label>
-                    <input type="text" name="title" class="form-control" value="{{ news.title }}" 
-                           placeholder="Enter an engaging title for your article..." required>
-                    <small class="form-text">Keep it clear and compelling</small>
+                <!-- Title -->
+                <div class="wp-field-group">
+                    <input 
+                        type="text" 
+                        name="title" 
+                        id="title"
+                        class="wp-title-input" 
+                        value="{{ news.title }}"
+                        placeholder="Add title"
+                        required
+                        maxlength="200">
                 </div>
 
-                <div class="form-group">
-                    <label><i class="fas fa-align-left"></i> Article Content *</label>
-                    <textarea name="content" class="form-control" rows="28" 
-                              placeholder="Write your article content here..." required>{{ news.content }}</textarea>
-                    <small class="form-text">Use clear paragraphs and formatting for better readability</small>
+                <!-- URL Slug -->
+                <div class="wp-field-group">
+                    <div class="wp-permalink">
+                        <span class="wp-permalink-label">Permalink:</span>
+                        <input 
+                            type="text" 
+                            name="slug" 
+                            id="slug"
+                            class="wp-slug-input" 
+                            value="{{ news.slug|default:'' }}"
+                            placeholder="url-slug-here"
+                            pattern="[a-z0-9-]+"
+                            title="Only lowercase letters, numbers, and hyphens">
+                        <button type="button" class="btn-link-wp" id="editSlug">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Content Editor -->
+                <div class="wp-field-group">
+                    <label class="wp-label">Content *</label>
+                    <textarea 
+                        name="content" 
+                        id="content"
+                        class="wp-content-editor"
+                        placeholder="Start writing your article..."
+                        required>{{ news.content }}</textarea>
+                    <small class="wp-hint">Write your article content with proper formatting</small>
+                </div>
+
+                <!-- Excerpt -->
+                <div class="wp-field-group">
+                    <label class="wp-label">Excerpt</label>
+                    <textarea 
+                        name="excerpt" 
+                        id="excerpt"
+                        class="wp-excerpt-input"
+                        rows="3"
+                        placeholder="Brief summary of your article (optional)..."
+                        maxlength="300">{{ news.excerpt|default:'' }}</textarea>
+                    <small class="wp-hint">Brief summary displayed in article lists (max 300 characters)</small>
+                </div>
+
+                <!-- Meta Description -->
+                <div class="wp-field-group">
+                    <label class="wp-label">
+                        <i class="fas fa-search"></i> SEO Meta Description
+                    </label>
+                    <textarea 
+                        name="meta_description" 
+                        id="metaDescription"
+                        class="wp-meta-input"
+                        rows="3"
+                        placeholder="Meta description for search engines..."
+                        maxlength="160">{{ news.meta_description|default:'' }}</textarea>
+                    <small class="wp-hint">Recommended: 150-160 characters for optimal SEO</small>
+                </div>
+
             </div>
 
-            <!-- Classification Section -->
-            <div class="form-section">
-                <h4 class="section-title">
-                    <i class="fas fa-folder-open"></i> Classification
-                </h4>
+            <!-- Sidebar -->
+            <div class="wp-sidebar">
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Category *</label>
-                        <select name="category" class="form-control" required>
-                            <option value="">Select a category...</option>
-                            {% for cat_code, cat_name in categories %}
-                            <option value="{{ cat_code }}" {% if news.category == cat_code %}selected{% endif %}>{{ cat_name }}</option>
-                            {% endfor %}
+                <!-- Publish Settings -->
+                <div class="wp-panel">
+                    <h3 class="wp-panel-title">
+                        <i class="fas fa-cog"></i> Publish Settings
+                    </h3>
+                    
+                    <div class="wp-field">
+                        <label class="wp-label-sm">Status</label>
+                        <select name="visibility" class="wp-select">
+                            <option value="public" {% if news.visibility == 'public' or not news.visibility %}selected{% endif %}>
+                                Public
+                            </option>
+                            <option value="private" {% if news.visibility == 'private' %}selected{% endif %}>
+                                Private
+                            </option>
+                            <option value="password" {% if news.visibility == 'password' %}selected{% endif %}>
+                                Password Protected
+                            </option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-user-edit"></i> Author</label>
-                        <select name="author" class="form-control">
-                            <option value="">No Author (Optional)</option>
+                    <div class="wp-field">
+                        <label class="wp-label-sm">
+                            <i class="far fa-calendar"></i> Publish Date
+                        </label>
+                        <input 
+                            type="datetime-local" 
+                            name="publish_date" 
+                            class="wp-input-sm"
+                            value="{{ news.publish_date|date:'Y-m-d\TH:i'|default:'' }}">
+                        <small class="wp-hint">Leave empty to publish immediately</small>
+                    </div>
+
+                    <div class="wp-field">
+                        <label class="wp-label-sm">
+                            <i class="fas fa-user-edit"></i> Author *
+                        </label>
+                        <select name="author" class="wp-select" required>
+                            <option value="">Select Author...</option>
                             {% for member in team_members %}
                             <option value="{{ member.id }}" {% if news.author_id == member.id %}selected{% endif %}>
-                                {{ member.name }} - {{ member.get_role_display }}
+                                {{ member.name }}
                             </option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
-            </div>
 
-            <!-- Media Section -->
-            <div class="form-section">
-                <h4 class="section-title">
-                    <i class="fas fa-image"></i> Featured Image
-                </h4>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-upload"></i> Upload Image</label>
-                    <input type="file" name="image" class="form-control file-input" accept="image/*">
-                    {% if news.image %}
-                    <div class="image-preview">
-                        <p class="preview-label">
-                            <i class="fas fa-check-circle"></i> Current Image:
-                        </p>
-                        <img src="{{ news.image.url }}" alt="Current image" class="preview-img">
-                        <p class="preview-note">
-                            <i class="fas fa-info-circle"></i> Upload a new image to replace the current one
-                        </p>
+                <!-- Categories -->
+                <div class="wp-panel">
+                    <h3 class="wp-panel-title">
+                        <i class="fas fa-folder-open"></i> Category
+                    </h3>
+                    <div class="wp-checkbox-list">
+                        {% for cat_code, cat_name in categories %}
+                        <label class="wp-checkbox-label">
+                            <input 
+                                type="radio" 
+                                name="category" 
+                                value="{{ cat_code }}"
+                                {% if news.category == cat_code %}checked{% endif %}
+                                required>
+                            <span>{{ cat_name }}</span>
+                        </label>
+                        {% endfor %}
                     </div>
-                    {% else %}
-                    <small class="form-text">
-                        <i class="fas fa-info-circle"></i> Recommended size: 1200x630px for best display
-                    </small>
-                    {% endif %}
+                    <small class="wp-hint">Select a category</small>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="fas fa-{% if is_edit %}save{% else %}plus-circle{% endif %}"></i> 
-                    {% if is_edit %}Update{% else %}Publish{% endif %} Article
-                </button>
-                <a href="{% url 'custom_admin:news_list' %}" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
+                <!-- Tags -->
+                <div class="wp-panel">
+                    <h3 class="wp-panel-title">
+                        <i class="fas fa-tags"></i> Tags
+                    </h3>
+                    <div class="wp-field">
+                        <div id="tagsContainer" class="tags-container"></div>
+                        <input 
+                            type="text" 
+                            id="tagInput"
+                            class="wp-input-sm"
+                            placeholder="Type tag and press Enter"
+                            autocomplete="off">
+                        <input type="hidden" name="tags" id="tagsHidden" value="{{ news.tags|default:'' }}">
+                        <small class="wp-hint">Press Enter to add each tag</small>
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                <div class="wp-panel">
+                    <h3 class="wp-panel-title">
+                        <i class="fas fa-image"></i> Featured Image
+                    </h3>
+                    
+                    <div class="wp-image-upload">
+                        {% if news.image %}
+                        <div class="wp-image-preview">
+                            <img src="{{ news.image.url }}" alt="Featured image" id="imagePreview">
+                            <button type="button" class="wp-image-remove" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="wp-image-preview" id="imagePreviewContainer" style="display: none;">
+                            <img src="" alt="Preview" id="imagePreview">
+                            <button type="button" class="wp-image-remove" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                        
+                        <label for="image" class="wp-upload-btn">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>{% if news.image %}Change Image{% else %}Upload Image{% endif %}</span>
+                        </label>
+                        <input 
+                            type="file" 
+                            name="image" 
+                            id="image"
+                            accept="image/jpeg,image/png,image/jpg,image/webp"
+                            style="display: none;">
+                        <small class="wp-hint">Recommended: 1200x630px, max 5MB</small>
+                    </div>
+                </div>
+
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-generate slug from title
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    const editSlugBtn = document.getElementById('editSlug');
+    let slugEdited = {{ news.slug|yesno:"true,false" }};
+
+    titleInput.addEventListener('input', function() {
+        if (!slugEdited) {
+            const slug = this.value
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+            slugInput.value = slug;
+        }
+    });
+
+    editSlugBtn.addEventListener('click', function() {
+        slugInput.focus();
+        slugEdited = true;
+    });
+
+    slugInput.addEventListener('input', function() {
+        slugEdited = true;
+    });
+
+    // Image preview
+    const imageInput = document.getElementById('image');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const removeImageBtn = document.getElementById('removeImage');
+
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                if (imagePreviewContainer) {
+                    imagePreviewContainer.style.display = 'block';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener('click', function() {
+            imageInput.value = '';
+            if (imagePreviewContainer) {
+                imagePreviewContainer.style.display = 'none';
+            }
+            imagePreview.src = '';
+        });
+    }
+
+    // Form validation
+    const form = document.getElementById('articleForm');
+    form.addEventListener('submit', function(e) {
+        const title = titleInput.value.trim();
+        const content = document.getElementById('content').value.trim();
+        
+        if (!title || title.length < 10) {
+            e.preventDefault();
+            alert('Title must be at least 10 characters long');
+            titleInput.focus();
+            return false;
+        }
+        
+        if (!content || content.length < 50) {
+            e.preventDefault();
+            alert('Content must be at least 50 characters long');
+            document.getElementById('content').focus();
+            return false;
+        }
+    });
+
+    // Tags Management
+    const tagInput = document.getElementById('tagInput');
+    const tagsContainer = document.getElementById('tagsContainer');
+    const tagsHidden = document.getElementById('tagsHidden');
+    let tags = [];
+
+    // Load existing tags
+    if (tagsHidden.value) {
+        tags = tagsHidden.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+        renderTags();
+    }
+
+    // Prevent Enter from submitting form in tag input
+    tagInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const tag = tagInput.value.trim();
+            if (tag && !tags.includes(tag)) {
+                tags.push(tag);
+                renderTags();
+                tagInput.value = '';
+            }
+        }
+    });
+
+    function renderTags() {
+        tagsContainer.innerHTML = '';
+        tags.forEach((tag, index) => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <button type="button" class="tag-remove" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            tagsContainer.appendChild(tagElement);
+        });
+        tagsHidden.value = tags.join(', ');
+
+        // Add event listeners to remove buttons
+        document.querySelectorAll('.tag-remove').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                tags.splice(index, 1);
+                renderTags();
+            });
+        });
+    }
+});
+</script>
+
+<style>
+.wp-editor-container {
+    background: #f0f0f1;
+    min-height: 100vh;
+    padding: 0;
+}
+
+.wp-header {
+    background: #fff;
+    border-bottom: 1px solid #dcdcde;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.wp-header-left h1 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 600;
+    color: #1d2327;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wp-header-left h1 i {
+    color: #2271b1;
+}
+
+.wp-header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary-wp {
+    background: #2271b1;
+    color: #fff;
+    border: 1px solid #2271b1;
+    padding: 10px 24px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary-wp:hover {
+    background: #135e96;
+    border-color: #135e96;
+}
+
+.btn-secondary-wp {
+    background: #fff;
+    color: #2c3338;
+    border: 1px solid #dcdcde;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-secondary-wp:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+}
+
+.wp-editor-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.wp-main-content {
+    background: #fff;
+    padding: 40px;
+    min-height: calc(100vh - 61px);
+}
+
+.wp-sidebar {
+    background: #f0f0f1;
+    padding: 32px 24px;
+    border-left: 1px solid #dcdcde;
+}
+
+.wp-field-group {
+    margin-bottom: 48px;
+}
+
+.wp-title-input {
+    width: 100%;
+    font-size: 40px;
+    font-weight: 600;
+    border: none;
+    padding: 16px 0;
+    outline: none;
+    color: #1d2327;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.4;
+}
+
+.wp-title-input::placeholder {
+    color: #949494;
+}
+
+.wp-permalink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    margin-bottom: 24px;
+}
+
+.wp-permalink-label {
+    font-size: 13px;
+    color: #646970;
+    font-weight: 500;
+}
+
+.wp-slug-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #2271b1;
+    outline: none;
+    padding: 4px;
+}
+
+.btn-link-wp {
+    background: none;
+    border: none;
+    color: #2271b1;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+.btn-link-wp:hover {
+    background: #e5f5ff;
+}
+
+.wp-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    margin-bottom: 12px;
+}
+
+.wp-content-editor {
+    width: 100%;
+    min-height: 500px;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.wp-content-editor:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.wp-excerpt-input,
+.wp-meta-input {
+    width: 100%;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+}
+
+.wp-excerpt-input:focus,
+.wp-meta-input:focus {
+    border-color: #2271b1;
+}
+
+.wp-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #646970;
+    font-style: italic;
+}
+
+.wp-panel {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.wp-panel-title {
+    margin: 0;
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    border-bottom: 1px solid #dcdcde;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wp-panel-title i {
+    color: #2271b1;
+    font-size: 15px;
+}
+
+.wp-field {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wp-field:last-child {
+    border-bottom: none;
+}
+
+.wp-label-sm {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    margin-bottom: 8px;
+}
+
+.wp-select,
+.wp-input-sm {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+    font-size: 13px;
+    outline: none;
+}
+
+.wp-select:focus,
+.wp-input-sm:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.wp-checkbox-list {
+    padding: 12px 16px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.wp-checkbox-label {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: #2c3338;
+}
+
+.wp-checkbox-label input {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.wp-checkbox-label:hover {
+    color: #2271b1;
+}
+
+.wp-image-upload {
+    padding: 16px;
+}
+
+.wp-image-preview {
+    position: relative;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #dcdcde;
+}
+
+.wp-image-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.wp-image-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.wp-image-remove:hover {
+    background: #d63638;
+}
+
+.wp-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #f6f7f7;
+    border: 1px dashed #dcdcde;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #2c3338;
+    transition: all 0.2s;
+    margin-bottom: 8px;
+}
+
+.wp-upload-btn:hover {
+    background: #fff;
+    border-color: #2271b1;
+    color: #2271b1;
+}
+
+/* Tags Styling */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    min-height: 32px;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2271b1;
+    color: #fff;
+    padding: 8px 8px 8px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tag-remove {
+    background: #dc3545;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.tag-remove:hover {
+    background: #c82333;
+}
+
+.tag-remove i {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .wp-editor-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .wp-sidebar {
+        border-left: none;
+        border-top: 1px solid #dcdcde;
+    }
+    
+    .wp-main-content {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wp-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .wp-header-actions {
+        justify-content: space-between;
+    }
+    
+    .wp-title-input {
+        font-size: 28px;
+    }
+    
+    .wp-main-content {
+        padding: 20px 16px;
+    }
+    
+    .wp-sidebar {
+        padding: 20px 16px;
+    }
+}
+</style>
 {% endblock %}

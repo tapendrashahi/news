@@ -86,27 +86,40 @@ def admin_news_create(request):
     """Create new news article"""
     if request.method == 'POST':
         title = request.POST.get('title')
+        slug = request.POST.get('slug')
         content = request.POST.get('content')
+        excerpt = request.POST.get('excerpt', '')
         category = request.POST.get('category')
+        tags = request.POST.get('tags', '')
         author_id = request.POST.get('author')
+        meta_description = request.POST.get('meta_description', '')
+        visibility = request.POST.get('visibility', 'public')
+        publish_date = request.POST.get('publish_date')
         image = request.FILES.get('image')
         
         if title and content and category:
             news = News.objects.create(
                 title=title,
+                slug=slug if slug else '',
                 content=content,
+                excerpt=excerpt,
                 category=category,
+                tags=tags,
                 author_id=author_id if author_id else None,
+                meta_description=meta_description,
+                visibility=visibility,
+                publish_date=publish_date if publish_date else None,
                 image=image if image else None
             )
             messages.success(request, f'News article "{title}" created successfully!')
-            return redirect('admin_news_list')
+            return redirect('custom_admin:news_list')
         else:
             messages.error(request, 'Please fill in all required fields.')
     
     team_members = TeamMember.objects.filter(is_active=True)
     
     context = {
+        'news': News(),  # Empty news object for form
         'team_members': team_members,
         'categories': News.CATEGORY_CHOICES,
     }
@@ -120,8 +133,16 @@ def admin_news_edit(request, pk):
     
     if request.method == 'POST':
         news.title = request.POST.get('title')
+        news.slug = request.POST.get('slug', '')
         news.content = request.POST.get('content')
+        news.excerpt = request.POST.get('excerpt', '')
         news.category = request.POST.get('category')
+        news.tags = request.POST.get('tags', '')
+        news.meta_description = request.POST.get('meta_description', '')
+        news.visibility = request.POST.get('visibility', 'public')
+        publish_date = request.POST.get('publish_date')
+        news.publish_date = publish_date if publish_date else None
+        
         author_id = request.POST.get('author')
         news.author_id = author_id if author_id else None
         
@@ -130,7 +151,7 @@ def admin_news_edit(request, pk):
         
         news.save()
         messages.success(request, f'News article "{news.title}" updated successfully!')
-        return redirect('admin_news_list')
+        return redirect('custom_admin:news_list')
     
     team_members = TeamMember.objects.filter(is_active=True)
     

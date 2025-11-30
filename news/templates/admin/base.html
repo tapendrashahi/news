@@ -73,6 +73,16 @@
             padding: 20px 0;
         }
 
+        .menu-section-title {
+            padding: 20px 24px 8px 24px;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 12px;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -959,26 +969,43 @@
             <a href="{% url 'custom_admin:dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <i class="fas fa-chart-line"></i> Dashboard
             </a>
-            <a href="{% url 'custom_admin:news_list' %}" class="menu-item {% if 'news' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-newspaper"></i> News Articles
+            
+            <div class="menu-section-title">Content Management</div>
+            
+            <a href="{% url 'custom_admin:news_create' %}" class="menu-item {% if request.resolver_match.url_name == 'news_create' %}active{% endif %}">
+                <i class="fas fa-pen-nib"></i> Create Article
             </a>
-            <a href="{% url 'custom_admin:team_list' %}" class="menu-item {% if 'team' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-users"></i> Team Members
+            <a href="{% url 'custom_admin:news_list' %}" class="menu-item {% if request.resolver_match.url_name == 'news_list' or request.resolver_match.url_name == 'news_edit' %}active{% endif %}">
+                <i class="fas fa-newspaper"></i> All Articles
             </a>
+            
+            <div class="menu-section-title">Team</div>
+            
+            <a href="{% url 'custom_admin:team_create' %}" class="menu-item {% if request.resolver_match.url_name == 'team_create' %}active{% endif %}">
+                <i class="fas fa-user-plus"></i> Add Team Member
+            </a>
+            <a href="{% url 'custom_admin:team_list' %}" class="menu-item {% if request.resolver_match.url_name == 'team_list' or request.resolver_match.url_name == 'team_edit' %}active{% endif %}">
+                <i class="fas fa-users"></i> All Team Members
+            </a>
+            
+            <div class="menu-section-title">Engagement</div>
+            
             <a href="{% url 'custom_admin:comments_list' %}" class="menu-item {% if 'comment' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-comments"></i> Comments
+                <i class="fas fa-comments"></i> Review Comments
             </a>
             <a href="{% url 'custom_admin:reports' %}" class="menu-item {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
-                <i class="fas fa-chart-bar"></i> Reports
+                <i class="fas fa-chart-bar"></i> Analytics
             </a>
-            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 16px 0;">
+            
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 12px;">
+            
             <a href="/" class="menu-item">
                 <i class="fas fa-globe"></i> View Site
             </a>
             <a href="/admin/" class="menu-item">
                 <i class="fas fa-cog"></i> Django Admin
             </a>
-            <a href="/admin/logout/" class="menu-item" style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <a href="/admin/logout/" class="menu-item" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>

@@ -40,17 +40,53 @@ class News(models.Model):
         ('tech', 'Tech'),
         ('education', 'Education'),
     ]
+    
+    VISIBILITY_CHOICES = [
+        ('public', 'Public'),
+        ('private', 'Private'),
+        ('password', 'Password Protected'),
+    ]
 
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True, help_text="URL-friendly version of title")
     content = models.TextField()
+    excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary of the article")
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='business')
+    tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated tags")
     author = models.ForeignKey(TeamMember, on_delete=models.SET_NULL, null=True, blank=True, related_name='articles', help_text="Select the author from team members")
+    meta_description = models.CharField(max_length=160, blank=True, help_text="SEO meta description")
+    visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='public')
+    publish_date = models.DateTimeField(null=True, blank=True, help_text="Schedule publish date/time")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='news_images/', blank=True, null=True)
-
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'News Article'
+        verbose_name_plural = 'News Articles'
+    
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        # Auto-generate slug from title if not provided
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+            # Ensure unique slug
+            original_slug = self.slug
+            counter = 1
+            while News.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
+    
+    def get_tags_list(self):
+        """Return tags as a list"""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
+        return []
 
 
 class Comment(models.Model):
