@@ -52,3 +52,42 @@ class News(models.Model):
     def __str__(self):
         return self.title
 
+
+class Comment(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=100, help_text="Commenter's name")
+    email = models.EmailField(help_text="Commenter's email (not displayed publicly)")
+    text = models.TextField(help_text="Comment text")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=True, help_text="Whether this comment is approved for display")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+    
+    def __str__(self):
+        return f"Comment by {self.name} on {self.news.title}"
+
+
+class ShareCount(models.Model):
+    PLATFORM_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('twitter', 'Twitter'),
+        ('linkedin', 'LinkedIn'),
+        ('email', 'Email'),
+    ]
+    
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='shares')
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    count = models.IntegerField(default=0)
+    last_shared = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['news', 'platform']
+        verbose_name = 'Share Count'
+        verbose_name_plural = 'Share Counts'
+    
+    def __str__(self):
+        return f"{self.news.title} - {self.platform}: {self.count}"
+

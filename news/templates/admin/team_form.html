@@ -1,0 +1,136 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Team Member{% endblock %}
+{% block page_title %}{% if is_edit %}Edit{% else %}Add New{% endif %} Team Member{% endblock %}
+
+{% block content %}
+<div class="table-card" style="max-width: 900px; margin: 0 auto;">
+    <div class="table-header">
+        <div>
+            <h3>
+                <i class="fas fa-{% if is_edit %}user-edit{% else %}user-plus{% endif %}"></i>
+                {% if is_edit %}Edit{% else %}Add New{% endif %} Team Member
+            </h3>
+            <p style="color: #6c757d; font-size: 13px; margin-top: 4px;">
+                {% if is_edit %}Update team member information{% else %}Add a new member to your team{% endif %}
+            </p>
+        </div>
+        <a href="{% url 'custom_admin:team_list' %}" class="btn btn-sm" style="background: #6c757d; color: white;">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data" class="admin-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name *</label>
+                <input type="text" name="name" class="form-control" value="{{ team_member.name }}" 
+                       placeholder="Enter full name..." required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-briefcase"></i> Role *</label>
+                    <select name="role" class="form-control" required>
+                        <option value="">Select a role...</option>
+                        {% for role_code, role_name in roles %}
+                        <option value="{{ role_code }}" {% if team_member.role == role_code %}selected{% endif %}>{{ role_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-sort-numeric-down"></i> Display Order</label>
+                    <input type="number" name="order" class="form-control" value="{{ team_member.order|default:0 }}" 
+                           min="0" placeholder="0">
+                    <small class="form-text">Lower numbers appear first</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Bio</label>
+                <textarea name="bio" class="form-control" rows="5" 
+                          placeholder="Write a brief bio...">{{ team_member.bio }}</textarea>
+                <small class="form-text">A short description about the team member</small>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" name="email" class="form-control" value="{{ team_member.email }}"
+                       placeholder="email@example.com">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fab fa-twitter"></i> Twitter URL</label>
+                    <input type="url" name="twitter_url" class="form-control" value="{{ team_member.twitter_url }}"
+                           placeholder="https://twitter.com/username">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fab fa-linkedin"></i> LinkedIn URL</label>
+                    <input type="url" name="linkedin_url" class="form-control" value="{{ team_member.linkedin_url }}"
+                           placeholder="https://linkedin.com/in/username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-camera"></i> Profile Photo</label>
+                <input type="file" name="photo" class="form-control file-input" accept="image/*">
+                {% if team_member.photo %}
+                <div class="image-preview">
+                    <p class="preview-label">
+                        <i class="fas fa-check-circle"></i> Current Photo:
+                    </p>
+                    <img src="{{ team_member.photo.url }}" alt="{{ team_member.name }}" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block;">
+                    <p class="preview-note" style="margin-top: 12px;">
+                        <i class="fas fa-info-circle"></i> Upload a new photo to replace the current one
+                    </p>
+                </div>
+                {% else %}
+                <small class="form-text">
+                    <i class="fas fa-info-circle"></i> Recommended: Square image, minimum 400x400px
+                </small>
+                {% endif %}
+            </div>
+
+            {% if is_edit %}
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600;">
+                    <input type="checkbox" name="is_active" {% if team_member.is_active %}checked{% endif %}
+                           style="width: 18px; height: 18px; cursor: pointer;">
+                    <span><i class="fas fa-toggle-on" style="color: #27ae60;"></i> Active Member</span>
+                </label>
+                <small class="form-text">Inactive members won't be displayed on the website</small>
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-{% if is_edit %}save{% else %}user-plus{% endif %}"></i>
+                    {% if is_edit %}Update{% else %}Add{% endif %} Member
+                </button>
+                <a href="{% url 'custom_admin:team_list' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {% if is_edit %}Update{% else %}Add{% endif %} Member
+                </button>
+                <a href="{% url 'custom_admin:team_list' %}" class="btn" style="background: #6c757d; color: white;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('custom-admin/', include('news.admin_urls')),  # Custom admin panel
     path('', include('news.urls')),   # include your app URLs
 ]
 

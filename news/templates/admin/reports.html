@@ -1,0 +1,203 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<!-- Date Range Filter -->
+<div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form method="get" style="display: flex; gap: 12px; align-items: end;">
+        <div class="form-group" style="margin: 0;">
+            <label>Time Period</label>
+            <select name="days" class="form-control" style="width: 200px;" onchange="this.form.submit()">
+                <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
+                <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
+                <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 Days</option>
+                <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<!-- Overview Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div>
+                <div class="stat-value">{{ total_news }}</div>
+                <div class="stat-label">Total Articles</div>
+            </div>
+            <div class="stat-card-icon blue">
+                <i class="fas fa-newspaper"></i>
+            </div>
+        </div>
+        <small style="color: #3498db;">+{{ news_period }} in selected period</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div>
+                <div class="stat-value">{{ total_comments }}</div>
+                <div class="stat-label">Total Comments</div>
+            </div>
+            <div class="stat-card-icon orange">
+                <i class="fas fa-comments"></i>
+            </div>
+        </div>
+        <small style="color: #f39c12;">+{{ comments_period }} in selected period</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div>
+                <div class="stat-value">{{ approved_comments }}</div>
+                <div class="stat-label">Approved Comments</div>
+            </div>
+            <div class="stat-card-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <small style="color: #27ae60;">{{ pending_comments }} pending</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div>
+                <div class="stat-value">{% widthratio approved_comments total_comments 100 %}%</div>
+                <div class="stat-label">Approval Rate</div>
+            </div>
+            <div class="stat-card-icon blue">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <!-- Category Breakdown -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>Category Distribution</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Articles</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in category_stats %}
+                <tr>
+                    <td><span class="badge badge-info">{{ cat.name }}</span></td>
+                    <td>{{ cat.count }}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="background: #ecf0f1; height: 8px; flex: 1; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #3498db; height: 100%; width: {{ cat.percentage }}%;"></div>
+                            </div>
+                            <span style="font-size: 12px;">{{ cat.percentage|floatformat:1 }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Share Statistics -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>Share Statistics</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th>Total Shares</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in share_stats %}
+                <tr>
+                    <td>
+                        {% if stat.platform == 'Facebook' %}
+                        <i class="fab fa-facebook" style="color: #1877f2;"></i>
+                        {% elif stat.platform == 'Twitter' %}
+                        <i class="fab fa-x-twitter" style="color: #000;"></i>
+                        {% elif stat.platform == 'Linkedin' %}
+                        <i class="fab fa-linkedin" style="color: #0077b5;"></i>
+                        {% else %}
+                        <i class="fas fa-envelope" style="color: #7f8c8d;"></i>
+                        {% endif %}
+                        {{ stat.platform }}
+                    </td>
+                    <td><strong>{{ stat.count }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Top Authors -->
+{% if top_authors %}
+<div class="table-card" style="margin-top: 24px;">
+    <div class="table-header">
+        <h3>Top Authors</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Author</th>
+                <th>Articles Published</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for author in top_authors %}
+            <tr>
+                <td><strong>#{{ forloop.counter }}</strong></td>
+                <td>{{ author.name }}</td>
+                <td>{{ author.count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Most Commented Articles -->
+{% if most_commented %}
+<div class="table-card" style="margin-top: 24px;">
+    <div class="table-header">
+        <h3>Most Commented Articles</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Article</th>
+                <th>Category</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in most_commented %}
+            <tr>
+                <td><strong>#{{ forloop.counter }}</strong></td>
+                <td>
+                    <a href="/news/{{ item.news.id }}/" target="_blank" style="color: #3498db; text-decoration: none;">
+                        {{ item.news.title|truncatewords:10 }}
+                    </a>
+                </td>
+                <td><span class="badge badge-info">{{ item.news.get_category_display }}</span></td>
+                <td><strong>{{ item.count }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

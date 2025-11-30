@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ category }} News - NewsPortal</title>
+    <title>{{ category }} News - AI Analitica</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
@@ -927,8 +927,8 @@
     <div class="container">
         <div class="nav-wrapper">
             <a href="/" class="logo">
-                <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
-                <span>NewsPortal</span>
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span>AI Analitica</span>
             </a>
 
             <ul class="nav-menu">
@@ -1085,15 +1085,33 @@
                 </div>
 
                 <!-- Pagination -->
+                {% if paginator.num_pages > 1 %}
                 <div class="pagination">
-                    <a href="#" class="page-link disabled"><i class="fas fa-chevron-left"></i></a>
-                    <a href="#" class="page-link active">1</a>
-                    <a href="#" class="page-link">2</a>
-                    <a href="#" class="page-link">3</a>
-                    <a href="#" class="page-link">4</a>
-                    <a href="#" class="page-link">5</a>
-                    <a href="#" class="page-link"><i class="fas fa-chevron-right"></i></a>
+                    {% if news_list.has_previous %}
+                        <a href="?page={{ news_list.previous_page_number }}" class="page-link">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {% else %}
+                        <a href="#" class="page-link disabled"><i class="fas fa-chevron-left"></i></a>
+                    {% endif %}
+                    
+                    {% for num in paginator.page_range %}
+                        {% if news_list.number == num %}
+                            <a href="?page={{ num }}" class="page-link active">{{ num }}</a>
+                        {% elif num > news_list.number|add:'-3' and num < news_list.number|add:'3' %}
+                            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if news_list.has_next %}
+                        <a href="?page={{ news_list.next_page_number }}" class="page-link">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% else %}
+                        <a href="#" class="page-link disabled"><i class="fas fa-chevron-right"></i></a>
+                    {% endif %}
                 </div>
+                {% endif %}
             {% else %}
                 <!-- Empty State -->
                 <div class="empty-state">
@@ -1218,7 +1236,7 @@
                 <a href="/advertise/">Advertise</a>
             </div>
             <p class="footer-copyright">
-                &copy; 2024 NewsPortal. All rights reserved.
+                &copy; 2025 AI Analitica. All rights reserved.
             </p>
         </div>
     </div>

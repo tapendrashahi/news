@@ -1,0 +1,103 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Comments{% endblock %}
+{% block page_title %}Comments Moderation{% endblock %}
+
+{% block content %}
+<div class="table-card">
+    <div class="table-header">
+        <div>
+            <h3><i class="fas fa-comments"></i> Comments Moderation ({{ comments.count }})</h3>
+            <p style="color: #6c757d; font-size: 13px; margin-top: 4px;">Review and manage user comments</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="?filter=all" class="btn btn-sm {% if filter == 'all' %}btn-primary{% else %}" style="background: #6c757d; color: white;"{% endif %}>
+                <i class="fas fa-list"></i> All
+            </a>
+            <a href="?filter=pending" class="btn btn-sm {% if filter == 'pending' %}btn-primary{% else %}" style="background: #f39c12; color: white;"{% endif %}>
+                <i class="fas fa-clock"></i> Pending
+            </a>
+            <a href="?filter=approved" class="btn btn-sm {% if filter == 'approved' %}btn-primary{% else %}" style="background: #27ae60; color: white;"{% endif %}>
+                <i class="fas fa-check-circle"></i> Approved
+            </a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50px;">ID</th>
+                <th style="width: 140px;">User</th>
+                <th style="width: 180px;">Email</th>
+                <th style="width: 200px;">Article</th>
+                <th>Comment</th>
+                <th style="width: 130px;">Date</th>
+                <th style="width: 100px;">Status</th>
+                <th style="width: 140px; text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+                <td style="font-weight: 700; color: #667eea;">#{{ comment.id }}</td>
+                <td style="font-weight: 600;">
+                    <i class="fas fa-user-circle" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ comment.name }}
+                </td>
+                <td style="color: #6c757d; font-size: 13px;">
+                    <i class="fas fa-envelope" style="margin-right: 6px;"></i>
+                    {{ comment.email }}
+                </td>
+                <td>
+                    <a href="/news/{{ comment.news.id }}/" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-external-link-alt" style="margin-right: 6px; font-size: 11px;"></i>
+                        {{ comment.news.title|truncatewords:5 }}
+                    </a>
+                </td>
+                <td style="color: #495057;">{{ comment.text|truncatewords:12 }}</td>
+                <td style="color: #6c757d; font-size: 13px;">
+                    <i class="fas fa-calendar" style="margin-right: 6px;"></i>
+                    {{ comment.created_at|date:"M d, Y" }}
+                </td>
+                <td>
+                    {% if comment.is_approved %}
+                    <span class="badge badge-success">
+                        <i class="fas fa-check"></i> Approved
+                    </span>
+                    {% else %}
+                    <span class="badge badge-warning">
+                        <i class="fas fa-clock"></i> Pending
+                    </span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center;">
+                    <div style="display: flex; gap: 8px; justify-content: center;">
+                        {% if comment.is_approved %}
+                        <a href="{% url 'custom_admin:comment_unapprove' comment.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white;" title="Unapprove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'custom_admin:comment_approve' comment.id %}" class="btn btn-sm btn-success" title="Approve">
+                            <i class="fas fa-check"></i>
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'custom_admin:comment_delete' comment.id %}" class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Are you sure you want to delete this comment?')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 60px; color: #999;">
+                    <i class="fas fa-inbox" style="font-size: 60px; display: block; margin-bottom: 20px; opacity: 0.2;"></i>
+                    <h3 style="font-size: 18px; margin-bottom: 12px; color: #6c757d;">No comments found</h3>
+                    <p style="font-size: 14px;">Comments will appear here once users start engaging with your articles.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

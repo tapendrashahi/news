@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ news.title }} - NewsPortal</title>
+    <title>{{ news.title }} - AI Analitica</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
@@ -571,7 +571,7 @@
         }
 
         .share-btn.facebook { background: #1877f2; }
-        .share-btn.twitter { background: #1da1f2; }
+        .share-btn.twitter { background: #000000; }
         .share-btn.linkedin { background: #0077b5; }
         .share-btn.email { background: var(--primary-color); }
 
@@ -944,8 +944,8 @@
     <div class="container">
         <div class="nav-wrapper">
             <a href="/" class="logo">
-                <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
-                <span>NewsPortal</span>
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span>AI Analitica</span>
             </a>
 
             <ul class="nav-menu">
@@ -1088,75 +1088,71 @@
 
             <!-- Share Section -->
             <div class="share-section">
-                <h4>Share This Article</h4>
+                <h4>Share This Article <span style="color: var(--text-secondary); font-size: 14px; font-weight: 400;">({{ total_shares }} shares)</span></h4>
                 <div class="share-buttons">
-                    <a href="#" class="share-btn facebook">
+                    <a href="#" class="share-btn facebook" data-platform="facebook" onclick="shareOnPlatform(event, 'facebook')">
                         <i class="fab fa-facebook-f"></i>
-                        Facebook
+                        Facebook <span class="share-count" data-platform="facebook">({{ share_counts.facebook }})</span>
                     </a>
-                    <a href="#" class="share-btn twitter">
-                        <i class="fab fa-twitter"></i>
-                        Twitter
+                    <a href="#" class="share-btn twitter" data-platform="twitter" onclick="shareOnPlatform(event, 'twitter')">
+                        <i class="fab fa-x-twitter"></i>
+                        X <span class="share-count" data-platform="twitter">({{ share_counts.twitter }})</span>
                     </a>
-                    <a href="#" class="share-btn linkedin">
+                    <a href="#" class="share-btn linkedin" data-platform="linkedin" onclick="shareOnPlatform(event, 'linkedin')">
                         <i class="fab fa-linkedin-in"></i>
-                        LinkedIn
+                        LinkedIn <span class="share-count" data-platform="linkedin">({{ share_counts.linkedin }})</span>
                     </a>
-                    <a href="mailto:?subject={{ news.title }}" class="share-btn email">
+                    <a href="#" class="share-btn email" data-platform="email" onclick="shareOnPlatform(event, 'email')">
                         <i class="fas fa-envelope"></i>
-                        Email
+                        Email <span class="share-count" data-platform="email">({{ share_counts.email }})</span>
                     </a>
                 </div>
             </div>
 
             <!-- Comments Section -->
             <div class="comments-section">
-                <h3 class="comments-header">Comments (24)</h3>
+                <h3 class="comments-header">Comments ({{ comment_count }})</h3>
 
-                <form class="comment-form">
-                    <textarea placeholder="Join the discussion..."></textarea>
+                {% if messages %}
+                    {% for message in messages %}
+                    <div style="padding: 16px; margin-bottom: 20px; border-radius: 8px; background: {% if message.tags == 'success' %}#d4edda; color: #155724; border: 1px solid #c3e6cb{% else %}#f8d7da; color: #721c24; border: 1px solid #f5c6cb{% endif %};">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form class="comment-form" method="post">
+                    {% csrf_token %}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <input type="text" name="name" placeholder="Your Name" required style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; outline: none;">
+                        <input type="email" name="email" placeholder="Your Email" required style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; outline: none;">
+                    </div>
+                    <textarea name="text" placeholder="Join the discussion..." required></textarea>
                     <button type="submit" class="comment-submit">Post Comment</button>
                 </form>
 
                 <div class="comments-list">
-                    <div class="comment">
-                        <div class="comment-header">
-                            <div class="comment-avatar">SA</div>
-                            <div>
-                                <div class="comment-author">Sarah Anderson</div>
-                                <div class="comment-time">2 hours ago</div>
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="comment">
+                            <div class="comment-header">
+                                <div class="comment-avatar">{{ comment.name|slice:":2"|upper }}</div>
+                                <div>
+                                    <div class="comment-author">{{ comment.name }}</div>
+                                    <div class="comment-time">{{ comment.created_at|timesince }} ago</div>
+                                </div>
                             </div>
+                            <p class="comment-text">
+                                {{ comment.text }}
+                            </p>
                         </div>
-                        <p class="comment-text">
-                            Excellent analysis! This really puts things into perspective. Looking forward to seeing how this develops.
-                        </p>
-                    </div>
-
-                    <div class="comment">
-                        <div class="comment-header">
-                            <div class="comment-avatar">MJ</div>
-                            <div>
-                                <div class="comment-author">Michael Johnson</div>
-                                <div class="comment-time">5 hours ago</div>
-                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                            <i class="far fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                            <p style="font-size: 16px;">No comments yet. Be the first to share your thoughts!</p>
                         </div>
-                        <p class="comment-text">
-                            Great piece of journalism. The depth of research here is impressive.
-                        </p>
-                    </div>
-
-                    <div class="comment">
-                        <div class="comment-header">
-                            <div class="comment-avatar">EL</div>
-                            <div>
-                                <div class="comment-author">Emily Liu</div>
-                                <div class="comment-time">1 day ago</div>
-                            </div>
-                        </div>
-                        <p class="comment-text">
-                            This is exactly the kind of in-depth reporting we need more of. Thank you for this comprehensive coverage.
-                        </p>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </main>
@@ -1179,32 +1175,20 @@
             <div class="sidebar-widget">
                 <h3 class="widget-title">Related Articles</h3>
                 
-                <div class="related-article">
-                    <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=80&h=80&fit=crop" 
-                         alt="Related" class="related-thumbnail">
-                    <div class="related-info">
-                        <h4><a href="#">Technology Disruption: What's Coming Next</a></h4>
-                        <div class="related-date">Nov 20, 2024</div>
+                {% if related_articles %}
+                    {% for article in related_articles %}
+                    <div class="related-article">
+                        <img src="{% if article.image %}{{ article.image.url }}{% else %}https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=80&h=80&fit=crop{% endif %}" 
+                             alt="{{ article.title }}" class="related-thumbnail">
+                        <div class="related-info">
+                            <h4><a href="{% url 'news:news_detail' article.pk %}">{{ article.title|truncatewords:8 }}</a></h4>
+                            <div class="related-date">{{ article.created_at|date:"M d, Y" }}</div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="related-article">
-                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=80&h=80&fit=crop" 
-                         alt="Related" class="related-thumbnail">
-                    <div class="related-info">
-                        <h4><a href="#">Market Analysis: Key Trends to Watch</a></h4>
-                        <div class="related-date">Nov 19, 2024</div>
-                    </div>
-                </div>
-
-                <div class="related-article">
-                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=80&h=80&fit=crop" 
-                         alt="Related" class="related-thumbnail">
-                    <div class="related-info">
-                        <h4><a href="#">Policy Changes: What You Need to Know</a></h4>
-                        <div class="related-date">Nov 18, 2024</div>
-                    </div>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: var(--text-secondary); font-size: 14px;">No related articles found.</p>
+                {% endif %}
             </div>
 
             <!-- Newsletter -->
@@ -1243,7 +1227,7 @@
                 <a href="/advertise/">Advertise</a>
             </div>
             <p class="footer-copyright">
-                &copy; 2024 NewsPortal. All rights reserved.
+                &copy; 2025 AI Analitica. All rights reserved. AI-Powered Analysis.
             </p>
         </div>
     </div>
@@ -1257,25 +1241,26 @@
     document.getElementById('currentDate').textContent = 
         `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
-    // Share Function
+    // Share Function (for top share button)
     function shareArticle() {
-        if (navigator.share) {
+        // Show a modal/menu with share options
+        const shareSection = document.querySelector('.share-section');
+        if (shareSection) {
+            shareSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            shareSection.style.animation = 'pulse 0.5s';
+        } else if (navigator.share) {
+            // Fallback to native share API
             navigator.share({
                 title: document.title,
                 url: window.location.href
             }).catch(err => console.log('Error sharing:', err));
         } else {
-            alert('Share functionality will copy the URL to clipboard');
-            navigator.clipboard.writeText(window.location.href);
+            // Copy to clipboard
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copied to clipboard! Share it on your favorite platform.');
+            });
         }
     }
-
-    // Comment Form
-    document.querySelector('.comment-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Comment functionality will be implemented with backend integration');
-        e.target.reset();
-    });
 
     // Newsletter Form
     document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
@@ -1303,6 +1288,72 @@
         const scrolled = (winScroll / height) * 100;
         // You can add a progress bar element and update its width here
     });
+
+    // Share on Platform Function with Count Tracking
+    function shareOnPlatform(event, platform) {
+        event.preventDefault();
+        
+        const articleTitle = "{{ news.title|escapejs }}";
+        const articleUrl = window.location.href;
+        let shareUrl = '';
+        
+        // Build share URLs for each platform
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(articleTitle)}&url=${encodeURIComponent(articleUrl)}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`;
+                break;
+            case 'email':
+                shareUrl = `mailto:?subject=${encodeURIComponent(articleTitle)}&body=${encodeURIComponent('Check out this article: ' + articleUrl)}`;
+                break;
+        }
+        
+        // Track the share
+        fetch("{% url 'news:track_share' news.pk %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `platform=${platform}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the share count display
+                const countElement = document.querySelector(`.share-count[data-platform="${platform}"]`);
+                if (countElement) {
+                    countElement.textContent = `(${data.count})`;
+                }
+                
+                // Update total shares
+                const allCounts = document.querySelectorAll('.share-count');
+                let total = 0;
+                allCounts.forEach(el => {
+                    const count = parseInt(el.textContent.replace(/[()]/g, ''));
+                    total += count;
+                });
+                
+                const totalElement = document.querySelector('.share-section h4 span');
+                if (totalElement) {
+                    totalElement.textContent = `(${total} shares)`;
+                }
+            }
+        })
+        .catch(error => console.error('Error tracking share:', error));
+        
+        // Open share window (except for email)
+        if (platform !== 'email') {
+            window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes');
+        } else {
+            window.location.href = shareUrl;
+        }
+    }
 </script>
 
 </body>

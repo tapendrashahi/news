@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import News, TeamMember
+from .models import News, TeamMember, Comment, ShareCount
 from django.utils.html import format_html
 
 @admin.register(News)
@@ -77,4 +77,38 @@ class TeamMemberAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} team member(s) deactivated successfully.')
     deactivate_members.short_description = "Deactivate selected team members"
 
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'news', 'text_preview', 'created_at', 'is_approved')
+    list_filter = ('is_approved', 'created_at')
+    search_fields = ('name', 'email', 'text', 'news__title')
+    list_editable = ('is_approved',)
+    readonly_fields = ('created_at',)
+    fields = ('news', 'name', 'email', 'text', 'is_approved', 'created_at')
+    
+    def text_preview(self, obj):
+        return obj.text[:75] + '...' if len(obj.text) > 75 else obj.text
+    text_preview.short_description = 'Comment'
+    
+    actions = ['approve_comments', 'unapprove_comments']
+    
+    def approve_comments(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f'{updated} comment(s) approved successfully.')
+    approve_comments.short_description = "Approve selected comments"
+    
+    def unapprove_comments(self, request, queryset):
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f'{updated} comment(s) unapproved successfully.')
+    unapprove_comments.short_description = "Unapprove selected comments"
+
+
+@admin.register(ShareCount)
+class ShareCountAdmin(admin.ModelAdmin):
+    list_display = ('news', 'platform', 'count', 'last_shared')
+    list_filter = ('platform', 'last_shared')
+    search_fields = ('news__title',)
+    readonly_fields = ('last_shared',)
+    ordering = ('-count',)
 
