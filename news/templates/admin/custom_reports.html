@@ -1,0 +1,753 @@
+{% extends 'admin/base_custom.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="reports-wrapper">
+    <!-- Header -->
+    <div class="reports-header">
+        <div class="header-info">
+            <h1>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Reports & Analytics
+            </h1>
+            <p class="header-subtitle">Comprehensive insights and performance metrics</p>
+        </div>
+        
+        <!-- Time Range Selector -->
+        <form method="get" class="time-selector">
+            <select name="days" class="time-select" onchange="this.form.submit()">
+                <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="reports-container">
+        
+        <!-- Overview Stats -->
+        <div class="stats-grid">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Articles</div>
+                    <div class="stat-value">{{ total_news }}</div>
+                    <div class="stat-change">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"/>
+                        </svg>
+                        +{{ news_period }} in period
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Comments</div>
+                    <div class="stat-value">{{ total_comments }}</div>
+                    <div class="stat-change">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"/>
+                        </svg>
+                        +{{ comments_period }} in period
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-info">
+                <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Approved</div>
+                    <div class="stat-value">{{ approved_comments }}</div>
+                    <div class="stat-change">
+                        {% if total_comments > 0 %}
+                        {{ approval_rate }}% approval rate
+                        {% else %}
+                        No comments yet
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Pending Review</div>
+                    <div class="stat-value">{{ pending_comments }}</div>
+                    <div class="stat-change">
+                        {% if pending_comments > 0 %}
+                        <span style="color: #ed8936;">Needs attention</span>
+                        {% else %}
+                        <span style="color: #48bb78;">All clear!</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            
+            <!-- Left Column -->
+            <div class="left-column">
+                
+                <!-- Category Distribution -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                            Category Distribution
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="category-list">
+                            {% for cat in category_stats %}
+                            <div class="category-item">
+                                <div class="category-info">
+                                    <span class="category-name">{{ cat.name }}</span>
+                                    <span class="category-count">{{ cat.count }} article{{ cat.count|pluralize }}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ cat.percentage|floatformat:0 }}%"></div>
+                                </div>
+                                <span class="category-percent">{{ cat.percentage|floatformat:1 }}%</span>
+                            </div>
+                            {% empty %}
+                            <div class="empty-message">No categories available</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Shares -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            </svg>
+                            Social Media Shares
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="shares-grid">
+                            {% for share in share_stats %}
+                            <div class="share-item">
+                                <div class="share-icon share-{{ share.platform|lower }}">
+                                    {% if share.platform == 'Facebook' %}
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                    </svg>
+                                    {% elif share.platform == 'Twitter' %}
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                    </svg>
+                                    {% elif share.platform == 'Linkedin' %}
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                    </svg>
+                                    {% else %}
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                                <div class="share-details">
+                                    <span class="share-platform">{{ share.platform }}</span>
+                                    <span class="share-count">{{ share.count }}</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="empty-message" style="grid-column: 1/-1;">No share data available</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                
+                <!-- Top Authors -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                            Top Authors
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="authors-list">
+                            {% for author in top_authors %}
+                            <div class="author-item">
+                                <div class="author-rank">{{ forloop.counter }}</div>
+                                <div class="author-avatar">{{ author.name|slice:":1"|upper }}</div>
+                                <div class="author-info">
+                                    <span class="author-name">{{ author.name }}</span>
+                                    <span class="author-count">{{ author.count }} article{{ author.count|pluralize }}</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="empty-message">No author data available</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Most Commented -->
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                            Most Commented Articles
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="articles-list">
+                            {% for item in most_commented %}
+                            <div class="article-item">
+                                <div class="article-details">
+                                    <a href="/news/{{ item.news.id }}/" target="_blank" class="article-title">
+                                        {{ item.news.title|truncatewords:8 }}
+                                    </a>
+                                    <span class="article-meta">
+                                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"/>
+                                        </svg>
+                                        {{ item.count }} comment{{ item.count|pluralize }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="empty-message">No comment data available</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.reports-wrapper {
+    background: #f8f9fa;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+}
+
+/* Header */
+.reports-header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.header-info h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.header-info h1 svg {
+    color: #4299e1;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: #718096;
+}
+
+.time-selector {
+    display: flex;
+    align-items: center;
+}
+
+.time-select {
+    padding: 8px 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    background: #fff;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-select:hover {
+    border-color: #4299e1;
+}
+
+.time-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+/* Container */
+.reports-container {
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid;
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stat-primary { border-left-color: #4299e1; }
+.stat-success { border-left-color: #48bb78; }
+.stat-info { border-left-color: #9f7aea; }
+.stat-warning { border-left-color: #ed8936; }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-primary .stat-icon {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    color: #4299e1;
+}
+
+.stat-success .stat-icon {
+    background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    color: #48bb78;
+}
+
+.stat-info .stat-icon {
+    background: linear-gradient(135deg, #faf5ff 0%, #e9d8fd 100%);
+    color: #9f7aea;
+}
+
+.stat-warning .stat-icon {
+    background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
+    color: #ed8936;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 6px;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #48bb78;
+    font-weight: 500;
+}
+
+.stat-change svg {
+    flex-shrink: 0;
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.left-column,
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Report Card */
+.report-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(to bottom, #fff, #f7fafc);
+}
+
+.card-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.card-header h3 svg {
+    color: #4299e1;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Category List */
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.category-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.category-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.category-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.category-count {
+    font-size: 11px;
+    color: #718096;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    grid-column: 1 / 2;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4299e1 0%, #667eea 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.category-percent {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4299e1;
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+/* Shares Grid */
+.shares-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.share-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: #f7fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.share-item:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.share-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.share-facebook { background: #1877f2; }
+.share-twitter { background: #1da1f2; }
+.share-linkedin { background: #0a66c2; }
+.share-email { background: #718096; }
+
+.share-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.share-platform {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.share-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+/* Authors List */
+.authors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.author-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f7fafc;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.author-item:hover {
+    background: #edf2f7;
+}
+
+.author-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.author-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.author-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.author-count {
+    font-size: 11px;
+    color: #718096;
+}
+
+/* Articles List */
+.articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.article-item {
+    padding: 14px;
+    background: #f7fafc;
+    border-radius: 6px;
+    border-left: 3px solid #4299e1;
+    transition: all 0.2s;
+}
+
+.article-item:hover {
+    background: #edf2f7;
+    transform: translateX(4px);
+}
+
+.article-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.article-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.article-title:hover {
+    color: #4299e1;
+}
+
+.article-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #718096;
+}
+
+.article-meta svg {
+    color: #a0aec0;
+}
+
+/* Empty Message */
+.empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a0aec0;
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .reports-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .time-selector {
+        width: 100%;
+    }
+    
+    .time-select {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .shares-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .reports-container {
+        padding: 12px;
+    }
+}
+</style>
+{% endblock %}

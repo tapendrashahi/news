@@ -1,0 +1,509 @@
+{% extends 'admin/base_custom.html' %}
+
+{% block title %}Team Members{% endblock %}
+
+{% block content %}
+<div class="team-list-wrapper">
+    <!-- Header -->
+    <div class="list-header">
+        <div class="header-info">
+            <h1>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Team Members
+            </h1>
+            <p class="header-count">{{ team_members.count }} member{{ team_members.count|pluralize }}</p>
+        </div>
+        <a href="{% url 'custom_admin:team_create' %}" class="btn-primary">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Add Member
+        </a>
+    </div>
+
+    <!-- Team Table -->
+    <div class="table-container">
+        <table class="team-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th style="width: 280px;">Member</th>
+                    <th style="width: 160px;">Role</th>
+                    <th>Email</th>
+                    <th style="width: 80px;">Order</th>
+                    <th style="width: 100px;">Status</th>
+                    <th style="width: 120px; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in team_members %}
+                <tr>
+                    <td>
+                        <span class="id-badge">#{{ member.id }}</span>
+                    </td>
+                    <td>
+                        <div class="member-info">
+                            {% if member.photo %}
+                            <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="member-photo">
+                            {% else %}
+                            <div class="member-avatar">{{ member.name|slice:":1"|upper }}</div>
+                            {% endif %}
+                            <div class="member-details">
+                                <span class="member-name">{{ member.name }}</span>
+                                {% if member.bio %}
+                                <span class="member-bio">{{ member.bio|truncatewords:8 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="role-badge">
+                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"/>
+                                <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                            </svg>
+                            {{ member.get_role_display }}
+                        </span>
+                    </td>
+                    <td class="email-cell">
+                        {% if member.email %}
+                        <a href="mailto:{{ member.email }}" class="email-link">
+                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                            </svg>
+                            {{ member.email }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="order-badge">{{ member.order }}</span>
+                    </td>
+                    <td>
+                        {% if member.is_active %}
+                        <span class="status-badge status-active">
+                            <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                            </svg>
+                            Active
+                        </span>
+                        {% else %}
+                        <span class="status-badge status-inactive">
+                            <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                            </svg>
+                            Inactive
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'custom_admin:team_edit' member.id %}" class="btn-action btn-edit" title="Edit">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'custom_admin:team_delete' member.id %}" class="btn-action btn-delete" 
+                               onclick="return confirm('Delete {{ member.name }}?')" title="Delete">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <h3>No team members yet</h3>
+                        <p>Start building your team by adding your first member</p>
+                        <a href="{% url 'custom_admin:team_create' %}" class="btn-primary" style="margin-top: 16px;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            Add First Member
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.team-list-wrapper {
+    background: #f8f9fa;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+}
+
+/* Header */
+.list-header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.header-info h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.header-info h1 svg {
+    color: #48bb78;
+}
+
+.header-count {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #48bb78;
+    border: 1px solid #48bb78;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #38a169;
+    border-color: #38a169;
+}
+
+/* Table Container */
+.table-container {
+    background: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.team-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.team-table thead {
+    background: linear-gradient(to bottom, #fff, #f7fafc);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.team-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.team-table tbody tr {
+    border-bottom: 1px solid #f7fafc;
+    transition: all 0.2s;
+}
+
+.team-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.team-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #2d3748;
+    vertical-align: middle;
+}
+
+/* ID Badge */
+.id-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+/* Member Info */
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.member-photo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.member-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.member-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #1a202c;
+    font-size: 13px;
+}
+
+.member-bio {
+    font-size: 11px;
+    color: #718096;
+    line-height: 1.4;
+}
+
+/* Role Badge */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #ebf8ff;
+    color: #2c5282;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+.role-badge svg {
+    color: #4299e1;
+}
+
+/* Email Cell */
+.email-cell {
+    color: #718096;
+    font-size: 12px;
+}
+
+.email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #4299e1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.email-link:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+.text-muted {
+    color: #cbd5e0;
+}
+
+/* Order Badge */
+.order-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f7fafc;
+    color: #4a5568;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-active {
+    background: #f0fff4;
+    color: #22543d;
+}
+
+.status-active svg {
+    color: #38a169;
+}
+
+.status-inactive {
+    background: #fffaf0;
+    color: #744210;
+}
+
+.status-inactive svg {
+    color: #dd6b20;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: #fff;
+    border-color: #48bb78;
+    color: #48bb78;
+}
+
+.btn-edit:hover {
+    background: #48bb78;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #fff;
+    border-color: #f56565;
+    color: #f56565;
+}
+
+.btn-delete:hover {
+    background: #f56565;
+    color: #fff;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-state svg {
+    color: #cbd5e0;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #718096;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .team-table th:nth-child(4),
+    .team-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .list-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .table-container {
+        margin: 12px;
+        overflow-x: auto;
+    }
+    
+    .team-table {
+        min-width: 700px;
+    }
+    
+    .team-table th:nth-child(5),
+    .team-table td:nth-child(5) {
+        display: none;
+    }
+    
+    .member-bio {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-table th:nth-child(3),
+    .team-table td:nth-child(3) {
+        display: none;
+    }
+}
+</style>
+{% endblock %}

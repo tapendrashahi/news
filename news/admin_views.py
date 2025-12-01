@@ -1,12 +1,54 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
 from .models import News, TeamMember, Comment, ShareCount
 from django.contrib.auth.models import User
+
+
+def admin_login(request):
+    """Custom admin login view"""
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('custom_admin:dashboard')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        remember = request.POST.get('remember')
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            if user.is_staff:
+                login(request, user)
+                
+                # Set session expiry based on 'remember me'
+                if not remember:
+                    request.session.set_expiry(0)  # Session expires when browser closes
+                
+                messages.success(request, f'Welcome back, {user.username}!')
+                
+                # Redirect to 'next' parameter or dashboard
+                next_url = request.GET.get('next', 'custom_admin:dashboard')
+                return redirect(next_url)
+            else:
+                messages.error(request, 'You do not have permission to access the admin area.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    
+    return render(request, 'admin/custom_login.html')
+
+
+def admin_logout(request):
+    """Custom admin logout view"""
+    logout(request)
+    messages.success(request, 'You have been successfully logged out.')
+    return redirect('custom_admin:login')
+
 
 @staff_member_required
 def admin_dashboard(request):
@@ -79,7 +121,7 @@ def admin_news_list(request):
         'categories': News.CATEGORY_CHOICES,
     }
     
-    return render(request, 'admin/news_list.html', context)
+    return render(request, 'admin/custom_news_list.html', context)
 
 @staff_member_required
 def admin_news_create(request):
@@ -124,7 +166,7 @@ def admin_news_create(request):
         'categories': News.CATEGORY_CHOICES,
     }
     
-    return render(request, 'admin/news_form.html', context)
+    return render(request, 'admin/add_news.html', context)
 
 @staff_member_required
 def admin_news_edit(request, pk):
@@ -162,7 +204,7 @@ def admin_news_edit(request, pk):
         'is_edit': True,
     }
     
-    return render(request, 'admin/news_form.html', context)
+    return render(request, 'admin/add_news.html', context)
 
 @staff_member_required
 def admin_news_delete(request, pk):
@@ -171,7 +213,7 @@ def admin_news_delete(request, pk):
     title = news.title
     news.delete()
     messages.success(request, f'News article "{title}" deleted successfully!')
-    return redirect('admin_news_list')
+    return redirect('custom_admin:news_list')
 
 @staff_member_required
 def admin_team_list(request):
@@ -182,7 +224,7 @@ def admin_team_list(request):
         'team_members': team_members,
     }
     
-    return render(request, 'admin/team_list.html', context)
+    return render(request, 'admin/custom_team_list.html', context)
 
 @staff_member_required
 def admin_team_create(request):
@@ -209,15 +251,16 @@ def admin_team_create(request):
                 photo=photo if photo else None
             )
             messages.success(request, f'Team member "{name}" added successfully!')
-            return redirect('admin_team_list')
+            return redirect('custom_admin:team_list')
         else:
             messages.error(request, 'Please fill in all required fields.')
     
     context = {
+        'team_member': TeamMember(),
         'roles': TeamMember.ROLE_CHOICES,
     }
     
-    return render(request, 'admin/team_form.html', context)
+    return render(request, 'admin/custom_team_form.html', context)
 
 @staff_member_required
 def admin_team_edit(request, pk):
@@ -239,7 +282,7 @@ def admin_team_edit(request, pk):
         
         team_member.save()
         messages.success(request, f'Team member "{team_member.name}" updated successfully!')
-        return redirect('admin_team_list')
+        return redirect('custom_admin:team_list')
     
     context = {
         'team_member': team_member,
@@ -247,7 +290,7 @@ def admin_team_edit(request, pk):
         'is_edit': True,
     }
     
-    return render(request, 'admin/team_form.html', context)
+    return render(request, 'admin/custom_team_form.html', context)
 
 @staff_member_required
 def admin_team_delete(request, pk):
@@ -256,7 +299,7 @@ def admin_team_delete(request, pk):
     name = team_member.name
     team_member.delete()
     messages.success(request, f'Team member "{name}" deleted successfully!')
-    return redirect('admin_team_list')
+    return redirect('custom_admin:team_list')
 
 @staff_member_required
 def admin_comments_list(request):
@@ -277,7 +320,7 @@ def admin_comments_list(request):
         'filter': filter_type,
     }
     
-    return render(request, 'admin/comments_list.html', context)
+    return render(request, 'admin/custom_comments.html', context)
 
 @staff_member_required
 def admin_comment_approve(request, pk):
@@ -286,7 +329,7 @@ def admin_comment_approve(request, pk):
     comment.is_approved = True
     comment.save()
     messages.success(request, 'Comment approved successfully!')
-    return redirect('admin_comments_list')
+    return redirect('custom_admin:comments_list')
 
 @staff_member_required
 def admin_comment_unapprove(request, pk):
@@ -295,7 +338,7 @@ def admin_comment_unapprove(request, pk):
     comment.is_approved = False
     comment.save()
     messages.success(request, 'Comment unapproved successfully!')
-    return redirect('admin_comments_list')
+    return redirect('custom_admin:comments_list')
 
 @staff_member_required
 def admin_comment_delete(request, pk):
@@ -303,7 +346,7 @@ def admin_comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     comment.delete()
     messages.success(request, 'Comment deleted successfully!')
-    return redirect('admin_comments_list')
+    return redirect('custom_admin:comments_list')
 
 @staff_member_required
 def admin_reports(request):
@@ -332,6 +375,7 @@ def admin_reports(request):
     approved_comments = Comment.objects.filter(is_approved=True).count()
     pending_comments = Comment.objects.filter(is_approved=False).count()
     comments_period = Comment.objects.filter(created_at__gte=start_date).count()
+    approval_rate = int((approved_comments / total_comments * 100)) if total_comments > 0 else 0
     
     # Share statistics
     share_stats = []
@@ -375,9 +419,10 @@ def admin_reports(request):
         'approved_comments': approved_comments,
         'pending_comments': pending_comments,
         'comments_period': comments_period,
+        'approval_rate': approval_rate,
         'share_stats': share_stats,
         'top_authors': top_authors,
         'most_commented': most_commented,
     }
     
-    return render(request, 'admin/reports.html', context)
+    return render(request, 'admin/custom_reports.html', context)

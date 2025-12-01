@@ -1,0 +1,559 @@
+{% extends 'admin/base_custom.html' %}
+
+{% block title %}News Articles{% endblock %}
+
+{% block content %}
+<div class="news-list-wrapper">
+    <!-- Header -->
+    <div class="list-header">
+        <div class="header-info">
+            <h1>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                All Articles
+            </h1>
+            <p class="header-count">{{ news_list.count }} article{{ news_list.count|pluralize }}</p>
+        </div>
+        <a href="{% url 'custom_admin:news_create' %}" class="btn-primary">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Article
+        </a>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+        <form method="get" class="filters-form">
+            <div class="filter-group">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" class="filter-input" placeholder="Search articles..." value="{{ search }}">
+            </div>
+            
+            <div class="filter-group">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                <select name="category" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for cat_code, cat_name in categories %}
+                    <option value="{{ cat_code }}" {% if category == cat_code %}selected{% endif %}>{{ cat_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-filter">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Search
+            </button>
+            
+            {% if search or category %}
+            <a href="{% url 'custom_admin:news_list' %}" class="btn-clear">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Articles Table -->
+    <div class="table-container">
+        <table class="articles-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ID</th>
+                    <th>Title</th>
+                    <th style="width: 140px;">Category</th>
+                    <th style="width: 150px;">Author</th>
+                    <th style="width: 120px;">Date</th>
+                    <th style="width: 150px; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for news in news_list %}
+                <tr>
+                    <td>
+                        <span class="id-badge">#{{ news.id }}</span>
+                    </td>
+                    <td class="title-cell">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/>
+                        </svg>
+                        <span class="title-text">{{ news.title|truncatewords:12 }}</span>
+                    </td>
+                    <td>
+                        <span class="category-badge">{{ news.get_category_display }}</span>
+                    </td>
+                    <td class="author-cell">
+                        <div class="author-avatar">{{ news.author.name|slice:":1"|upper|default:"?" }}</div>
+                        <span>{{ news.author.name|default:"No Author" }}</span>
+                    </td>
+                    <td class="date-cell">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                        </svg>
+                        <span>{{ news.created_at|date:"M d, Y" }}</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/news/{{ news.id }}/" target="_blank" class="btn-action btn-view" title="View">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'custom_admin:news_edit' news.id %}" class="btn-action btn-edit" title="Edit">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'custom_admin:news_delete' news.id %}" class="btn-action btn-delete" 
+                               onclick="return confirm('Delete this article?')" title="Delete">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h3>No articles found</h3>
+                        <p>{% if search or category %}Try different search filters{% else %}Start by creating your first article{% endif %}</p>
+                        {% if not search and not category %}
+                        <a href="{% url 'custom_admin:news_create' %}" class="btn-primary" style="margin-top: 16px;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Create First Article
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.news-list-wrapper {
+    background: #f8f9fa;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+}
+
+/* Header */
+.list-header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.header-info h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.header-info h1 svg {
+    color: #4299e1;
+}
+
+.header-count {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4299e1;
+    border: 1px solid #4299e1;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #3182ce;
+    border-color: #3182ce;
+}
+
+/* Filters Bar */
+.filters-bar {
+    background: #fff;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 220px;
+}
+
+.filter-group svg {
+    position: absolute;
+    left: 12px;
+    color: #718096;
+    pointer-events: none;
+}
+
+.filter-input,
+.filter-select {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.filter-input::placeholder {
+    color: #a0aec0;
+}
+
+.btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #4299e1;
+    border: 1px solid #4299e1;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-filter:hover {
+    background: #3182ce;
+    border-color: #3182ce;
+}
+
+.btn-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    color: #4a5568;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: #f7fafc;
+    border-color: #a0aec0;
+}
+
+/* Table Container */
+.table-container {
+    background: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.articles-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.articles-table thead {
+    background: linear-gradient(to bottom, #fff, #f7fafc);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.articles-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.articles-table tbody tr {
+    border-bottom: 1px solid #f7fafc;
+    transition: all 0.2s;
+}
+
+.articles-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.articles-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #2d3748;
+}
+
+/* ID Badge */
+.id-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+/* Title Cell */
+.title-cell {
+    font-weight: 600;
+}
+
+.title-cell svg {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    color: #4299e1;
+}
+
+.title-text {
+    vertical-align: middle;
+}
+
+/* Category Badge */
+.category-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #e6fffa;
+    color: #047857;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Author Cell */
+.author-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Date Cell */
+.date-cell {
+    color: #718096;
+    font-size: 12px;
+}
+
+.date-cell svg {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    color: #a0aec0;
+}
+
+.date-cell span {
+    vertical-align: middle;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-view {
+    background: #fff;
+    border-color: #4299e1;
+    color: #4299e1;
+}
+
+.btn-view:hover {
+    background: #4299e1;
+    color: #fff;
+}
+
+.btn-edit {
+    background: #fff;
+    border-color: #48bb78;
+    color: #48bb78;
+}
+
+.btn-edit:hover {
+    background: #48bb78;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #fff;
+    border-color: #f56565;
+    color: #f56565;
+}
+
+.btn-delete:hover {
+    background: #f56565;
+    color: #fff;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-state svg {
+    color: #cbd5e0;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #718096;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .articles-table th:nth-child(4),
+    .articles-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .list-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters-form {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .btn-filter,
+    .btn-clear {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .table-container {
+        margin: 12px;
+        overflow-x: auto;
+    }
+    
+    .articles-table {
+        min-width: 600px;
+    }
+    
+    .articles-table th:nth-child(3),
+    .articles-table td:nth-child(3),
+    .articles-table th:nth-child(5),
+    .articles-table td:nth-child(5) {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
