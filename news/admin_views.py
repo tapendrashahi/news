@@ -54,7 +54,7 @@ def admin_dashboard(request):
         'top_shared': top_shared,
     }
     
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'admin/custom_admin.html', context)
 
 @staff_member_required
 def admin_news_list(request):
