@@ -274,3 +274,35 @@ def cookie_policy(request):
     }
     
     return render(request, 'news/cookee.html', context)
+
+def editorial_guidelines(request):
+    """Editorial Guidelines page with JSON data"""
+    # Load editorial guidelines data from JSON file
+    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'administration', 'guidemines.json')
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            guidelines_data = json.load(f)
+    except FileNotFoundError:
+        # Fallback data if JSON file is not found
+        guidelines_data = {
+            'metadata': {
+                'title': 'Editorial Guidelines',
+                'lastUpdated': '2024-12-01',
+                'companyName': 'News Portal'
+            },
+            'introduction': {
+                'title': 'Introduction',
+                'content': ['Welcome to our editorial guidelines.']
+            },
+            'sections': []
+        }
+    
+    # Convert to JSON string for JavaScript
+    guidelines_data_json = json.dumps(guidelines_data)
+    
+    context = {
+        'guidelines_data': guidelines_data_json
+    }
+    
+    return render(request, 'news/editorial_guideline.html', context)
