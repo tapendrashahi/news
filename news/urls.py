@@ -15,4 +15,5 @@ urlpatterns = [
     path('cookies/', views.cookie_policy, name='cookie_policy'),
     path('guidelines/', views.editorial_guidelines, name='editorial_guidelines'),
     path('ethics/', views.ethics_policy, name='ethics_policy'),
+    path('subscribe/', views.subscribe_newsletter, name='subscribe_newsletter'),
 ]

@@ -343,3 +343,53 @@ def ethics_policy(request):
     }
     
     return render(request, 'news/ethics_policy.html', context)
+
+@require_POST
+def subscribe_newsletter(request):
+    """Handle newsletter subscription"""
+    from .models import Subscriber
+    
+    email = request.POST.get('email', '').strip()
+    name = request.POST.get('name', '').strip()
+    
+    if not email:
+        return JsonResponse({'success': False, 'message': 'Email is required.'}, status=400)
+    
+    # Validate email format (basic check)
+    import re
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email):
+        return JsonResponse({'success': False, 'message': 'Please enter a valid email address.'}, status=400)
+    
+    try:
+        # Check if subscriber already exists
+        subscriber, created = Subscriber.objects.get_or_create(
+            email=email,
+            defaults={'name': name, 'is_active': True}
+        )
+        
+        if created:
+            return JsonResponse({
+                'success': True, 
+                'message': 'Thank you for subscribing! We\'ll send our newsletter to your inbox.'
+            })
+        else:
+            if subscriber.is_active:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'You are already subscribed to our newsletter.'
+                })
+            else:
+                # Reactivate inactive subscriber
+                subscriber.is_active = True
+                subscriber.unsubscribed_at = None
+                subscriber.save()
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Welcome back! Your subscription has been reactivated.'
+                })
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': 'An error occurred. Please try again later.'
+        }, status=500)
