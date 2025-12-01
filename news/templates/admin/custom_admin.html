@@ -116,11 +116,25 @@
             color: #1a202c;
         }
 
+        .user-menu-container {
+            position: relative;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
             font-size: 12px;
+            padding: 8px 14px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-info:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         .user-avatar {
@@ -134,6 +148,86 @@
             color: white;
             font-weight: 600;
             font-size: 12px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-header {
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .user-dropdown-header .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-dropdown-header .user-email {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .user-dropdown-menu {
+            padding: 8px 0;
+        }
+
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .user-dropdown-item:hover {
+            background: #f7fafc;
+            color: #667eea;
+        }
+
+        .user-dropdown-item svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .user-dropdown-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
+        }
+
+        .user-dropdown-item.logout {
+            color: #e53e3e;
+        }
+
+        .user-dropdown-item.logout:hover {
+            background: #fff5f5;
+            color: #c53030;
         }
 
         /* Stats Cards */
@@ -428,6 +522,12 @@
                         </svg>
                         <span>Comments</span>
                     </a>
+                    <a href="{% url 'custom_admin:subscribers' %}" class="menu-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Subscribers</span>
+                    </a>
                 </div>
 
                 <div class="menu-section">
@@ -463,9 +563,41 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <h1>Dashboard</h1>
-                <div class="user-info">
-                    <span>{{ request.user.username }}</span>
-                    <div class="user-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+                <div class="user-menu-container">
+                    <div class="user-info" onclick="toggleUserDropdown()">
+                        <span>{{ request.user.username }}</span>
+                        <div class="user-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                            <div class="user-email">{{ request.user.email|default:"Admin User" }}</div>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <a href="{% url 'custom_admin:profile' %}" class="user-dropdown-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                View Profile
+                            </a>
+                            <a href="{% url 'custom_admin:dashboard' %}" class="user-dropdown-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                            <div class="user-dropdown-divider"></div>
+                            <a href="{% url 'custom_admin:logout' %}" class="user-dropdown-item logout">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -584,5 +716,22 @@
             </div>
         </main>
     </div>
+
+    <script>
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            var dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            var container = document.querySelector('.user-menu-container');
+            var dropdown = document.getElementById('userDropdown');
+            if (container && dropdown && !container.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
 </body>
 </html>

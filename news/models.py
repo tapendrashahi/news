@@ -127,3 +127,20 @@ class ShareCount(models.Model):
     def __str__(self):
         return f"{self.news.title} - {self.platform}: {self.count}"
 
+
+class Subscriber(models.Model):
+    """Newsletter subscriber model"""
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True, help_text="Whether subscriber is active")
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    unsubscribed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = 'Subscriber'
+        verbose_name_plural = 'Subscribers'
+    
+    def __str__(self):
+        return self.email
+

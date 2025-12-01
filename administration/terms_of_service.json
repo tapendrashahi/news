@@ -1,0 +1,389 @@
+{
+  "metadata": {
+    "title": "Terms of Service",
+    "lastUpdated": "2024-12-01",
+    "effectiveDate": "2024-01-01",
+    "companyName": "News Portal",
+    "companyEmail": "legal@newsportal.com",
+    "companyAddress": "123 Main Street, City, State 12345",
+    "websiteUrl": "https://newsportal.com"
+  },
+  "introduction": {
+    "title": "Introduction & Agreement",
+    "content": [
+      "Welcome to News Portal. These Terms of Service ('Terms', 'Terms of Service') govern your use of our website located at newsportal.com (together or individually 'Service') operated by News Portal.",
+      "By accessing or using our Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.",
+      "We reserve the right to update, change, or replace any part of these Terms of Service at any time. It is your responsibility to check this page periodically for changes."
+    ]
+  },
+  "sections": [
+    {
+      "id": "definitions",
+      "title": "Definitions & Interpretation",
+      "icon": "book",
+      "content": [
+        "For the purposes of these Terms of Service, the following definitions apply:"
+      ],
+      "items": [
+        "'Service' refers to the News Portal website, mobile applications, and all related services",
+        "'User', 'You', and 'Your' refers to the individual accessing or using the Service",
+        "'We', 'Us', and 'Our' refers to News Portal and its affiliates",
+        "'Content' means text, images, videos, audio, or other materials available on the Service",
+        "'User Content' means content that users post, upload, or submit to the Service",
+        "'Account' means a unique account created for you to access our Service"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "title": "Eligibility & Account Registration",
+      "icon": "user",
+      "content": [
+        "By using this Service, you represent and warrant that:"
+      ],
+      "items": [
+        "You are at least 13 years of age",
+        "You have the legal capacity to enter into these Terms",
+        "You will provide accurate, current, and complete information during registration",
+        "You will maintain the security of your account credentials",
+        "You are responsible for all activities that occur under your account",
+        "You will notify us immediately of any unauthorized use of your account"
+      ],
+      "subsections": [
+        {
+          "title": "Account Responsibilities",
+          "content": "You are solely responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities or actions that occur under your account."
+        },
+        {
+          "title": "Account Termination",
+          "content": "We reserve the right to refuse service, terminate accounts, or remove or edit content at our sole discretion."
+        }
+      ]
+    },
+    {
+      "id": "acceptable-use",
+      "title": "Acceptable Use Policy",
+      "icon": "shield",
+      "content": [
+        "You agree not to use the Service for any unlawful purpose or in any way that could damage, disable, overburden, or impair the Service. Specifically, you agree NOT to:"
+      ],
+      "items": [
+        "Violate any applicable local, state, national, or international law",
+        "Infringe upon or violate intellectual property rights of others",
+        "Harass, abuse, threaten, or intimidate other users",
+        "Post or transmit spam, unauthorized advertising, or promotional materials",
+        "Distribute viruses, malware, or any other harmful computer code",
+        "Attempt to gain unauthorized access to the Service or other users' accounts",
+        "Impersonate any person or entity or falsely represent your affiliation",
+        "Collect or harvest personal information of other users",
+        "Interfere with or disrupt the Service or servers",
+        "Use automated systems (bots, scrapers) without permission",
+        "Post false, misleading, or fraudulent content",
+        "Engage in any activity that could damage our reputation"
+      ]
+    },
+    {
+      "id": "user-content",
+      "title": "User-Generated Content",
+      "icon": "edit",
+      "content": [
+        "Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, or other material ('User Content')."
+      ],
+      "subsections": [
+        {
+          "title": "Content Ownership",
+          "content": "You retain all rights to your User Content. However, by posting content on our Service, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, publish, and distribute your content in connection with the Service."
+        },
+        {
+          "title": "Content Standards",
+          "content": "All User Content must comply with our content standards. Content must not be illegal, offensive, defamatory, obscene, threatening, or violate any third-party rights."
+        },
+        {
+          "title": "Content Monitoring",
+          "content": "We reserve the right (but have no obligation) to monitor, review, and remove User Content that violates these Terms or is otherwise objectionable."
+        },
+        {
+          "title": "Content Responsibility",
+          "content": "You are solely responsible for your User Content and the consequences of posting or publishing it. We do not endorse any User Content or opinion expressed by any user."
+        }
+      ]
+    },
+    {
+      "id": "intellectual-property",
+      "title": "Intellectual Property Rights",
+      "icon": "copyright",
+      "content": [
+        "The Service and its original content (excluding User Content), features, and functionality are and will remain the exclusive property of News Portal and its licensors."
+      ],
+      "items": [
+        "All trademarks, logos, and service marks displayed on the Service are our property or the property of third parties",
+        "You may not use our trademarks without our prior written permission",
+        "The Service is protected by copyright, trademark, and other intellectual property laws",
+        "You may not copy, modify, distribute, sell, or lease any part of our Service",
+        "You may not reverse engineer or attempt to extract source code from our Service"
+      ],
+      "subsections": [
+        {
+          "title": "Limited License",
+          "content": "We grant you a limited, non-exclusive, non-transferable license to access and use the Service for personal, non-commercial purposes, subject to these Terms."
+        },
+        {
+          "title": "Copyright Infringement",
+          "content": "We respect intellectual property rights. If you believe any content on our Service infringes your copyright, please contact us with details of the alleged infringement."
+        }
+      ]
+    },
+    {
+      "id": "comments-feedback",
+      "title": "Comments, Reviews & Feedback",
+      "icon": "comment",
+      "content": [
+        "When you post comments, reviews, or provide feedback on our Service:"
+      ],
+      "items": [
+        "You grant us the right to use, reproduce, and publish your comments",
+        "Your comments must not be unlawful, threatening, defamatory, or obscene",
+        "You are responsible for ensuring your comments do not violate any third-party rights",
+        "We reserve the right to remove any comments that violate these Terms",
+        "Comments do not reflect our views or opinions",
+        "We are not liable for any comments posted by users or third parties"
+      ]
+    },
+    {
+      "id": "subscriptions",
+      "title": "Subscriptions & Payments",
+      "icon": "credit-card",
+      "content": [
+        "Some parts of the Service may be billed on a subscription basis ('Subscription(s)')."
+      ],
+      "subsections": [
+        {
+          "title": "Billing & Renewal",
+          "content": "You will be billed in advance on a recurring basis (monthly, annually, etc.). Your subscription will automatically renew at the end of each period unless you cancel it."
+        },
+        {
+          "title": "Payment Methods",
+          "content": "You agree to provide current, complete, and accurate payment information. You authorize us to charge your payment method for all fees incurred."
+        },
+        {
+          "title": "Fee Changes",
+          "content": "We reserve the right to modify subscription fees upon reasonable notice. Continued use after fee changes constitutes acceptance of the new fees."
+        },
+        {
+          "title": "Refunds",
+          "content": "Except when required by law, paid subscription fees are non-refundable. We do not provide refunds for partial subscription periods."
+        },
+        {
+          "title": "Cancellation",
+          "content": "You may cancel your subscription at any time through your account settings. Cancellation will be effective at the end of the current billing period."
+        }
+      ]
+    },
+    {
+      "id": "third-party",
+      "title": "Third-Party Links & Services",
+      "icon": "link",
+      "content": [
+        "Our Service may contain links to third-party websites or services that are not owned or controlled by News Portal."
+      ],
+      "items": [
+        "We have no control over and assume no responsibility for third-party content or services",
+        "We do not endorse or warrant the offerings of any third parties",
+        "Third-party websites are governed by their own terms and privacy policies",
+        "You access third-party websites at your own risk",
+        "We are not liable for any damages arising from your use of third-party websites",
+        "We recommend reviewing the terms and privacy policies of any third-party website"
+      ]
+    },
+    {
+      "id": "disclaimer",
+      "title": "Disclaimer of Warranties",
+      "icon": "alert",
+      "content": [
+        "THE SERVICE IS PROVIDED ON AN 'AS IS' AND 'AS AVAILABLE' BASIS. WE MAKE NO WARRANTIES, EXPRESSED OR IMPLIED, REGARDING:"
+      ],
+      "items": [
+        "The operation or availability of the Service",
+        "The accuracy, completeness, or reliability of any content",
+        "That the Service will be uninterrupted, secure, or error-free",
+        "That defects will be corrected or that the Service is free of viruses",
+        "The fitness of the Service for any particular purpose",
+        "Any information or advice obtained through the Service"
+      ],
+      "subsections": [
+        {
+          "title": "No Medical/Legal/Financial Advice",
+          "content": "Content on our Service is for informational purposes only and does not constitute professional medical, legal, or financial advice. Always seek advice from qualified professionals."
+        },
+        {
+          "title": "News Accuracy",
+          "content": "While we strive for accuracy, we cannot guarantee that all content is complete, accurate, or current. News content may be subject to correction or update."
+        }
+      ]
+    },
+    {
+      "id": "limitation-liability",
+      "title": "Limitation of Liability",
+      "icon": "warning",
+      "content": [
+        "TO THE MAXIMUM EXTENT PERMITTED BY LAW, NEWS PORTAL SHALL NOT BE LIABLE FOR:"
+      ],
+      "items": [
+        "Any indirect, incidental, special, consequential, or punitive damages",
+        "Loss of profits, revenue, data, or use",
+        "Loss of or damage to property",
+        "Claims of third parties",
+        "Any damages arising from your use of or inability to use the Service",
+        "Unauthorized access to or alteration of your content",
+        "Statements or conduct of any third party on the Service"
+      ],
+      "subsections": [
+        {
+          "title": "Liability Cap",
+          "content": "Our total liability to you for all claims arising from your use of the Service shall not exceed the amount you paid to us in the 12 months prior to the claim, or $100, whichever is greater."
+        }
+      ]
+    },
+    {
+      "id": "indemnification",
+      "title": "Indemnification",
+      "icon": "gavel",
+      "content": [
+        "You agree to defend, indemnify, and hold harmless News Portal, its affiliates, officers, directors, employees, and agents from and against any claims, damages, obligations, losses, liabilities, costs, or expenses arising from:"
+      ],
+      "items": [
+        "Your use of or access to the Service",
+        "Your violation of these Terms of Service",
+        "Your violation of any third-party rights, including intellectual property rights",
+        "Your User Content posted on the Service",
+        "Any harmful activity you engage in related to the Service"
+      ]
+    },
+    {
+      "id": "termination",
+      "title": "Termination & Suspension",
+      "icon": "stop",
+      "content": [
+        "We may terminate or suspend your account and access to the Service immediately, without prior notice or liability, for any reason, including:"
+      ],
+      "items": [
+        "Breach of these Terms of Service",
+        "Violation of applicable laws or regulations",
+        "Fraudulent, abusive, or illegal activity",
+        "At our sole discretion for any or no reason"
+      ],
+      "subsections": [
+        {
+          "title": "Effect of Termination",
+          "content": "Upon termination, your right to use the Service will immediately cease. All provisions of these Terms which should survive termination shall survive, including ownership provisions, warranty disclaimers, and limitations of liability."
+        },
+        {
+          "title": "Data Deletion",
+          "content": "We may delete your account and all associated data following termination. We are not obligated to retain any User Content after termination."
+        }
+      ]
+    },
+    {
+      "id": "governing-law",
+      "title": "Governing Law & Jurisdiction",
+      "icon": "hammer",
+      "content": [
+        "These Terms shall be governed by and construed in accordance with the laws of [Your State/Country], without regard to its conflict of law provisions."
+      ],
+      "subsections": [
+        {
+          "title": "Dispute Resolution",
+          "content": "Any disputes arising from these Terms or your use of the Service shall be resolved through binding arbitration, except where prohibited by law."
+        },
+        {
+          "title": "Jurisdiction",
+          "content": "You agree to submit to the personal jurisdiction of the courts located in [Your State/Country] for any actions not subject to arbitration."
+        }
+      ]
+    },
+    {
+      "id": "modifications",
+      "title": "Changes to Terms",
+      "icon": "refresh",
+      "content": [
+        "We reserve the right to modify or replace these Terms at any time at our sole discretion."
+      ],
+      "items": [
+        "We will provide notice of material changes by posting the new Terms on this page",
+        "We will update the 'Last Updated' date at the top of these Terms",
+        "Continued use of the Service after changes constitutes acceptance of new Terms",
+        "You are responsible for reviewing these Terms periodically",
+        "If you do not agree to new Terms, you must stop using the Service"
+      ]
+    },
+    {
+      "id": "severability",
+      "title": "Severability & Waiver",
+      "icon": "puzzle",
+      "content": [
+        "If any provision of these Terms is held to be unenforceable or invalid, such provision will be changed and interpreted to accomplish the objectives of such provision to the greatest extent possible under applicable law, and the remaining provisions will continue in full force and effect."
+      ],
+      "subsections": [
+        {
+          "title": "No Waiver",
+          "content": "Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. Any waiver must be in writing and signed by us."
+        }
+      ]
+    },
+    {
+      "id": "entire-agreement",
+      "title": "Entire Agreement",
+      "icon": "document",
+      "content": [
+        "These Terms of Service, together with our Privacy Policy and any other legal notices published by us on the Service, constitute the entire agreement between you and News Portal concerning the Service."
+      ],
+      "items": [
+        "These Terms supersede all prior or contemporaneous communications",
+        "No amendment to these Terms shall be effective unless made in writing and signed by us",
+        "Section headings are for convenience only and have no legal effect"
+      ]
+    },
+    {
+      "id": "force-majeure",
+      "title": "Force Majeure",
+      "icon": "lightning",
+      "content": [
+        "We shall not be liable for any failure or delay in performance due to circumstances beyond our reasonable control, including but not limited to acts of God, war, terrorism, riots, embargoes, acts of civil or military authorities, fire, floods, accidents, pandemics, strikes, or shortages of transportation, facilities, fuel, energy, labor, or materials."
+      ]
+    },
+    {
+      "id": "assignment",
+      "title": "Assignment",
+      "icon": "transfer",
+      "content": [
+        "You may not assign or transfer these Terms or your rights and obligations under these Terms without our prior written consent. We may assign our rights and obligations under these Terms without restriction."
+      ]
+    }
+  ],
+  "contact": {
+    "title": "Contact Information",
+    "content": [
+      "If you have any questions about these Terms of Service, please contact us:"
+    ],
+    "methods": [
+      {
+        "type": "email",
+        "label": "Email",
+        "value": "legal@newsportal.com"
+      },
+      {
+        "type": "phone",
+        "label": "Phone",
+        "value": "+1 (555) 123-4567"
+      },
+      {
+        "type": "address",
+        "label": "Mailing Address",
+        "value": "Legal Department\nNews Portal\n123 Main Street\nCity, State 12345\nUnited States"
+      }
+    ]
+  },
+  "acknowledgment": {
+    "title": "Acknowledgment",
+    "content": "BY USING THE SERVICE, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY THEM."
+  }
+}

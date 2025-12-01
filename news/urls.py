@@ -9,5 +9,8 @@ urlpatterns = [
     path('news/<int:pk>/', views.news_detail, name='news_detail'),
     path('news/<int:pk>/share/', views.track_share, name='track_share'),
     path('about/', views.about, name='about'),
-    path('search/', views.search, name='search'), 
+    path('search/', views.search, name='search'),
+    path('privacy/', views.privacy_policy, name='privacy_policy'),
+    path('terms/', views.terms_of_service, name='terms_of_service'),
+    path('cookies/', views.cookie_policy, name='cookie_policy'),
 ]

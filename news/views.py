@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import News, TeamMember, Comment, ShareCount
+import json
+import os
 
 def home(request):
     # Get latest news articles for display
@@ -176,3 +178,99 @@ def about(request):
     }
     
     return render(request, 'news/about.html', context)
+
+def privacy_policy(request):
+    """Privacy Policy page with JSON data"""
+    # Load privacy policy data from JSON file
+    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'administration', 'privacy_polity.json')
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            privacy_data = json.load(f)
+    except FileNotFoundError:
+        # Fallback data if JSON file is not found
+        privacy_data = {
+            'metadata': {
+                'title': 'Privacy Policy',
+                'lastUpdated': '2024-12-01',
+                'companyName': 'News Portal'
+            },
+            'introduction': {
+                'title': 'Introduction',
+                'content': ['Welcome to our privacy policy.']
+            },
+            'sections': []
+        }
+    
+    # Convert to JSON string for JavaScript
+    privacy_data_json = json.dumps(privacy_data)
+    
+    context = {
+        'privacy_data': privacy_data_json
+    }
+    
+    return render(request, 'news/privacy_policy.html', context)
+
+def terms_of_service(request):
+    """Terms of Service page with JSON data"""
+    # Load terms of service data from JSON file
+    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'administration', 'terms_of_service.json')
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            terms_data = json.load(f)
+    except FileNotFoundError:
+        # Fallback data if JSON file is not found
+        terms_data = {
+            'metadata': {
+                'title': 'Terms of Service',
+                'lastUpdated': '2024-12-01',
+                'companyName': 'News Portal'
+            },
+            'introduction': {
+                'title': 'Introduction',
+                'content': ['Welcome to our terms of service.']
+            },
+            'sections': []
+        }
+    
+    # Convert to JSON string for JavaScript
+    terms_data_json = json.dumps(terms_data)
+    
+    context = {
+        'terms_data': terms_data_json
+    }
+    
+    return render(request, 'news/terms_of_service.html', context)
+
+def cookie_policy(request):
+    """Cookie Policy page with JSON data"""
+    # Load cookie policy data from JSON file
+    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'administration', 'cookee.json')
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            cookie_data = json.load(f)
+    except FileNotFoundError:
+        # Fallback data if JSON file is not found
+        cookie_data = {
+            'metadata': {
+                'title': 'Cookie Policy',
+                'lastUpdated': '2024-12-01',
+                'companyName': 'News Portal'
+            },
+            'introduction': {
+                'title': 'Introduction',
+                'content': ['Welcome to our cookie policy.']
+            },
+            'sections': []
+        }
+    
+    # Convert to JSON string for JavaScript
+    cookie_data_json = json.dumps(cookie_data)
+    
+    context = {
+        'cookie_data': cookie_data_json
+    }
+    
+    return render(request, 'news/cookee.html', context)

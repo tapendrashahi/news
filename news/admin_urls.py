@@ -8,6 +8,9 @@ urlpatterns = [
     path('login/', admin_views.admin_login, name='login'),
     path('logout/', admin_views.admin_logout, name='logout'),
     
+    # Profile
+    path('profile/', admin_views.admin_profile, name='profile'),
+    
     # Dashboard
     path('', admin_views.admin_dashboard, name='dashboard'),
     
@@ -20,6 +23,7 @@ urlpatterns = [
     # Team Management
     path('team/', admin_views.admin_team_list, name='team_list'),
     path('team/create/', admin_views.admin_team_create, name='team_create'),
+    path('team/<int:pk>/', admin_views.admin_team_detail, name='team_detail'),
     path('team/<int:pk>/edit/', admin_views.admin_team_edit, name='team_edit'),
     path('team/<int:pk>/delete/', admin_views.admin_team_delete, name='team_delete'),
     
@@ -28,6 +32,13 @@ urlpatterns = [
     path('comments/<int:pk>/approve/', admin_views.admin_comment_approve, name='comment_approve'),
     path('comments/<int:pk>/unapprove/', admin_views.admin_comment_unapprove, name='comment_unapprove'),
     path('comments/<int:pk>/delete/', admin_views.admin_comment_delete, name='comment_delete'),
+    
+    # Subscribers Management
+    path('subscribers/', admin_views.admin_subscribers, name='subscribers'),
+    path('subscribers/<int:pk>/toggle/', admin_views.admin_subscriber_toggle, name='subscriber_toggle'),
+    path('subscribers/<int:pk>/delete/', admin_views.admin_subscriber_delete, name='subscriber_delete'),
+    path('subscribers/export/', admin_views.admin_subscribers_export, name='subscribers_export'),
+    path('subscribers/bulk-delete/', admin_views.admin_subscribers_bulk_delete, name='subscribers_bulk_delete'),
     
     # Reports
     path('reports/', admin_views.admin_reports, name='reports'),

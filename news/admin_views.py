@@ -5,8 +5,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.utils import timezone
+from django.http import HttpResponse
 from datetime import timedelta
-from .models import News, TeamMember, Comment, ShareCount
+import csv
+from .models import News, TeamMember, Comment, ShareCount, Subscriber
 from django.contrib.auth.models import User
 
 
@@ -48,6 +50,30 @@ def admin_logout(request):
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
     return redirect('custom_admin:login')
+
+
+@staff_member_required
+def admin_profile(request):
+    """View current user's profile"""
+    # Try to find associated team member
+    team_member = None
+    try:
+        # Check if user email matches any team member
+        if request.user.email:
+            team_member = TeamMember.objects.filter(email=request.user.email).first()
+        # Or check by name
+        if not team_member:
+            full_name = request.user.get_full_name()
+            if full_name:
+                team_member = TeamMember.objects.filter(name__icontains=full_name).first()
+    except:
+        pass
+    
+    context = {
+        'user': request.user,
+        'team_member': team_member,
+    }
+    return render(request, 'admin/custom_team_details.html', context)
 
 
 @staff_member_required
@@ -225,6 +251,21 @@ def admin_team_list(request):
     }
     
     return render(request, 'admin/custom_team_list.html', context)
+
+@staff_member_required
+def admin_team_detail(request, pk):
+    """View team member details"""
+    team_member = get_object_or_404(TeamMember, pk=pk)
+    
+    # Get all news articles by this team member
+    articles = News.objects.filter(author=team_member).order_by('-created_at')
+    
+    context = {
+        'team_member': team_member,
+        'articles': articles,
+    }
+    
+    return render(request, 'admin/custom_team_details.html', context)
 
 @staff_member_required
 def admin_team_create(request):
@@ -426,3 +467,120 @@ def admin_reports(request):
     }
     
     return render(request, 'admin/custom_reports.html', context)
+
+
+@staff_member_required
+def admin_subscribers(request):
+    """List all newsletter subscribers with filters"""
+    
+    # Handle POST request for adding new subscriber
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        name = request.POST.get('name', '')
+        
+        if email:
+            # Check if subscriber already exists
+            if Subscriber.objects.filter(email=email).exists():
+                messages.warning(request, f'Subscriber with email {email} already exists.')
+            else:
+                Subscriber.objects.create(email=email, name=name)
+                messages.success(request, f'Subscriber {email} added successfully!')
+        return redirect('custom_admin:subscribers')
+    
+    search = request.GET.get('search', '')
+    status = request.GET.get('status', '')
+    
+    subscribers = Subscriber.objects.all()
+    
+    # Apply filters
+    if search:
+        subscribers = subscribers.filter(
+            Q(email__icontains=search) | Q(name__icontains=search)
+        )
+    
+    if status == 'active':
+        subscribers = subscribers.filter(is_active=True)
+    elif status == 'unsubscribed':
+        subscribers = subscribers.filter(is_active=False)
+    
+    # Calculate stats
+    total_subscribers = Subscriber.objects.count()
+    active_subscribers = Subscriber.objects.filter(is_active=True).count()
+    unsubscribed_count = Subscriber.objects.filter(is_active=False).count()
+    
+    # New this month
+    first_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    new_this_month = Subscriber.objects.filter(subscribed_at__gte=first_of_month).count()
+    
+    context = {
+        'subscribers': subscribers,
+        'search': search,
+        'status': status,
+        'total_subscribers': total_subscribers,
+        'active_subscribers': active_subscribers,
+        'unsubscribed_count': unsubscribed_count,
+        'new_this_month': new_this_month,
+    }
+    
+    return render(request, 'admin/subscribers.html', context)
+
+
+@staff_member_required
+def admin_subscriber_toggle(request, pk):
+    """Toggle subscriber active status"""
+    subscriber = get_object_or_404(Subscriber, pk=pk)
+    subscriber.is_active = not subscriber.is_active
+    if not subscriber.is_active:
+        subscriber.unsubscribed_at = timezone.now()
+    else:
+        subscriber.unsubscribed_at = None
+    subscriber.save()
+    
+    status = "activated" if subscriber.is_active else "deactivated"
+    messages.success(request, f'Subscriber {subscriber.email} has been {status}.')
+    return redirect('custom_admin:subscribers')
+
+
+@staff_member_required
+def admin_subscriber_delete(request, pk):
+    """Delete a subscriber"""
+    subscriber = get_object_or_404(Subscriber, pk=pk)
+    email = subscriber.email
+    subscriber.delete()
+    messages.success(request, f'Subscriber {email} has been deleted.')
+    return redirect('custom_admin:subscribers')
+
+
+@staff_member_required
+def admin_subscribers_export(request):
+    """Export subscribers to CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="subscribers.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Email', 'Name', 'Status', 'Subscribed At', 'Unsubscribed At'])
+    
+    subscribers = Subscriber.objects.all()
+    for subscriber in subscribers:
+        writer.writerow([
+            subscriber.email,
+            subscriber.name,
+            'Active' if subscriber.is_active else 'Unsubscribed',
+            subscriber.subscribed_at.strftime('%Y-%m-%d %H:%M'),
+            subscriber.unsubscribed_at.strftime('%Y-%m-%d %H:%M') if subscriber.unsubscribed_at else '',
+        ])
+    
+    return response
+
+
+@staff_member_required
+def admin_subscribers_bulk_delete(request):
+    """Bulk delete subscribers"""
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
+        if ids:
+            deleted_count = Subscriber.objects.filter(id__in=ids).delete()[0]
+            messages.success(request, f'{deleted_count} subscriber(s) deleted successfully.')
+        else:
+            messages.warning(request, 'No subscribers selected.')
+    return redirect('custom_admin:subscribers')
