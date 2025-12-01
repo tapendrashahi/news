@@ -1,55 +1,110 @@
-<!-- AI Analitica static SVG icon
-   - Minimal, neutral, data-driven aesthetic
-   - Scalable SVG (512x512)
-   - Deliverables: monochrome + optional color-ready layers
--->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AI Analitica — Icon (SVG)</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #1e293b;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      svg {
+        filter: drop-shadow(0 10px 40px rgba(0,0,0,0.3));
+      }
+    </style>
   </head>
   <body>
-    <!-- SVG: a balanced, techy monogram combining 'AI' with a neutral lens / data grid -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="AI Analitica logo">
+    <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 512 512" role="img" aria-label="AI Analitica logo">
       <defs>
         <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
-          <stop offset="0%" stop-color="#0f172a" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#0ea5a6" stop-opacity="1"/>
+          <stop offset="0%" stop-color="#0f172a"/>
+          <stop offset="100%" stop-color="#0ea5e8"/>
         </linearGradient>
-        <clipPath id="rounded">
-          <rect x="32" y="32" width="448" height="448" rx="64" ry="64"/>
-        </clipPath>
+        <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
       </defs>
 
-      <!-- Background rounded square to give app/icon feel -->
-      <rect x="32" y="32" width="448" height="448" rx="64" ry="64" fill="url(#g1)"/>
+      <!-- Background rounded square -->
+      <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="url(#g1)"/>
 
-      <!-- Center neutral 'lens' circle -->
-      <g clip-path="url(#rounded)">
-        <circle cx="256" cy="220" r="120" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
-
-        <!-- Central data nucleus (iconic minimal form) -->
-        <g fill="#ffffff" fill-opacity="0.9">
-          <circle cx="256" cy="220" r="10" />
+      <!-- Main content group -->
+      <g>
+        <!-- Outer data grid frame -->
+        <g stroke="#ffffff" stroke-opacity="0.08" stroke-width="1.5" fill="none">
+          <line x1="140" y1="140" x2="372" y2="140"/>
+          <line x1="140" y1="256" x2="372" y2="256"/>
+          <line x1="140" y1="372" x2="372" y2="372"/>
+          <line x1="140" y1="140" x2="140" y2="372"/>
+          <line x1="256" y1="140" x2="256" y2="372"/>
+          <line x1="372" y1="140" x2="372" y2="372"/>
         </g>
 
-        <!-- Orbital analytic rings -->
-        <g stroke="#ffffff" stroke-opacity="0.22" stroke-width="3" fill="none">
-          <ellipse cx="256" cy="220" rx="70" ry="28" />
-          <ellipse cx="256" cy="220" rx="90" ry="38" />
+        <!-- Central AI lens/eye construct -->
+        <g>
+          <!-- Iris outer ring -->
+          <circle cx="256" cy="256" r="90" fill="none" stroke="url(#accent)" stroke-width="3" stroke-opacity="0.4"/>
+          
+          <!-- Inner lens with subtle fill -->
+          <circle cx="256" cy="256" r="70" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+          
+          <!-- Neural network nodes -->
+          <g fill="url(#accent)" opacity="0.8">
+            <!-- Center node -->
+            <circle cx="256" cy="256" r="8"/>
+            
+            <!-- Ring of data points -->
+            <circle cx="256" cy="206" r="5"/>
+            <circle cx="296" cy="226" r="5"/>
+            <circle cx="306" cy="256" r="5"/>
+            <circle cx="296" cy="286" r="5"/>
+            <circle cx="256" cy="306" r="5"/>
+            <circle cx="216" cy="286" r="5"/>
+            <circle cx="206" cy="256" r="5"/>
+            <circle cx="216" cy="226" r="5"/>
+          </g>
+
+          <!-- Connection lines (neural pathways) -->
+          <g stroke="url(#accent)" stroke-width="1.5" stroke-opacity="0.3" fill="none">
+            <line x1="256" y1="256" x2="256" y2="206"/>
+            <line x1="256" y1="256" x2="296" y2="226"/>
+            <line x1="256" y1="256" x2="306" y2="256"/>
+            <line x1="256" y1="256" x2="296" y2="286"/>
+            <line x1="256" y1="256" x2="256" y2="306"/>
+            <line x1="256" y1="256" x2="216" y2="286"/>
+            <line x1="256" y1="256" x2="206" y2="256"/>
+            <line x1="256" y1="256" x2="216" y2="226"/>
+          </g>
+
+          <!-- Orbital scanning arcs -->
+          <g stroke="#ffffff" stroke-opacity="0.12" stroke-width="2" fill="none" stroke-linecap="round">
+            <path d="M 256 166 A 90 90 0 0 1 346 256" transform="rotate(15 256 256)"/>
+            <path d="M 346 256 A 90 90 0 0 1 256 346" transform="rotate(15 256 256)"/>
+          </g>
         </g>
 
-        
-
-        <!-- Removed old wave lines for cleaner iconic form -->
-
-        <!-- Thin ring for focus -->
-        <circle cx="256" cy="220" r="138" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="4"/>
+        <!-- Data pulse indicators (corner accents) -->
+        <g fill="url(#accent)" opacity="0.6">
+          <rect x="128" y="128" width="4" height="16" rx="2"/>
+          <rect x="128" y="128" width="16" height="4" rx="2"/>
+          
+          <rect x="380" y="128" width="4" height="16" rx="2"/>
+          <rect x="368" y="128" width="16" height="4" rx="2"/>
+          
+          <rect x="128" y="368" width="4" height="16" rx="2"/>
+          <rect x="128" y="380" width="16" height="4" rx="2"/>
+          
+          <rect x="380" y="368" width="4" height="16" rx="2"/>
+          <rect x="368" y="380" width="16" height="4" rx="2"/>
+        </g>
       </g>
-
-      
     </svg>
   </body>
 </html>

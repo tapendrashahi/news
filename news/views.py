@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.conf import settings
 from .models import News, TeamMember, Comment, ShareCount
 import json
 import os
@@ -306,3 +307,39 @@ def editorial_guidelines(request):
     }
     
     return render(request, 'news/editorial_guideline.html', context)
+
+def ethics_policy(request):
+    """Display the ethics policy page"""
+    json_path = os.path.join(settings.BASE_DIR, 'administration', 'ethics_policy.json')
+    
+    # Load JSON data
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            ethics_data = json.load(f)
+    except FileNotFoundError:
+        ethics_data = {
+            "metadata": {
+                "title": "Ethics Policy",
+                "lastUpdated": "2024-12-01",
+                "companyName": "AI Analitica"
+            },
+            "introduction": {
+                "title": "Our Ethical Commitment",
+                "content": ["Ethics policy information will be available soon."]
+            },
+            "sections": [],
+            "contact": {
+                "title": "Contact Us",
+                "content": ["For ethics inquiries, please contact us."],
+                "methods": []
+            }
+        }
+    
+    # Convert to JSON string for JavaScript
+    ethics_data_json = json.dumps(ethics_data)
+    
+    context = {
+        'ethics_data': ethics_data_json
+    }
+    
+    return render(request, 'news/ethics_policy.html', context)

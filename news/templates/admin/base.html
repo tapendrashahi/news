@@ -1054,7 +1054,51 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2><i class="fas fa-brain"></i> AI Analitica</h2>
+            <h2 style="display: flex; align-items: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512" role="img" aria-label="AI Analitica logo" style="flex-shrink: 0;">
+                    <defs>
+                        <linearGradient id="admin-g1" x1="0%" x2="100%" y1="0%" y2="100%">
+                            <stop offset="0%" stop-color="#0f172a"/>
+                            <stop offset="100%" stop-color="#0ea5e8"/>
+                        </linearGradient>
+                        <linearGradient id="admin-accent" x1="0%" x2="100%" y1="0%" y2="100%">
+                            <stop offset="0%" stop-color="#06b6d4"/>
+                            <stop offset="100%" stop-color="#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#admin-g1)"/>
+                    <g stroke="#ffffff" stroke-width="1" stroke-opacity="0.1">
+                        <line x1="32" y1="181" x2="480" y2="181"/>
+                        <line x1="32" y1="331" x2="480" y2="331"/>
+                        <line x1="181" y1="32" x2="181" y2="480"/>
+                        <line x1="331" y1="32" x2="331" y2="480"/>
+                    </g>
+                    <circle cx="256" cy="256" r="90" fill="none" stroke="url(#admin-accent)" stroke-width="3" stroke-opacity="0.4"/>
+                    <circle cx="256" cy="256" r="70" fill="#fff" fill-opacity="0.04" stroke="#fff" stroke-opacity="0.15" stroke-width="2"/>
+                    <g fill="url(#admin-accent)" opacity="0.8">
+                        <circle cx="256" cy="256" r="8"/>
+                        <circle cx="256" cy="206" r="5"/>
+                        <circle cx="296" cy="226" r="5"/>
+                        <circle cx="306" cy="256" r="5"/>
+                        <circle cx="296" cy="286" r="5"/>
+                        <circle cx="256" cy="306" r="5"/>
+                        <circle cx="216" cy="286" r="5"/>
+                        <circle cx="206" cy="256" r="5"/>
+                        <circle cx="216" cy="226" r="5"/>
+                    </g>
+                    <g stroke="url(#admin-accent)" stroke-width="1.5" stroke-opacity="0.3" fill="none">
+                        <line x1="256" y1="256" x2="256" y2="206"/>
+                        <line x1="256" y1="256" x2="296" y2="226"/>
+                        <line x1="256" y1="256" x2="306" y2="256"/>
+                        <line x1="256" y1="256" x2="296" y2="286"/>
+                        <line x1="256" y1="256" x2="256" y2="306"/>
+                        <line x1="256" y1="256" x2="216" y2="286"/>
+                        <line x1="256" y1="256" x2="206" y2="256"/>
+                        <line x1="256" y1="256" x2="216" y2="226"/>
+                    </g>
+                </svg>
+                <span>AI Analitica</span>
+            </h2>
         </div>
         <div class="sidebar-menu">
             <a href="{% url 'custom_admin:dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">

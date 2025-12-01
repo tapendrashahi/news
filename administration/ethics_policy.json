@@ -1,0 +1,678 @@
+{
+  "metadata": {
+    "title": "Ethics Policy",
+    "lastUpdated": "2024-12-01",
+    "effectiveDate": "2024-01-01",
+    "companyName": "News Portal",
+    "companyEmail": "ethics@newsportal.com",
+    "version": "2.0"
+  },
+  "introduction": {
+    "title": "Our Ethical Commitment",
+    "content": [
+      "At News Portal, we are committed to the highest standards of ethical conduct and professional integrity. This Ethics Policy outlines the principles and standards that guide our behavior and decision-making.",
+      "Our ethical standards apply to all employees, contractors, contributors, and anyone representing News Portal. We believe that maintaining trust with our audience, sources, and partners requires unwavering commitment to ethical principles.",
+      "This policy is not exhaustive but provides a framework for ethical decision-making. When faced with ethical dilemmas, we encourage consultation with supervisors, editors, or our ethics committee."
+    ]
+  },
+  "sections": [
+    {
+      "id": "core-values",
+      "title": "Core Ethical Values",
+      "icon": "heart",
+      "content": [
+        "Our ethics policy is built on fundamental values that guide all our actions:"
+      ],
+      "subsections": [
+        {
+          "title": "Integrity",
+          "content": "We act with honesty and honor in all our dealings. We do what is right, not what is easy or convenient.",
+          "items": [
+            "Tell the truth, even when it's difficult",
+            "Admit mistakes and take responsibility",
+            "Keep promises and commitments",
+            "Be honest in all communications",
+            "Maintain consistency between words and actions"
+          ]
+        },
+        {
+          "title": "Independence",
+          "content": "We maintain independence from influences that could compromise our judgment or objectivity.",
+          "items": [
+            "Make decisions based on facts and merit",
+            "Resist pressure from external sources",
+            "Avoid conflicts of interest",
+            "Maintain editorial independence",
+            "Protect our autonomy and credibility"
+          ]
+        },
+        {
+          "title": "Accountability",
+          "content": "We take responsibility for our actions and their consequences.",
+          "items": [
+            "Accept responsibility for our work",
+            "Correct errors promptly and transparently",
+            "Answer for our decisions and actions",
+            "Hold ourselves to high standards",
+            "Learn from mistakes and improve"
+          ]
+        },
+        {
+          "title": "Respect",
+          "content": "We treat all individuals with dignity and respect, regardless of their position or circumstances.",
+          "items": [
+            "Respect the rights and dignity of all people",
+            "Listen to diverse perspectives",
+            "Treat sources and subjects fairly",
+            "Show empathy and compassion",
+            "Value diversity and inclusion"
+          ]
+        },
+        {
+          "title": "Transparency",
+          "content": "We are open about our methods, motivations, and potential conflicts.",
+          "items": [
+            "Disclose relevant information",
+            "Be clear about our processes",
+            "Explain our decisions when appropriate",
+            "Acknowledge limitations",
+            "Share information openly and honestly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conflicts-of-interest",
+      "title": "Conflicts of Interest",
+      "icon": "warning",
+      "content": [
+        "A conflict of interest occurs when personal interests could compromise professional judgment. We must identify, disclose, and manage all potential conflicts."
+      ],
+      "subsections": [
+        {
+          "title": "Financial Conflicts",
+          "content": "We avoid financial interests that could influence our work or create the appearance of bias.",
+          "items": [
+            "Do not cover companies or industries in which you have financial investments",
+            "Disclose any financial interests relevant to your coverage area",
+            "Do not trade stocks or securities based on unpublished information",
+            "Avoid business relationships with sources or subjects of coverage",
+            "Do not accept loans or financial benefits from sources"
+          ]
+        },
+        {
+          "title": "Personal Relationships",
+          "content": "Personal relationships can create conflicts when they involve people or organizations we cover.",
+          "items": [
+            "Do not cover family members, romantic partners, or close friends",
+            "Disclose personal relationships relevant to your work",
+            "Recuse yourself from stories involving personal connections",
+            "Avoid socializing with sources in ways that could compromise objectivity",
+            "Maintain professional boundaries with sources"
+          ]
+        },
+        {
+          "title": "Political & Advocacy Activities",
+          "content": "Political activities and advocacy can compromise actual or perceived objectivity.",
+          "items": [
+            "Do not engage in political activism or campaigning",
+            "Avoid public displays of political preference",
+            "Do not hold political office while employed as a journalist",
+            "Refrain from signing petitions or joining advocacy organizations related to coverage areas",
+            "Maintain neutrality in public forums and social media"
+          ]
+        },
+        {
+          "title": "Outside Employment & Activities",
+          "items": [
+            "Disclose all outside employment and professional activities",
+            "Obtain approval before accepting outside work",
+            "Ensure outside activities do not conflict with your role",
+            "Do not use your position for personal gain",
+            "Avoid activities that could compromise your credibility"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gifts-hospitality",
+      "title": "Gifts, Hospitality & Benefits",
+      "icon": "gift",
+      "content": [
+        "Accepting gifts, meals, travel, or other benefits from sources or subjects of coverage can create conflicts of interest and compromise independence."
+      ],
+      "subsections": [
+        {
+          "title": "Gift Policy",
+          "items": [
+            "Do not accept gifts of significant value (generally $25 or more)",
+            "Decline gifts from sources, subjects, or anyone seeking to influence coverage",
+            "Return or donate gifts that cannot be refused",
+            "Do not accept cash or cash equivalents under any circumstances",
+            "Promotional items and samples must be returned or shared with the team",
+            "Disclose any gifts received that cannot be returned"
+          ]
+        },
+        {
+          "title": "Meals & Entertainment",
+          "items": [
+            "Pay your own way whenever possible",
+            "Accept modest meals only when necessary for newsgathering",
+            "Do not accept lavish entertainment or hospitality",
+            "Split checks or take turns paying when dining with regular sources",
+            "Decline invitations to events unrelated to legitimate news coverage"
+          ]
+        },
+        {
+          "title": "Travel & Accommodations",
+          "items": [
+            "News Portal pays for all travel and accommodations when possible",
+            "Accept travel/accommodation from news sources only when absolutely necessary",
+            "Disclose when travel or accommodation is provided by others",
+            "Maintain editorial independence regardless of who pays for travel",
+            "Do not accept free or discounted travel for personal use"
+          ]
+        },
+        {
+          "title": "Awards & Prizes",
+          "items": [
+            "Decline awards that come with significant monetary value from organizations you cover",
+            "Disclose all professional awards and their sponsors",
+            "Do not allow awards to influence coverage",
+            "Evaluate whether accepting an award creates a conflict of interest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "source-relationships",
+      "title": "Relationships with Sources",
+      "icon": "users",
+      "content": [
+        "Ethical relationships with sources are built on honesty, respect, and professional boundaries."
+      ],
+      "subsections": [
+        {
+          "title": "Source Honesty",
+          "items": [
+            "Always identify yourself as a journalist",
+            "Be clear about your purpose when contacting sources",
+            "Do not misrepresent yourself or your intentions",
+            "Explain how information will be used",
+            "Honor agreements about attribution and confidentiality"
+          ]
+        },
+        {
+          "title": "Confidential Sources",
+          "content": "Protecting confidential sources is a serious ethical and sometimes legal obligation.",
+          "items": [
+            "Only promise confidentiality when necessary for important stories",
+            "Obtain editor approval before granting confidentiality",
+            "Clearly define the terms of confidentiality",
+            "Keep confidences even under legal pressure",
+            "Never reveal a source's identity without their permission",
+            "Maintain secure records of confidential source communications"
+          ]
+        },
+        {
+          "title": "Source Relationships",
+          "items": [
+            "Maintain professional distance from sources",
+            "Do not develop personal relationships that could compromise objectivity",
+            "Avoid socializing with sources outside of professional contexts",
+            "Do not promise favorable coverage",
+            "Treat all sources with respect and fairness"
+          ]
+        },
+        {
+          "title": "Payment for Information",
+          "items": [
+            "Do not pay sources for news information",
+            "Do not pay for interviews or access",
+            "Legitimate expenses (travel, document fees) may be reimbursed with approval",
+            "Disclose if any payment or benefit was provided to a source"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accuracy-truthfulness",
+      "title": "Accuracy & Truthfulness",
+      "icon": "check",
+      "content": [
+        "Accuracy and truthfulness are the foundation of journalistic ethics. We strive for accuracy in every aspect of our work."
+      ],
+      "subsections": [
+        {
+          "title": "Verification Standards",
+          "items": [
+            "Verify all information before publication",
+            "Use multiple independent sources when possible",
+            "Distinguish between what we know and what we believe",
+            "Clearly identify unverified information",
+            "Check the accuracy of names, dates, quotes, and facts",
+            "Correct errors immediately and transparently"
+          ]
+        },
+        {
+          "title": "Fabrication & Plagiarism",
+          "content": "Fabrication and plagiarism are among the most serious ethical violations.",
+          "items": [
+            "Never fabricate information, quotes, or sources",
+            "Never present another's work as your own",
+            "Always attribute information to its source",
+            "Use quotation marks for direct quotes",
+            "Paraphrase properly while crediting the source",
+            "Violations result in immediate termination"
+          ]
+        },
+        {
+          "title": "Manipulation & Deception",
+          "items": [
+            "Do not manipulate photos, videos, or audio to mislead",
+            "Do not take quotes out of context to change meaning",
+            "Do not omit key information that would alter understanding",
+            "Be transparent about limitations in our knowledge",
+            "Do not use deceptive newsgathering techniques except in rare, approved cases"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fairness-impartiality",
+      "title": "Fairness & Impartiality",
+      "icon": "balance",
+      "content": [
+        "We strive to be fair and impartial in our coverage, presenting information without bias or prejudice."
+      ],
+      "subsections": [
+        {
+          "title": "Balanced Coverage",
+          "items": [
+            "Present all relevant sides of controversial issues",
+            "Give subjects of criticism an opportunity to respond",
+            "Seek out diverse perspectives",
+            "Challenge claims from all sides equally",
+            "Avoid loaded or biased language",
+            "Distinguish between news coverage and opinion"
+          ]
+        },
+        {
+          "title": "Avoiding Bias",
+          "items": [
+            "Examine your own biases and assumptions",
+            "Do not let personal views influence coverage",
+            "Be aware of unconscious bias",
+            "Seek diverse voices and perspectives",
+            "Question your assumptions",
+            "Accept feedback about potential bias"
+          ]
+        },
+        {
+          "title": "Right of Reply",
+          "items": [
+            "Give people criticized in our coverage a chance to respond",
+            "Provide adequate time for response before publication",
+            "Include substantive responses prominently in the story",
+            "Be fair even to those who decline to comment",
+            "Note when individuals cannot be reached or decline to comment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privacy-dignity",
+      "title": "Privacy & Human Dignity",
+      "icon": "shield",
+      "content": [
+        "We respect privacy and treat all individuals with dignity, especially vulnerable populations."
+      ],
+      "subsections": [
+        {
+          "title": "Privacy Rights",
+          "items": [
+            "Respect individuals' reasonable expectations of privacy",
+            "Balance privacy interests against public interest",
+            "Be especially careful with private matters of public figures",
+            "Do not intrude on private grief without compelling justification",
+            "Obtain consent before entering private property",
+            "Consider the long-term impact of publishing personal information"
+          ]
+        },
+        {
+          "title": "Vulnerable Individuals",
+          "content": "Special care must be taken when covering vulnerable populations.",
+          "items": [
+            "Protect the identity of minors in sensitive stories",
+            "Be sensitive when covering victims of crime or tragedy",
+            "Consider mental capacity when interviewing vulnerable individuals",
+            "Protect the identity of sexual assault victims",
+            "Be careful when covering individuals with mental illness",
+            "Show compassion for those experiencing trauma or grief"
+          ]
+        },
+        {
+          "title": "Informed Consent",
+          "items": [
+            "Ensure interviewees understand how information will be used",
+            "Obtain consent before recording conversations where required by law",
+            "Get permission before photographing people in private settings",
+            "Explain potential consequences of participating in stories",
+            "Respect when people withdraw consent (where legally possible)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "harm-minimization",
+      "title": "Minimizing Harm",
+      "icon": "heart-pulse",
+      "content": [
+        "While we pursue truth and serve the public interest, we seek to minimize unnecessary harm."
+      ],
+      "subsections": [
+        {
+          "title": "Balancing Public Interest & Harm",
+          "items": [
+            "Consider whether publication serves a legitimate public interest",
+            "Weigh the public's need to know against potential harm",
+            "Use the least harmful means to obtain and report information",
+            "Consider whether the same story can be told with less harm",
+            "Be transparent about why sensitive information is being published"
+          ]
+        },
+        {
+          "title": "Graphic Content",
+          "items": [
+            "Avoid gratuitous use of graphic images or descriptions",
+            "Provide warnings for disturbing content",
+            "Consider the impact on victims, families, and audiences",
+            "Ask whether graphic details serve a journalistic purpose",
+            "Respect the dignity of deceased individuals"
+          ]
+        },
+        {
+          "title": "Sensitive Topics",
+          "content": "Extra care is required when covering sensitive topics like suicide, sexual assault, or violence.",
+          "items": [
+            "Follow guidelines for reporting on suicide to avoid contagion",
+            "Protect the identity of sexual assault victims",
+            "Avoid graphic descriptions of violence unless necessary",
+            "Provide resources and hotlines for affected individuals",
+            "Consider the impact on families and communities",
+            "Be sensitive to cultural and religious considerations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "independence",
+      "title": "Independence & Integrity",
+      "icon": "lock",
+      "content": [
+        "We maintain independence from commercial, political, and other external pressures."
+      ],
+      "subsections": [
+        {
+          "title": "Editorial Independence",
+          "items": [
+            "Editorial decisions are based solely on journalistic merit",
+            "Resist pressure from advertisers, sponsors, or powerful interests",
+            "Maintain separation between editorial and commercial operations",
+            "Do not allow business relationships to influence coverage",
+            "Report stories based on public interest, not commercial interest"
+          ]
+        },
+        {
+          "title": "Commercial Pressure",
+          "items": [
+            "Do not promise coverage in exchange for advertising",
+            "Clearly label sponsored content",
+            "Maintain editorial standards for all content",
+            "Do not allow advertisers to review stories before publication",
+            "Report on advertisers and business partners fairly"
+          ]
+        },
+        {
+          "title": "Political Independence",
+          "items": [
+            "Maintain independence from political parties and movements",
+            "Do not accept direction from political figures or organizations",
+            "Cover all political actors fairly and without bias",
+            "Resist pressure from government or political interests",
+            "Maintain separation from advocacy organizations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "digital-ethics",
+      "title": "Digital & Social Media Ethics",
+      "icon": "mobile",
+      "content": [
+        "Digital platforms present unique ethical challenges that require careful consideration."
+      ],
+      "subsections": [
+        {
+          "title": "Social Media Conduct",
+          "items": [
+            "Maintain professional standards on social media",
+            "Avoid expressing political bias on social platforms",
+            "Verify information before sharing",
+            "Identify yourself as a News Portal journalist",
+            "Respect embargoes and confidential information online",
+            "Engage respectfully with audiences",
+            "Do not harass or attack others online"
+          ]
+        },
+        {
+          "title": "User-Generated Content",
+          "items": [
+            "Verify authenticity of user-generated content",
+            "Obtain permission before using social media content",
+            "Credit sources appropriately",
+            "Be aware of potential manipulation or misinformation",
+            "Consider privacy implications of sharing user content"
+          ]
+        },
+        {
+          "title": "Online Privacy & Security",
+          "items": [
+            "Protect source communications with encryption",
+            "Secure sensitive information appropriately",
+            "Be aware of digital surveillance risks",
+            "Use secure methods for receiving confidential information",
+            "Protect sources who may face digital threats"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diversity-inclusion",
+      "title": "Diversity, Equity & Inclusion",
+      "icon": "globe",
+      "content": [
+        "We are committed to diversity, equity, and inclusion in our workplace and our coverage."
+      ],
+      "subsections": [
+        {
+          "title": "Inclusive Coverage",
+          "items": [
+            "Seek diverse sources and perspectives",
+            "Cover underrepresented communities fairly and accurately",
+            "Avoid stereotypes and generalizations",
+            "Be sensitive to cultural differences",
+            "Consider whose voices are missing from stories",
+            "Challenge systemic bias in coverage"
+          ]
+        },
+        {
+          "title": "Inclusive Language",
+          "items": [
+            "Use gender-neutral language when appropriate",
+            "Respect individuals' preferred names and pronouns",
+            "Use person-first language for disabilities when appropriate",
+            "Avoid racist, sexist, or discriminatory language",
+            "Be precise rather than using broad generalizations",
+            "Consult style guides and affected communities"
+          ]
+        },
+        {
+          "title": "Workplace Inclusion",
+          "items": [
+            "Treat all colleagues with respect and dignity",
+            "Value diverse perspectives and experiences",
+            "Speak up against discrimination or harassment",
+            "Support inclusive hiring and promotion practices",
+            "Participate in diversity and inclusion training",
+            "Create a welcoming environment for all"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workplace-conduct",
+      "title": "Workplace Conduct",
+      "icon": "briefcase",
+      "content": [
+        "We maintain professional standards of conduct in the workplace."
+      ],
+      "subsections": [
+        {
+          "title": "Professional Behavior",
+          "items": [
+            "Treat colleagues with respect and professionalism",
+            "Communicate clearly and honestly",
+            "Meet deadlines and commitments",
+            "Collaborate effectively with team members",
+            "Accept constructive feedback graciously",
+            "Maintain confidentiality of proprietary information"
+          ]
+        },
+        {
+          "title": "Harassment & Discrimination",
+          "content": "We have zero tolerance for harassment or discrimination of any kind.",
+          "items": [
+            "Do not engage in sexual harassment or misconduct",
+            "Do not discriminate based on protected characteristics",
+            "Report harassment or discrimination immediately",
+            "Support colleagues who experience harassment",
+            "Participate in anti-harassment training",
+            "Create a safe and respectful work environment"
+          ]
+        },
+        {
+          "title": "Substance Use",
+          "items": [
+            "Do not use alcohol or drugs in ways that impair work performance",
+            "Do not come to work under the influence",
+            "Do not use illegal substances",
+            "Seek help for substance abuse issues",
+            "Support colleagues dealing with substance issues"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legal-compliance",
+      "title": "Legal & Regulatory Compliance",
+      "icon": "gavel",
+      "content": [
+        "We comply with all applicable laws and regulations while pursuing our journalistic mission."
+      ],
+      "subsections": [
+        {
+          "title": "Media Law",
+          "items": [
+            "Understand and comply with defamation law",
+            "Respect copyright and intellectual property rights",
+            "Follow court reporting restrictions when applicable",
+            "Comply with privacy laws and regulations",
+            "Understand shield laws and reporter's privilege",
+            "Consult legal counsel for complex legal issues"
+          ]
+        },
+        {
+          "title": "Regulatory Compliance",
+          "items": [
+            "Comply with employment laws and regulations",
+            "Follow financial reporting requirements",
+            "Adhere to data protection regulations",
+            "Comply with advertising and disclosure regulations",
+            "Follow safety and health regulations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reporting-violations",
+      "title": "Reporting Ethics Violations",
+      "icon": "flag",
+      "content": [
+        "We encourage reporting of ethical concerns and protect those who raise issues in good faith."
+      ],
+      "subsections": [
+        {
+          "title": "How to Report",
+          "items": [
+            "Speak with your supervisor or editor",
+            "Contact the ethics committee",
+            "Email ethics@newsportal.com",
+            "Use the anonymous ethics hotline",
+            "Report to Human Resources",
+            "Reports can be made anonymously"
+          ]
+        },
+        {
+          "title": "Investigation Process",
+          "items": [
+            "All reports are taken seriously and investigated",
+            "Investigations are conducted promptly and fairly",
+            "Confidentiality is maintained to the extent possible",
+            "Both parties are given an opportunity to provide information",
+            "Appropriate action is taken based on findings",
+            "Follow-up is provided to the extent possible"
+          ]
+        },
+        {
+          "title": "Non-Retaliation",
+          "content": "We prohibit retaliation against anyone who reports ethical concerns in good faith.",
+          "items": [
+            "No adverse action for good faith reports",
+            "Retaliation is itself an ethics violation",
+            "Report any suspected retaliation immediately",
+            "Protection extends to witnesses and participants",
+            "False or malicious reports are not protected"
+          ]
+        }
+      ]
+    }
+  ],
+  "contact": {
+    "title": "Ethics Questions & Concerns",
+    "content": [
+      "If you have questions about this Ethics Policy or need to report an ethics concern, please contact:"
+    ],
+    "methods": [
+      {
+        "type": "email",
+        "label": "Ethics Committee",
+        "value": "ethics@newsportal.com"
+      },
+      {
+        "type": "phone",
+        "label": "Ethics Hotline",
+        "value": "+1 (555) 123-ETHICS"
+      },
+      {
+        "type": "email",
+        "label": "Human Resources",
+        "value": "hr@newsportal.com"
+      }
+    ]
+  },
+  "acknowledgment": {
+    "title": "Acknowledgment & Commitment",
+    "content": "All team members are required to read, understand, and comply with this Ethics Policy. By working with News Portal, you acknowledge your commitment to upholding these ethical standards and agree to conduct yourself in accordance with these principles."
+  }
+}
