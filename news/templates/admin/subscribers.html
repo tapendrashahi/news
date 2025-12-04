@@ -1,7 +1,6 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/base_custom.html' %}
 
 {% block title %}Newsletter Subscribers{% endblock %}
-{% block page_title %}Newsletter Subscribers{% endblock %}
 
 {% block content %}
 <div class="subscribers-wrapper">
@@ -388,21 +387,6 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <style>
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -415,7 +399,6 @@ document.addEventListener('keydown', function(e) {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 13px;
     color: #2d3748;
-    animation: fadeIn 0.3s ease;
 }
 
 /* Header */
@@ -430,7 +413,6 @@ document.addEventListener('keydown', function(e) {
     top: 0;
     z-index: 100;
     box-shadow: none;
-    animation: slideIn 0.4s ease;
 }
 
 .header-info h1 {
@@ -617,7 +599,6 @@ document.addEventListener('keydown', function(e) {
     border: 2px solid #9f7aea;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(159, 122, 234, 0.2);
-    animation: fadeIn 0.3s ease;
 }
 
 .bulk-count {
@@ -681,7 +662,6 @@ document.addEventListener('keydown', function(e) {
     border-left: 4px solid;
     box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
-    animation: fadeIn 0.5s ease;
 }
 
 .stat-mini:hover {
@@ -749,7 +729,6 @@ document.addEventListener('keydown', function(e) {
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     overflow: hidden;
-    animation: fadeIn 0.6s ease;
 }
 
 .subscribers-table {
@@ -950,7 +929,6 @@ document.addEventListener('keydown', function(e) {
 .empty-state svg {
     color: #cbd5e0;
     margin-bottom: 20px;
-    animation: pulse 2s ease infinite;
 }
 
 .empty-state h3 {
@@ -980,7 +958,6 @@ document.addEventListener('keydown', function(e) {
 
 .modal.active {
     display: flex;
-    animation: fadeIn 0.3s ease;
 }
 
 .modal-overlay {
@@ -1000,7 +977,6 @@ document.addEventListener('keydown', function(e) {
     width: 90%;
     max-width: 520px;
     box-shadow: 0 25px 60px rgba(102, 126, 234, 0.3);
-    animation: fadeIn 0.3s ease;
 }
 
 .modal-header {
