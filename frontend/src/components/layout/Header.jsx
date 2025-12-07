@@ -127,7 +127,7 @@ function Header() {
           <Link to="/" className="header__logo">
             <div className="header__logo-text">
               <span className="header__logo-title">
-                <span className="header__logo-accent">AI</span>Analatica
+                <span className="header__logo-accent">AI</span>Analitica
               </span>
               <span className="header__logo-tagline">News Intelligence</span>
             </div>

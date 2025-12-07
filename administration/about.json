@@ -1,0 +1,84 @@
+{
+  "hero": {
+    "title": "About AI Analitica",
+    "subtitle": "AI-Powered News Analysis • Unbiased • Data-Driven • Free from Human Bias"
+  },
+  "mission": {
+    "title": "Our Mission",
+    "content": [
+      "At AI Analitica, we leverage cutting-edge artificial intelligence to deliver news analysis completely free from human bias. Our mission is to provide objective, data-driven perspectives on global events using advanced AI technology.",
+      "Every article and analysis published on our platform is generated and evaluated by AI systems, ensuring that personal opinions, political leanings, and subjective biases don't cloud the facts. We believe AI can offer a uniquely neutral viewpoint that helps readers understand complex issues from multiple angles simultaneously."
+    ]
+  },
+  "values": {
+    "title": "Our Core Values",
+    "items": [
+      {
+        "icon": "robot",
+        "title": "AI-Powered",
+        "description": "100% AI-generated analysis ensures consistency, objectivity, and freedom from human emotional bias."
+      },
+      {
+        "icon": "chart-line",
+        "title": "Data-Driven",
+        "description": "Our AI analyzes vast amounts of data from multiple sources to provide comprehensive perspectives."
+      },
+      {
+        "icon": "balance-scale",
+        "title": "Unbiased",
+        "description": "No political agenda, no corporate influence—just pure analytical intelligence."
+      }
+    ]
+  },
+  "story": {
+    "title": "Our Story",
+    "content": [
+      "AI Analitica was founded on the belief that artificial intelligence can revolutionize how we consume and understand news. Traditional journalism, while valuable, is inevitably influenced by human biases—conscious or unconscious. We asked ourselves: what if AI could analyze news with complete objectivity?",
+      "Today, our advanced AI systems process thousands of news sources, cross-reference facts, identify patterns, and generate balanced analysis that presents multiple perspectives. Every opinion and analysis you read here comes from AI, not humans, ensuring you get insights free from personal agendas, political affiliations, or emotional reactions."
+    ]
+  },
+  "stats": [
+    {
+      "value": "500K+",
+      "label": "Monthly Readers"
+    },
+    {
+      "value": "10K+",
+      "label": "Articles Published"
+    },
+    {
+      "value": "50+",
+      "label": "Expert Journalists"
+    },
+    {
+      "value": "24/7",
+      "label": "News Coverage"
+    }
+  ],
+  "team": {
+    "title": "Meet Our Team",
+    "description": "Our diverse team of journalists, editors, and analysts brings decades of combined experience in news reporting.",
+    "fallbackMembers": [
+      {
+        "name": "Sarah Johnson",
+        "role": "Editor-in-Chief",
+        "icon": "user"
+      },
+      {
+        "name": "Michael Chen",
+        "role": "Tech Editor",
+        "icon": "user"
+      },
+      {
+        "name": "Emily Rodriguez",
+        "role": "Political Analyst",
+        "icon": "user"
+      },
+      {
+        "name": "David Park",
+        "role": "Business Reporter",
+        "icon": "user"
+      }
+    ]
+  }
+}
