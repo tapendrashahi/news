@@ -55,13 +55,13 @@
 }
 
 .category-chip:hover {
-  border-color: #007bff;
-  color: #007bff;
+  border-color: #f39c12;
+  color: #f39c12;
 }
 
 .category-chip--active {
-  background: #007bff;
-  border-color: #007bff;
+  background: #f39c12;
+  border-color: #f39c12;
   color: #fff;
 }
 

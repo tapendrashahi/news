@@ -17,7 +17,7 @@
 }
 
 .search-bar__input:focus {
-  border-color: #007bff;
+  border-color: #f39c12;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
@@ -45,7 +45,7 @@
 .search-bar__button {
   position: absolute;
   right: 8px;
-  background: #007bff;
+  background: #f39c12;
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -59,7 +59,7 @@
 }
 
 .search-bar__button:hover {
-  background: #0056b3;
+  background: #e08e0b;
 }
 
 .search-bar__button svg {

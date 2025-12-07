@@ -62,7 +62,7 @@
 .loading__spinner-circle {
   position: absolute;
   border: 3px solid transparent;
-  border-top-color: #007bff;
+  border-top-color: #f39c12;
   border-radius: 50%;
   animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }

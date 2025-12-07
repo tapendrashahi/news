@@ -88,14 +88,14 @@
 }
 
 .error-boundary__button--primary {
-  background: #007bff;
+  background: #f39c12;
   color: white;
 }
 
 .error-boundary__button--primary:hover {
-  background: #0056b3;
+  background: #e08e0b;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
 }
 
 .error-boundary__button--secondary {

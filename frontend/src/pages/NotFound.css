@@ -96,7 +96,7 @@
   gap: 8px;
   padding: 10px 20px;
   background: white;
-  color: #007bff;
+  color: #f39c12;
   text-decoration: none;
   border-radius: 8px;
   border: 2px solid #e0e0e0;
@@ -105,11 +105,11 @@
 }
 
 .not-found__link:hover {
-  border-color: #007bff;
-  background: #007bff;
+  border-color: #f39c12;
+  background: #f39c12;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
 }
 
 .not-found__link-icon {

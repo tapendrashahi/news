@@ -21,9 +21,9 @@
 
 .pagination__button:hover:not(:disabled),
 .pagination__page:hover {
-  background: #007bff;
+  background: #f39c12;
   color: #fff;
-  border-color: #007bff;
+  border-color: #f39c12;
 }
 
 .pagination__button:disabled {
@@ -32,9 +32,9 @@
 }
 
 .pagination__page--active {
-  background: #007bff;
+  background: #f39c12;
   color: #fff;
-  border-color: #007bff;
+  border-color: #f39c12;
   font-weight: 600;
 }
 
