@@ -1,0 +1,37 @@
+.category-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.category-badge:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.category-badge--small {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+}
+
+.category-badge--medium {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+
+.category-badge--large {
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.category-badge__count {
+  margin-left: 6px;
+  opacity: 0.9;
+  font-weight: 400;
+}

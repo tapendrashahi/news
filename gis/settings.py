@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-)3za!+3a!#h2dv(y8-*05#fj3f6&!^@#zm#-!(*m)gx5pkw6sc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -43,11 +43,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third-party apps
+    'rest_framework',
+    'corsheaders',
+    'django_filters',
+    # Local apps
     'news',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware (must be before CommonMiddleware)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,20 +87,30 @@ WSGI_APPLICATION = 'gis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Get database credentials from environment variables
-DB_PASSWORD = unquote(os.getenv('PGPASSWORD', ''))
+# Use SQLite for development, PostgreSQL for production
+USE_SQLITE = os.getenv('USE_SQLITE', 'True').lower() == 'true'
 
-# PostgreSQL Database Configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PGDATABASE', 'news'),
-        'USER': os.getenv('PGUSER', 'news_user'),
-        'PASSWORD': DB_PASSWORD,
-        'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '5432'),
+if USE_SQLITE or not os.getenv('PGPASSWORD'):
+    # SQLite Database Configuration (Development)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    # PostgreSQL Database Configuration (Production)
+    DB_PASSWORD = unquote(os.getenv('PGPASSWORD', ''))
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('PGDATABASE', 'news'),
+            'USER': os.getenv('PGUSER', 'news_user'),
+            'PASSWORD': DB_PASSWORD,
+            'HOST': os.getenv('PGHOST', 'localhost'),
+            'PORT': os.getenv('PGPORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -142,3 +158,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/custom-admin/login/'
 LOGIN_REDIRECT_URL = '/custom-admin/'
 LOGOUT_REDIRECT_URL = '/custom-admin/login/'
+
+# CORS Settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow CORS for all origins in development (comment out in production)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+
+# Django REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+}
+
+# React Frontend
+REACT_APP_DIR = BASE_DIR / 'frontend'

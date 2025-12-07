@@ -1,0 +1,124 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.loading--fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: white;
+  z-index: 9999;
+}
+
+.loading--overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.loading--overlay .loading__content {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.loading__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading__spinner {
+  position: relative;
+  display: inline-block;
+}
+
+.loading__spinner--small {
+  width: 32px;
+  height: 32px;
+}
+
+.loading__spinner--medium {
+  width: 48px;
+  height: 48px;
+}
+
+.loading__spinner--large {
+  width: 64px;
+  height: 64px;
+}
+
+.loading__spinner-circle {
+  position: absolute;
+  border: 3px solid transparent;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.loading__spinner--small .loading__spinner-circle {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}
+
+.loading__spinner--medium .loading__spinner-circle {
+  width: 48px;
+  height: 48px;
+  border-width: 3px;
+}
+
+.loading__spinner--large .loading__spinner-circle {
+  width: 64px;
+  height: 64px;
+  border-width: 4px;
+}
+
+.loading__spinner-circle:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.loading__spinner-circle:nth-child(2) {
+  animation-delay: -0.3s;
+  border-top-color: #667eea;
+}
+
+.loading__spinner-circle:nth-child(3) {
+  animation-delay: -0.15s;
+  border-top-color: #764ba2;
+}
+
+.loading__spinner-circle:nth-child(4) {
+  border-top-color: #28a745;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading__text {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.loading--overlay .loading__text {
+  color: #333;
+}

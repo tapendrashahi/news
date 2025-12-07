@@ -14,6 +14,7 @@ urlpatterns = [
     path('admin/login/', redirect_to_custom_login, name='admin_login_redirect'),
     path('admin/', admin.site.urls),
     path('custom-admin/', include('news.admin_urls')),  # Custom admin panel
+    path('api/', include('news.api_urls')),  # REST API endpoints
     path('', include('news.urls')),   # include your app URLs
 ]
 
