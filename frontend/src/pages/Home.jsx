@@ -271,8 +271,8 @@ const Home = () => {
               <aside className="sidebar">
                 {/* Trending Widget */}
                 <div className="sidebar__widget">
-                  <h3 className="sidebar__widget-title">
-                    <span className="widget-icon">🔥</span>
+                  <h3 className="widget-title">
+                    <span className="widget-icon">📈</span>
                     Trending Now
                   </h3>
                   <div className="trending-list">
