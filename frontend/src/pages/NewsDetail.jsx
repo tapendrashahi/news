@@ -20,11 +20,31 @@ const NewsDetail = () => {
   
   // Fetch more AI analysis articles for "Keep Learning" section
   const { data: moreArticles } = useNews({ page: 1 });
+  
+  // State for related articles
+  const [relatedArticles, setRelatedArticles] = useState([]);
 
   // Handle paginated API response - extract results array
   const comments = Array.isArray(commentsData) 
     ? commentsData 
     : (commentsData?.results || []);
+  
+  // Fetch related articles based on same category
+  useEffect(() => {
+    if (news?.category) {
+      fetch(`http://localhost:8000/api/news/?category=${news.category}&page_size=4`)
+        .then(response => response.json())
+        .then(data => {
+          const articles = data.results || data;
+          // Filter out current article and take only 3
+          const filtered = articles
+            .filter(article => article.id !== news.id)
+            .slice(0, 3);
+          setRelatedArticles(filtered);
+        })
+        .catch(error => console.error('Error fetching related articles:', error));
+    }
+  }, [news?.category, news?.id]);
 
   // Extract table of contents from article content
   useEffect(() => {
@@ -328,17 +348,35 @@ const NewsDetail = () => {
             <div className="sidebar-card">
               <h3 className="sidebar-title">Related Articles</h3>
               <div className="related-articles">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="related-article">
-                    <div className="related-article__image">
-                      <img src={`https://images.unsplash.com/photo-158${i}829365295-ab7cd400c167?w=400`} alt="Related" />
-                    </div>
-                    <div className="related-article__content">
-                      <h4>Related Article Title {i}</h4>
-                      <p className="related-article__date">2 days ago</p>
-                    </div>
-                  </div>
-                ))}
+                {relatedArticles.length > 0 ? (
+                  relatedArticles.map((article) => (
+                    <Link 
+                      key={article.id} 
+                      to={`/news/${article.slug || article.id}`} 
+                      className="related-article"
+                    >
+                      <div className="related-article__image">
+                        <img 
+                          src={article.image || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'} 
+                          alt={article.title}
+                          onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'}
+                        />
+                      </div>
+                      <div className="related-article__content">
+                        <h4>{article.title}</h4>
+                        <p className="related-article__date">
+                          {new Date(article.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="no-related">No related articles found</p>
+                )}
               </div>
             </div>
 

@@ -591,10 +591,19 @@
   border-radius: 8px;
   transition: background 0.2s;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .related-article:hover {
   background: #f8f9fa;
+}
+
+.no-related {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 20px;
 }
 
 .related-article__image {
