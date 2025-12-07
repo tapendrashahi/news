@@ -25,7 +25,6 @@ const NewsDetail = () => {
   const comments = Array.isArray(commentsData) 
     ? commentsData 
     : (commentsData?.results || []);
-  const API_BASE = process.env.REACT_APP_MEDIA_URL || 'http://localhost:8000';
 
   // Extract table of contents from article content
   useEffect(() => {
@@ -176,7 +175,7 @@ const NewsDetail = () => {
     );
   }
 
-  const imageUrl = news.image ? `${API_BASE}${news.image}` : null;
+  const imageUrl = news.image || null;
   const shareUrl = window.location.href;
 
   return (
@@ -447,7 +446,7 @@ const NewsDetail = () => {
                     >
                       <div className="learning-card__image">
                         <img 
-                          src={article.image ? `${API_BASE}${article.image}` : 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600'} 
+                          src={article.image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600'} 
                           alt={article.title}
                           onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600'}
                         />

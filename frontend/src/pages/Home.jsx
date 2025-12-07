@@ -61,8 +61,6 @@ const Home = () => {
     ? categories 
     : categories.slice(0, INITIAL_CATEGORY_LIMIT);
   const hasMoreCategories = categories.length > INITIAL_CATEGORY_LIMIT;
-  
-  const API_BASE = process.env.REACT_APP_MEDIA_URL || 'http://localhost:8000';
 
   // Helper function to format date - compact version
   const formatDate = (dateString) => {
@@ -162,7 +160,7 @@ const Home = () => {
                   <Link to={`/news/${displayNews[0].slug || displayNews[0].id}`} className="split-hero__link">
                     <div className="split-hero__image">
                       <img 
-                        src={displayNews[0].image ? `${API_BASE}${displayNews[0].image}` : 'https://images.unsplash.com/photo-1569163139394-de4798aa62b5?w=800'} 
+                        src={displayNews[0].image || 'https://images.unsplash.com/photo-1569163139394-de4798aa62b5?w=800'} 
                         alt={displayNews[0].title}
                         onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1569163139394-de4798aa62b5?w=800'}
                       />
@@ -195,7 +193,7 @@ const Home = () => {
                       <Link to={`/news/${item.slug || item.id}`} className="split-hero__small-link">
                         <div className="split-hero__small-image">
                           <img 
-                            src={item.image ? `${API_BASE}${item.image}` : 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'} 
+                            src={item.image || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'} 
                             alt={item.title}
                             onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'}
                           />
@@ -241,7 +239,7 @@ const Home = () => {
                       <Link to={`/news/${item.slug || item.id}`} className="news-card__link">
                         <div className="news-card__image">
                           <img 
-                            src={item.image ? `${API_BASE}${item.image}` : 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800'} 
+                            src={item.image || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800'} 
                             alt={item.title}
                             onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800'}
                           />

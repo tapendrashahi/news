@@ -21,7 +21,7 @@ const NewsCard = ({ news, featured = false }) => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const imageUrl = image ? `${process.env.REACT_APP_MEDIA_URL}${image}` : '/placeholder.jpg';
+  const imageUrl = image || '/placeholder.jpg';
 
   return (
     <article className={`news-card ${featured ? 'news-card--featured' : ''}`}>
