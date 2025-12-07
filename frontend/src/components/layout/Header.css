@@ -196,8 +196,8 @@
   background: #ffffff;
   border: 2px solid #e2e8f0;
   color: #1e293b;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -216,8 +216,8 @@
 }
 
 .header__search-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Search Modal Overlay */

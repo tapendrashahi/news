@@ -7,8 +7,8 @@ import './Home.css';
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [breakingNews, setBreakingNews] = useState([]);
   
+  // Fetch actual data from backend API
   const { data: newsData, isLoading: newsLoading } = useNews({ 
     page: currentPage,
     category: selectedCategory === 'all' ? '' : selectedCategory 
@@ -16,14 +16,7 @@ const Home = () => {
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
   
   const loading = newsLoading || categoriesLoading;
-  const news = newsData?.results || [];
-  
-  // Set breaking news
-  useEffect(() => {
-    if (news.length > 0) {
-      setBreakingNews(news.slice(0, 5));
-    }
-  }, [news]);
+  const featuredNews = newsData?.results || [];
 
   // Map icons to categories
   const categoryIcons = {
@@ -55,7 +48,7 @@ const Home = () => {
   
   const API_BASE = process.env.REACT_APP_MEDIA_URL || 'http://localhost:8000';
 
-  // Helper function to format date - compact version
+  // Helper function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -63,46 +56,28 @@ const Home = () => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     
     if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
   };
   
-  // Calculate read time based on content length - compact version
+  // Calculate read time based on content length
   const calculateReadTime = (content) => {
     const wordsPerMinute = 200;
     const words = content ? content.split(' ').length : 0;
     const minutes = Math.ceil(words / wordsPerMinute);
-    return `${minutes} min`;
+    return `${minutes} min read`;
   };
   
   // Generate AI confidence score (mock for now)
   const getAiConfidence = () => {
     return Math.floor(Math.random() * (98 - 85 + 1)) + 85;
   };
-  
-  // Get category color
-  const getCategoryColor = (category) => {
-    const colors = {
-      'politics': '#ef4444',
-      'political': '#ef4444',
-      'technology': '#3b82f6',
-      'tech': '#3b82f6',
-      'business': '#10b981',
-      'science': '#8b5cf6',
-      'health': '#ec4899',
-      'environment': '#14b8a6',
-      'sports': '#f59e0b',
-      'education': '#f97316',
-      'entertainment': '#a855f7'
-    };
-    return colors[category?.toLowerCase()] || '#7e22ce';
-  };
 
   // Category filtering is handled by the API, no need to filter locally
-  const displayNews = news;
+  const displayNews = featuredNews;
 
   return (
     <>
@@ -113,29 +88,6 @@ const Home = () => {
       />
       
       <div className="home">
-        {/* Breaking News Ticker */}
-        {breakingNews.length > 0 && (
-          <div className="breaking-news">
-            <div className="breaking-news__label">
-              <span className="breaking-news__icon">⚡</span>
-              <span className="breaking-news__text">BREAKING</span>
-            </div>
-            <div className="breaking-news__ticker">
-              <div className="breaking-news__track">
-                {breakingNews.map(item => (
-                  <Link 
-                    key={item.id} 
-                    to={`/news/${item.slug || item.id}`} 
-                    className="breaking-news__item"
-                  >
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        
         {/* Hero Section */}
       <section className="home__hero">
         <div className="hero__content">
