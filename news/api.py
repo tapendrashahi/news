@@ -63,7 +63,15 @@ class NewsViewSet(viewsets.ModelViewSet):
         # Try to get by slug first
         slug = kwargs.get('pk')
         try:
-            instance = News.objects.filter(visibility='public').select_related('author').prefetch_related('comments', 'shares').get(slug=slug)
+            # Use filter().first() to handle duplicate slugs - get most recent
+            instance = News.objects.filter(
+                visibility='public',
+                slug=slug
+            ).select_related('author').prefetch_related('comments', 'shares').order_by('-created_at').first()
+            
+            if not instance:
+                raise News.DoesNotExist
+                
         except News.DoesNotExist:
             # If not found by slug, try by pk
             try:
