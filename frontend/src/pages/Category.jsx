@@ -121,35 +121,31 @@ const Category = () => {
     <div className="category-page">
       {/* Breadcrumbs */}
       <div className="breadcrumbs">
-        <div className="container">
-          <div className="breadcrumbs-list">
-            <Link to="/"><i className="fas fa-home"></i> Home</Link>
-            <span className="breadcrumbs-separator">/</span>
-            <span className="breadcrumbs-current">{categoryDisplay}</span>
-          </div>
+        <div className="breadcrumbs-list">
+          <Link to="/"><i className="fas fa-home"></i> Home</Link>
+          <span className="breadcrumbs-separator">/</span>
+          <span className="breadcrumbs-current">{categoryDisplay}</span>
         </div>
       </div>
 
       {/* Category Header */}
       <div className="category-header" style={{ background: `linear-gradient(135deg, ${getCategoryColor()}, ${getCategoryColor()}dd)` }}>
-        <div className="container">
-          <div className="category-header-content">
-            <div className="category-icon">
-              <i className={`fas ${getCategoryIcon(category)}`}></i>
+        <div className="category-header-content">
+          <div className="category-icon">
+            <i className={`fas ${getCategoryIcon(category)}`}></i>
+          </div>
+          <h1 className="category-title">{categoryDisplay}</h1>
+          <p className="category-description">
+            Latest updates and in-depth analysis on {categoryDisplay.toLowerCase()} news
+          </p>
+          <div className="category-stats">
+            <div className="stat-item">
+              <i className="fas fa-newspaper"></i>
+              <span>{news.length} Articles</span>
             </div>
-            <h1 className="category-title">{categoryDisplay}</h1>
-            <p className="category-description">
-              Latest updates and in-depth analysis on {categoryDisplay.toLowerCase()} news
-            </p>
-            <div className="category-stats">
-              <div className="stat-item">
-                <i className="fas fa-newspaper"></i>
-                <span>{news.length} Articles</span>
-              </div>
-              <div className="stat-item">
-                <i className="fas fa-clock"></i>
-                <span>Updated Daily</span>
-              </div>
+            <div className="stat-item">
+              <i className="fas fa-clock"></i>
+              <span>Updated Daily</span>
             </div>
           </div>
         </div>
@@ -157,28 +153,25 @@ const Category = () => {
 
       {/* Filter Bar */}
       <div className="filter-bar">
-        <div className="container">
-          <div className="filter-content">
-            <div className="filter-left">
-              <span className="results-count">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, news.length)} of {news.length} articles
-              </span>
-            </div>
-            <div className="sort-dropdown">
-              <label htmlFor="sortBy">Sort by:</label>
-              <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="popular">Most Popular</option>
-              </select>
-            </div>
+        <div className="filter-content">
+          <div className="filter-left">
+            <span className="results-count">
+              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, news.length)} of {news.length} articles
+            </span>
+          </div>
+          <div className="sort-dropdown">
+            <label htmlFor="sortBy">Sort by:</label>
+            <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="popular">Most Popular</option>
+            </select>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container">
-        <div className="main-layout">
+      <div className="main-layout">
           
           {/* News List */}
           <main>
@@ -187,40 +180,38 @@ const Category = () => {
                 <div className="news-grid">
                   {currentNews.map((item) => (
                     <article key={item.id} className="news-card">
-                      <Link to={`/news/${item.slug || item.id}`} className="news-image">
+                      <Link to={`/news/${item.slug || item.id}`} className="news-card-image">
                         <img 
                           src={item.image || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'}
                           alt={item.title}
                           onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'}
                         />
-                        <span className="news-badge" style={{ backgroundColor: getCategoryColor() }}>
+                        <span className="category-badge" style={{ backgroundColor: getCategoryColor() }}>
                           {categoryDisplay.toUpperCase()}
                         </span>
                       </Link>
-                      <div className="news-content">
+                      <div className="news-card-content">
                         <div className="news-meta">
-                          <div className="meta-item">
+                          <span>
                             <i className="far fa-calendar"></i>
-                            <span>{formatDate(item.created_at)}</span>
-                          </div>
-                          <div className="meta-item">
+                            {formatDate(item.created_at)}
+                          </span>
+                          <span>
                             <i className="far fa-clock"></i>
-                            <span>{formatTimeAgo(item.created_at)}</span>
-                          </div>
+                            {formatTimeAgo(item.created_at)}
+                          </span>
                         </div>
-                        <h2 className="news-title">
+                        <h2 className="news-card-title">
                           <Link to={`/news/${item.slug || item.id}`}>
                             {item.title}
                           </Link>
                         </h2>
-                        <p className="news-excerpt">
+                        <p className="news-card-excerpt">
                           {item.excerpt || item.content?.substring(0, 150)}...
                         </p>
-                        <div className="news-footer">
+                        <div className="news-card-footer">
                           <div className="news-author">
-                            <div className="author-avatar">
-                              {item.author?.name?.charAt(0) || 'A'}
-                            </div>
+                            <i className="fas fa-user-circle"></i>
                             <span>{item.author?.name || 'Editorial'}</span>
                           </div>
                           <Link to={`/news/${item.slug || item.id}`} className="read-more">
@@ -370,7 +361,6 @@ const Category = () => {
             </div>
           </aside>
         </div>
-      </div>
     </div>
   );
 };
