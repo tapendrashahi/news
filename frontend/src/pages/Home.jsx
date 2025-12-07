@@ -144,38 +144,6 @@ const Home = () => {
             </div>
           </div>
         )}
-        
-        {/* Hero Section */}
-      <section className="home__hero">
-        <div className="hero__content">
-          <div className="hero__badge">
-            <span className="badge__icon">🤖</span>
-            <span className="badge__text">AI-Powered News Analysis</span>
-          </div>
-          <h1 className="home__title">AI Analitica</h1>
-          <p className="home__subtitle">
-            Unbiased News. Data-Driven Insights. Powered by Artificial Intelligence.
-          </p>
-          <p className="home__mission">
-            Every story analyzed through the lens of AI to deliver objective, 
-            multi-perspective coverage free from human bias.
-          </p>
-        </div>
-        <div className="hero__stats">
-          <div className="stat">
-            <div className="stat__number">10K+</div>
-            <div className="stat__label">Articles Analyzed</div>
-          </div>
-          <div className="stat">
-            <div className="stat__number">95%</div>
-            <div className="stat__label">AI Accuracy</div>
-          </div>
-          <div className="stat">
-            <div className="stat__number">24/7</div>
-            <div className="stat__label">Real-time Updates</div>
-          </div>
-        </div>
-      </section>
 
       {/* Category Navigation */}
       <section className="home__categories">
