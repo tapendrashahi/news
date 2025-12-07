@@ -5,8 +5,8 @@
 
 /* Base Styles */
 .home {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0;
   background: #f8f9fa;
 }
@@ -17,10 +17,11 @@
 .home__hero {
   position: relative;
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-  padding: 80px 40px 60px;
+  padding: 80px 0 60px;
   margin-bottom: 40px;
   color: #fff;
   overflow: hidden;
+  width: 100%;
 }
 
 .home__hero::before {
@@ -127,8 +128,15 @@
    CATEGORY NAVIGATION
    ============================================ */
 .home__categories {
-  padding: 0 40px;
+  padding: 0;
   margin-bottom: 40px;
+  width: 100%;
+}
+
+.home__categories-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
 .categories__container {
@@ -193,6 +201,8 @@
    MAIN CONTENT
    ============================================ */
 .home__content {
+  max-width: 1400px;
+  margin: 0 auto;
   padding: 0 40px 60px;
 }
 
@@ -536,14 +546,16 @@
    ============================================ */
 .home__mission-section {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  padding: 80px 40px;
+  padding: 80px 0;
   margin: 60px 0 0;
   color: #ffffff;
+  width: 100%;
 }
 
 .mission__content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0 40px;
 }
 
 .mission__title {

@@ -122,17 +122,19 @@ const Home = () => {
 
       {/* Category Navigation */}
       <section className="home__categories">
-        <div className="categories__container">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`category-chip ${selectedCategory === category.id ? 'category-chip--active' : ''}`}
-              onClick={() => setSelectedCategory(category.id)}
-            >
-              <span className="category-chip__icon">{category.icon}</span>
-              <span className="category-chip__name">{category.name}</span>
-            </button>
-          ))}
+        <div className="home__categories-wrapper">
+          <div className="categories__container">
+            {categories.map(category => (
+              <button
+                key={category.id}
+                className={`category-chip ${selectedCategory === category.id ? 'category-chip--active' : ''}`}
+                onClick={() => setSelectedCategory(category.id)}
+              >
+                <span className="category-chip__icon">{category.icon}</span>
+                <span className="category-chip__name">{category.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

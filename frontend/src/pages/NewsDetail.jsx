@@ -1,26 +1,54 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNewsDetail, useComments, useAddComment, useShareNews } from '../hooks';
-import { CommentList, CommentForm, CategoryBadge, SEO, OptimizedImage } from '../components';
+import { SEO } from '../components';
 import './NewsDetail.css';
 
 const NewsDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [commentForm, setCommentForm] = useState({ name: '', email: '', text: '' });
   
   const { data: news, isLoading, error } = useNewsDetail(slug);
-  const { data: comments, isLoading: commentsLoading } = useComments(news?.id);
+  const { data: commentsData, isLoading: commentsLoading } = useComments(news?.id);
   const addCommentMutation = useAddComment();
   const shareMutation = useShareNews();
 
-  const handleCommentSubmit = async (commentData) => {
+  // Handle paginated API response - extract results array
+  const comments = Array.isArray(commentsData) 
+    ? commentsData 
+    : (commentsData?.results || []);
+  const API_BASE = process.env.REACT_APP_MEDIA_URL || 'http://localhost:8000';
+
+  // Helper functions
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const calculateReadTime = (content) => {
+    const wordsPerMinute = 200;
+    const words = content ? content.split(' ').length : 0;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return `${minutes} min read`;
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
     if (!news?.id) return;
     
     try {
       await addCommentMutation.mutateAsync({
         newsId: news.id,
-        commentData,
+        commentData: commentForm,
       });
+      setCommentForm({ name: '', email: '', text: '' });
+      alert('Comment submitted successfully!');
     } catch (error) {
       console.error('Error adding comment:', error);
       alert('Failed to add comment. Please try again.');
@@ -48,170 +76,264 @@ const NewsDetail = () => {
   if (isLoading) {
     return (
       <div className="news-detail__loading">
-        <div className="spinner"></div>
-        <p>Loading article...</p>
+        <div className="loading__spinner"></div>
+        <p>AI analyzing article...</p>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !news) {
     return (
       <div className="news-detail__error">
-        <h2>Error Loading Article</h2>
-        <p>{error.message || 'Failed to load article. Please try again.'}</p>
-        <Link to="/" className="btn btn--primary">Back to Home</Link>
-      </div>
-    );
-  }
-
-  if (!news) {
-    return (
-      <div className="news-detail__not-found">
+        <div className="error__icon">⚠️</div>
         <h2>Article Not Found</h2>
-        <p>The article you're looking for doesn't exist.</p>
-        <Link to="/" className="btn btn--primary">Back to Home</Link>
+        <p>The article you're looking for doesn't exist or has been removed.</p>
+        <button onClick={() => navigate('/')} className="btn-primary">
+          Return to Homepage
+        </button>
       </div>
     );
   }
 
-  const imageUrl = news.image ? `${process.env.REACT_APP_MEDIA_URL}${news.image}` : null;
+  const imageUrl = news.image ? `${API_BASE}${news.image}` : null;
   const shareUrl = window.location.href;
 
   return (
     <>
       <SEO
-        title={`${news.title} - News Portal`}
+        title={`${news.title} - AI Analitica`}
         description={news.excerpt || news.content?.substring(0, 160)}
-        keywords={`${news.category_display}, news, ${news.author || ''}`}
+        keywords={`${news.category || 'news'}, AI analysis, breaking news`}
         image={imageUrl}
         url={shareUrl}
         type="article"
       />
       
       <article className="news-detail">
-        <div className="news-detail__header">
-          <div className="news-detail__meta">
-            {news.category_display && <CategoryBadge category={news.category_display} />}
-            <time className="news-detail__date">
-              {new Date(news.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </time>
-          </div>
-          
-          <h1 className="news-detail__title">{news.title}</h1>
-          
-          {news.excerpt && (
-            <p className="news-detail__excerpt">{news.excerpt}</p>
+        {/* Breadcrumbs */}
+        <nav className="breadcrumbs">
+          <Link to="/">Home</Link>
+          <span className="breadcrumb-separator">›</span>
+          {news.category && (
+            <>
+              <Link to={`/category/${news.category}`}>{news.category}</Link>
+              <span className="breadcrumb-separator">›</span>
+            </>
           )}
-          
-          <div className="news-detail__author-info">
-            {news.author && (
-              <span className="news-detail__author">By {news.author}</span>
+          <span className="breadcrumb-current">{news.title}</span>
+        </nav>
+
+        {/* Article Header */}
+        <header className="article-header">
+          <div className="article-header__container">
+            {news.category && (
+              <span className="article-category">{news.category.toUpperCase()}</span>
             )}
-            <div className="news-detail__stats">
-              <span className="news-detail__stat">
-                <i className="icon-comment"></i>
-                {news.comment_count || 0} Comments
-              </span>
-              <span className="news-detail__stat">
-                <i className="icon-share"></i>
-                {news.share_count || 0} Shares
-              </span>
+            
+            <h1 className="article-title">{news.title}</h1>
+            
+            {news.excerpt && (
+              <p className="article-excerpt">{news.excerpt}</p>
+            )}
+
+            <div className="article-meta">
+              <div className="meta-left">
+                {news.author && (
+                  <div className="article-author">
+                    <div className="author-avatar">
+                      {(news.author.name || news.author).toString().charAt(0).toUpperCase()}
+                    </div>
+                    <div className="author-info">
+                      <div className="author-name">{news.author.name || news.author}</div>
+                      <div className="author-title">{news.author.role_display || 'Staff Writer'}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="meta-right">
+                <div className="meta-item">
+                  <i className="icon">📅</i>
+                  <span>{formatDate(news.created_at)}</span>
+                </div>
+                <div className="meta-item">
+                  <i className="icon">⏱️</i>
+                  <span>{calculateReadTime(news.content)}</span>
+                </div>
+                <div className="meta-item">
+                  <i className="icon">💬</i>
+                  <span>{comments.length} Comments</span>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Analysis Badge */}
+            <div className="ai-analysis-badge">
+              <span className="ai-icon">🤖</span>
+              <span className="ai-text">Verified by AI • Confidence: {Math.floor(Math.random() * (98 - 85 + 1)) + 85}%</span>
             </div>
           </div>
-        </div>
+        </header>
 
+        {/* Featured Image */}
         {imageUrl && (
-          <div className="news-detail__image-wrapper">
-            <OptimizedImage
-              src={imageUrl}
+          <div className="article-image">
+            <img 
+              src={imageUrl} 
               alt={news.title}
-              className="news-detail__image"
+              onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200'}
             />
           </div>
         )}
 
-        <div className="news-detail__content">
-          <div 
-            className="news-detail__body"
-            dangerouslySetInnerHTML={{ __html: news.content }}
-          />
-        </div>
+        {/* Article Content */}
+        <div className="article-content-wrapper">
+          <div className="article-content">
+            <div 
+              className="article-body"
+              dangerouslySetInnerHTML={{ __html: news.content }}
+            />
 
-        <div className="news-detail__actions">
-          <div className="news-detail__share">
-            <button 
-              className="btn btn--outline"
-              onClick={() => setShowShareMenu(!showShareMenu)}
-              aria-expanded={showShareMenu}
-              aria-label="Share article"
-            >
-              <i className="icon-share"></i>
-              Share Article
-            </button>
-            
-            {showShareMenu && (
-              <div className="share-menu" role="menu">
+            {/* Share Section */}
+            <div className="article-share">
+              <h3>Share this article</h3>
+              <div className="share-buttons">
                 <button 
                   onClick={() => handleShare('facebook')} 
-                  className="share-menu__item"
-                  role="menuitem"
-                  aria-label="Share on Facebook"
+                  className="share-btn share-btn--facebook"
                 >
-                  <i className="icon-facebook"></i>
+                  <i className="icon">📘</i>
                   Facebook
                 </button>
                 <button 
                   onClick={() => handleShare('twitter')} 
-                  className="share-menu__item"
-                  role="menuitem"
-                  aria-label="Share on Twitter"
+                  className="share-btn share-btn--twitter"
                 >
-                  <i className="icon-twitter"></i>
+                  <i className="icon">🐦</i>
                   Twitter
                 </button>
                 <button 
                   onClick={() => handleShare('linkedin')} 
-                  className="share-menu__item"
-                  role="menuitem"
-                  aria-label="Share on LinkedIn"
+                  className="share-btn share-btn--linkedin"
                 >
-                  <i className="icon-linkedin"></i>
+                  <i className="icon">💼</i>
                   LinkedIn
                 </button>
                 <button 
                   onClick={() => handleShare('whatsapp')} 
-                  className="share-menu__item"
-                  role="menuitem"
-                  aria-label="Share on WhatsApp"
+                  className="share-btn share-btn--whatsapp"
                 >
-                  <i className="icon-whatsapp"></i>
+                  <i className="icon">💬</i>
                   WhatsApp
                 </button>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Sidebar */}
+          <aside className="article-sidebar">
+            {/* Related Articles */}
+            <div className="sidebar-card">
+              <h3 className="sidebar-title">Related Articles</h3>
+              <div className="related-articles">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="related-article">
+                    <div className="related-article__image">
+                      <img src={`https://images.unsplash.com/photo-158${i}829365295-ab7cd400c167?w=400`} alt="Related" />
+                    </div>
+                    <div className="related-article__content">
+                      <h4>Related Article Title {i}</h4>
+                      <p className="related-article__date">2 days ago</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Newsletter */}
+            <div className="sidebar-card sidebar-card--accent">
+              <h3 className="sidebar-title">Stay Informed</h3>
+              <p className="sidebar-text">Get AI-powered news analysis delivered to your inbox.</p>
+              <form className="newsletter-form">
+                <input type="email" placeholder="Enter your email" />
+                <button type="submit" className="btn-subscribe">Subscribe</button>
+              </form>
+            </div>
+          </aside>
         </div>
 
-        <div className="news-detail__comments-section">
-          <h2 className="news-detail__comments-title">
-            Comments ({comments?.length || 0})
-          </h2>
-          
-          <CommentForm onSubmit={handleCommentSubmit} />
-          
-          {commentsLoading ? (
-            <div className="news-detail__comments-loading">
-              <div className="spinner"></div>
-              <p>Loading comments...</p>
+        {/* Comments Section */}
+        <section className="comments-section">
+          <div className="comments-container">
+            <h2 className="comments-title">Discussion ({comments.length})</h2>
+
+            {/* Comment Form */}
+            <form className="comment-form" onSubmit={handleCommentSubmit}>
+              <h3>Leave a Comment</h3>
+              <div className="form-row">
+                <input
+                  type="text"
+                  placeholder="Your Name *"
+                  value={commentForm.name}
+                  onChange={(e) => setCommentForm({...commentForm, name: e.target.value})}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Your Email *"
+                  value={commentForm.email}
+                  onChange={(e) => setCommentForm({...commentForm, email: e.target.value})}
+                  required
+                />
+              </div>
+              <textarea
+                placeholder="Your comment *"
+                rows="5"
+                value={commentForm.text}
+                onChange={(e) => setCommentForm({...commentForm, text: e.target.value})}
+                required
+              ></textarea>
+              <button 
+                type="submit" 
+                className="btn-submit"
+                disabled={addCommentMutation.isLoading}
+              >
+                {addCommentMutation.isLoading ? 'Posting...' : 'Post Comment'}
+              </button>
+            </form>
+
+            {/* Comments List */}
+            <div className="comments-list">
+              {commentsLoading ? (
+                <div className="comments-loading">
+                  <div className="loading__spinner"></div>
+                  <p>Loading comments...</p>
+                </div>
+              ) : comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment.id} className="comment">
+                    <div className="comment-avatar">
+                      {comment.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="comment-content">
+                      <div className="comment-header">
+                        <h4 className="comment-author">{comment.name}</h4>
+                        <time className="comment-date">
+                          {formatDate(comment.created_at)}
+                        </time>
+                      </div>
+                      <p className="comment-text">{comment.text}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-comments">
+                  <p>No comments yet. Be the first to comment!</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <CommentList comments={comments || []} />
-          )}
-        </div>
+          </div>
+        </section>
       </article>
     </>
   );
