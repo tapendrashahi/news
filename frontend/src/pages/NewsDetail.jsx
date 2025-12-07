@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useNewsDetail, useComments, useAddComment, useShareNews } from '../hooks';
+import { useNewsDetail, useComments, useAddComment, useShareNews, useNews } from '../hooks';
 import { SEO } from '../components';
 import './NewsDetail.css';
 
@@ -9,17 +9,78 @@ const NewsDetail = () => {
   const navigate = useNavigate();
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', email: '', text: '' });
+  const [tableOfContents, setTableOfContents] = useState([]);
+  const [activeSection, setActiveSection] = useState('');
+  const contentRef = useRef(null);
   
   const { data: news, isLoading, error } = useNewsDetail(slug);
   const { data: commentsData, isLoading: commentsLoading } = useComments(news?.id);
   const addCommentMutation = useAddComment();
   const shareMutation = useShareNews();
+  
+  // Fetch more AI analysis articles for "Keep Learning" section
+  const { data: moreArticles } = useNews({ page: 1 });
 
   // Handle paginated API response - extract results array
   const comments = Array.isArray(commentsData) 
     ? commentsData 
     : (commentsData?.results || []);
   const API_BASE = process.env.REACT_APP_MEDIA_URL || 'http://localhost:8000';
+
+  // Extract table of contents from article content
+  useEffect(() => {
+    if (news?.content && contentRef.current) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = news.content;
+      
+      const headings = tempDiv.querySelectorAll('h1, h2, h3, h4');
+      const toc = Array.from(headings).map((heading, index) => {
+        const id = `section-${index}`;
+        const level = parseInt(heading.tagName.substring(1));
+        return {
+          id,
+          text: heading.textContent,
+          level
+        };
+      });
+      
+      setTableOfContents(toc);
+      
+      // Add IDs to actual content headings
+      setTimeout(() => {
+        const actualHeadings = contentRef.current?.querySelectorAll('h1, h2, h3, h4');
+        actualHeadings?.forEach((heading, index) => {
+          heading.id = `section-${index}`;
+        });
+      }, 100);
+    }
+  }, [news?.content]);
+
+  // Track active section on scroll with Intersection Observer
+  useEffect(() => {
+    if (!contentRef.current || tableOfContents.length === 0) return;
+
+    const observerOptions = {
+      rootMargin: '-100px 0px -66%',
+      threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Observe all heading elements
+    const headings = contentRef.current.querySelectorAll('h1, h2, h3, h4');
+    headings.forEach((heading) => observer.observe(heading));
+
+    return () => observer.disconnect();
+  }, [tableOfContents]);
 
   // Helper functions
   const formatDate = (dateString) => {
@@ -51,7 +112,13 @@ const NewsDetail = () => {
       alert('Comment submitted successfully!');
     } catch (error) {
       console.error('Error adding comment:', error);
-      alert('Failed to add comment. Please try again.');
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error 
+        || JSON.stringify(error.response?.data)
+        || 'Failed to add comment. Please try again.';
+      alert(errorMessage);
     }
   };
 
@@ -70,6 +137,20 @@ const NewsDetail = () => {
 
     if (shareUrls[platform]) {
       window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+    }
+  };
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -188,8 +269,33 @@ const NewsDetail = () => {
 
         {/* Article Content */}
         <div className="article-content-wrapper">
+          {/* Table of Contents - Left Sidebar */}
+          {tableOfContents.length > 0 && (
+            <aside className="table-of-contents">
+              <div className="toc-sticky">
+                <h3 className="toc-title">Contents</h3>
+                <nav className="toc-nav">
+                  {tableOfContents.map((item, index) => (
+                    <button
+                      key={item.id}
+                      className={`toc-item toc-item--level-${item.level} ${activeSection === item.id ? 'toc-item--active' : ''}`}
+                      onClick={() => scrollToSection(item.id)}
+                      title={item.text}
+                    >
+                      {index === 0 && item.level === 2 && (
+                        <span className="toc-badge">Key findings</span>
+                      )}
+                      {item.text}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </aside>
+          )}
+
           <div className="article-content">
             <div 
+              ref={contentRef}
               className="article-body"
               dangerouslySetInnerHTML={{ __html: news.content }}
             />
@@ -334,6 +440,48 @@ const NewsDetail = () => {
             </div>
           </div>
         </section>
+
+        {/* Keep Learning / Explore More Section */}
+        {moreArticles?.results && moreArticles.results.length > 0 && (
+          <section className="keep-learning">
+            <div className="keep-learning__container">
+              <h2 className="keep-learning__title">Keep Learning</h2>
+              <p className="keep-learning__subtitle">Explore More AI Analysis News</p>
+              
+              <div className="keep-learning__grid">
+                {moreArticles.results
+                  .filter(article => article.slug !== slug) // Exclude current article
+                  .slice(0, 6)
+                  .map((article) => (
+                    <Link 
+                      key={article.id} 
+                      to={`/news/${article.slug || article.id}`} 
+                      className="learning-card"
+                    >
+                      <div className="learning-card__image">
+                        <img 
+                          src={article.image ? `${API_BASE}${article.image}` : 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600'} 
+                          alt={article.title}
+                          onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600'}
+                        />
+                      </div>
+                      <div className="learning-card__content">
+                        <h3 className="learning-card__title">{article.title}</h3>
+                        <p className="learning-card__excerpt">
+                          {article.excerpt || article.content?.substring(0, 120) + '...'}
+                        </p>
+                        <div className="learning-card__meta">
+                          <span className="meta-date">{formatDate(article.created_at)}</span>
+                          <span className="meta-separator">•</span>
+                          <span className="meta-read">{calculateReadTime(article.content)}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          </section>
+        )}
       </article>
     </>
   );

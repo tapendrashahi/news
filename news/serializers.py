@@ -27,6 +27,9 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'news', 'name', 'email', 'text', 'created_at', 'is_approved']
         read_only_fields = ['created_at', 'is_approved']
+        extra_kwargs = {
+            'news': {'required': False}  # Make news optional for creation via action
+        }
     
     def validate_text(self, value):
         """Validate comment text"""

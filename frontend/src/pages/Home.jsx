@@ -145,40 +145,6 @@ const Home = () => {
           </div>
         )}
 
-      {/* Category Navigation */}
-      <section className="home__categories">
-        <div className="home__categories-wrapper">
-          <div className="categories__container">
-            {displayedCategories.map(category => (
-              <button
-                key={category.id}
-                className={`category-chip ${selectedCategory === category.id ? 'category-chip--active' : ''}`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                <span className="category-chip__icon">{category.icon}</span>
-                <span className="category-chip__name">{category.name}</span>
-                {category.count !== undefined && (
-                  <span className="category-chip__count">{category.count}</span>
-                )}
-              </button>
-            ))}
-            {hasMoreCategories && (
-              <button
-                className="category-chip category-chip--more"
-                onClick={() => setShowAllCategories(!showAllCategories)}
-              >
-                <span className="category-chip__icon">
-                  {showAllCategories ? '−' : '+'}
-                </span>
-                <span className="category-chip__name">
-                  {showAllCategories ? 'Show Less' : `${categories.length - INITIAL_CATEGORY_LIMIT} More`}
-                </span>
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <main className="home__content">
         {loading ? (
@@ -322,6 +288,29 @@ const Home = () => {
                           </div>
                         </div>
                       </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Browse Topics Widget */}
+                <div className="sidebar__widget">
+                  <h3 className="sidebar__widget-title">
+                    <span className="widget-icon">📂</span>
+                    Browse Topics
+                  </h3>
+                  <div className="browse-topics__list">
+                    {categories.map(category => (
+                      <button
+                        key={category.id}
+                        className={`topic-item ${selectedCategory === category.id ? 'topic-item--active' : ''}`}
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        <span className="topic-item__icon">{category.icon}</span>
+                        <span className="topic-item__name">{category.name}</span>
+                        {category.count !== undefined && (
+                          <span className="topic-item__count">{category.count}</span>
+                        )}
+                      </button>
                     ))}
                   </div>
                 </div>
