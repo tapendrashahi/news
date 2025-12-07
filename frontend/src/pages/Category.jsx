@@ -25,6 +25,11 @@ const Category = () => {
       .then(data => {
         let newsItems = data.results || data;
         
+        // Ensure newsItems is an array
+        if (!Array.isArray(newsItems)) {
+          newsItems = [];
+        }
+        
         // Sort news based on selection
         if (sortBy === 'oldest') {
           newsItems = [...newsItems].reverse();
@@ -39,6 +44,7 @@ const Category = () => {
       })
       .catch(error => {
         console.error('Error loading news:', error);
+        setNews([]);
         setLoading(false);
       });
   };
@@ -48,9 +54,13 @@ const Category = () => {
       .then(response => response.json())
       .then(data => {
         const newsItems = data.results || data;
-        setPopularNews(newsItems.slice(0, 5));
+        const newsArray = Array.isArray(newsItems) ? newsItems : [];
+        setPopularNews(newsArray.slice(0, 5));
       })
-      .catch(error => console.error('Error loading popular news:', error));
+      .catch(error => {
+        console.error('Error loading popular news:', error);
+        setPopularNews([]);
+      });
   };
 
   const fetchCategories = () => {
@@ -108,8 +118,8 @@ const Category = () => {
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentNews = news.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(news.length / itemsPerPage);
+  const currentNews = Array.isArray(news) ? news.slice(indexOfFirstItem, indexOfLastItem) : [];
+  const totalPages = Math.ceil((Array.isArray(news) ? news.length : 0) / itemsPerPage);
 
   const categoryDisplay = category?.charAt(0).toUpperCase() + category?.slice(1);
 
