@@ -3,8 +3,33 @@ import api from './api';
 export const newsService = {
   // Get all news with pagination
   getNews: async (params = {}) => {
-    const response = await api.get('/news/', { params });
-    return response.data;
+    console.log('🌐 [API CALL] newsService.getNews', {
+      function: 'getNews',
+      file: '/home/tapendra/Downloads/projects/news/frontend/src/services/newsService.js',
+      params,
+      endpoint: '/api/news/',
+      method: 'GET',
+      timestamp: new Date().toISOString()
+    });
+
+    try {
+      const response = await api.get('/news/', { params });
+      console.log('✅ [API SUCCESS] newsService.getNews', {
+        status: response.status,
+        dataKeys: Object.keys(response.data),
+        resultsCount: response.data.results?.length,
+        totalCount: response.data.count,
+        data: response.data
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ [API ERROR] newsService.getNews', {
+        error: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw error;
+    }
   },
 
   // Get single news by slug
@@ -31,8 +56,31 @@ export const newsService = {
 
   // Get categories
   getCategories: async () => {
-    const response = await api.get('/categories/');
-    return response.data;
+    console.log('🌐 [API CALL] newsService.getCategories', {
+      function: 'getCategories',
+      file: '/home/tapendra/Downloads/projects/news/frontend/src/services/newsService.js',
+      endpoint: '/api/categories/',
+      method: 'GET',
+      timestamp: new Date().toISOString()
+    });
+
+    try {
+      const response = await api.get('/categories/');
+      console.log('✅ [API SUCCESS] newsService.getCategories', {
+        status: response.status,
+        dataKeys: Object.keys(response.data),
+        categoriesCount: response.data.categories?.length,
+        data: response.data
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ [API ERROR] newsService.getCategories', {
+        error: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw error;
+    }
   },
 
   // Get comments for a news article

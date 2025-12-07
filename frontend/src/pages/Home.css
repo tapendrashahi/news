@@ -339,8 +339,10 @@
   grid-template-columns: 1.5fr 1fr;
   gap: 24px;
   margin-bottom: 48px;
-  padding: 0 20px;
-  max-width: 100%;
+  padding: 0 40px;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Large Featured Story */
@@ -581,18 +583,25 @@
    ============================================ */
 .content-wrapper {
   display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 40px;
-  margin-bottom: 60px;
-  padding: 0 20px;
-  max-width: 100%;
+  grid-template-columns: 1fr 280px;
+  gap: 60px;
+  margin: 0 auto 60px;
+  padding: 0 40px;
+  max-width: 1600px;
+  width: 100%;
+  min-width: min(100%, 1200px);
+  align-items: start;
 }
 
 /* ============================================
    NEWS GRID (Magazine Style)
    ============================================ */
 .news-grid {
-  min-width: 0;
+  width: 100% !important;
+  display: block !important;
+  min-width: 100%;
+  justify-self: stretch;
+  align-self: start;
 }
 
 .news-grid__header {
@@ -645,9 +654,10 @@
 }
 
 .news-grid__items {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 40px !important;
+  width: 100% !important;
 }
 
 /* News Cards */
@@ -669,11 +679,11 @@
 }
 
 .news-card--large .news-card__image {
-  height: 320px;
+  height: 420px;
 }
 
 .news-card--large .news-card__title {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 
 .news-card__link {
@@ -688,7 +698,7 @@
 
 .news-card__image {
   position: relative;
-  height: 220px;
+  height: 320px;
   overflow: hidden;
 }
 
@@ -717,7 +727,7 @@
 }
 
 .news-card__content {
-  padding: 20px;
+  padding: 24px;
 }
 
 .news-card__category {
@@ -734,7 +744,7 @@
 }
 
 .news-card__title {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.4;
   margin: 0 0 10px;
@@ -752,7 +762,7 @@
 }
 
 .news-card__excerpt {
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #64748b;
   margin: 0 0 16px;
@@ -1171,12 +1181,6 @@
   box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.1);
 }
 
-.news-grid__items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
-}
-
 /* ============================================
    NEWS CARD
    ============================================ */
@@ -1531,11 +1535,11 @@
 
   
   .split-hero {
-    padding: 0 12px;
+    padding: 0 20px;
   }
   
   .content-wrapper {
-    padding: 0 12px;
+    padding: 0 20px;
   }
 }
 
@@ -1602,10 +1606,10 @@
   }
   
   .split-hero {
-    padding: 0 16px;
+    padding: 0 24px;
   }
   
   .content-wrapper {
-    padding: 0 16px;
+    padding: 0 24px;
   }
 }

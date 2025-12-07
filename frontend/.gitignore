@@ -36,3 +36,11 @@ coverage/
 
 # Misc
 .cache/
+
+# Webpack cache
+.webpack-cache/
+node_modules/.cache/
+
+# Debug files (if accidentally created)
+**/DebugPanel.jsx
+**/DebugPanel.css

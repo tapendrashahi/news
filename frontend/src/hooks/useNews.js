@@ -10,11 +10,37 @@ import { newsService } from '../services/newsService';
  * @returns {Object} Query result with news data, loading state, and error
  */
 export const useNews = ({ page = 1, category = '', search = '' } = {}) => {
+  console.log('🎣 [HOOK] useNews called', {
+    hook: 'useNews',
+    file: '/home/tapendra/Downloads/projects/news/frontend/src/hooks/useNews.js',
+    params: { page, category, search },
+    queryKey: ['news', { page, category, search }]
+  });
+
   return useQuery({
     queryKey: ['news', { page, category, search }],
-    queryFn: () => newsService.getNews({ page, category, search }),
+    queryFn: () => {
+      console.log('🔄 [HOOK] useNews queryFn executing', {
+        queryKey: ['news', { page, category, search }],
+        about: 'Calling newsService.getNews'
+      });
+      return newsService.getNews({ page, category, search });
+    },
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    onSuccess: (data) => {
+      console.log('✅ [HOOK] useNews success', {
+        resultsCount: data?.results?.length,
+        totalCount: data?.count,
+        dataKeys: Object.keys(data || {})
+      });
+    },
+    onError: (error) => {
+      console.error('❌ [HOOK] useNews error', {
+        error: error.message,
+        stack: error.stack
+      });
+    }
   });
 };
 
@@ -69,10 +95,35 @@ export const useSearchNews = (query, page = 1) => {
  * @returns {Object} Query result with categories data
  */
 export const useCategories = () => {
+  console.log('🎣 [HOOK] useCategories called', {
+    hook: 'useCategories',
+    file: '/home/tapendra/Downloads/projects/news/frontend/src/hooks/useNews.js',
+    queryKey: ['categories']
+  });
+
   return useQuery({
     queryKey: ['categories'],
-    queryFn: () => newsService.getCategories(),
+    queryFn: () => {
+      console.log('🔄 [HOOK] useCategories queryFn executing', {
+        queryKey: ['categories'],
+        about: 'Calling newsService.getCategories'
+      });
+      return newsService.getCategories();
+    },
     staleTime: 30 * 60 * 1000, // 30 minutes
+    onSuccess: (data) => {
+      console.log('✅ [HOOK] useCategories success', {
+        categoriesCount: data?.categories?.length,
+        dataKeys: Object.keys(data || {}),
+        categories: data?.categories?.map(c => c.name)
+      });
+    },
+    onError: (error) => {
+      console.error('❌ [HOOK] useCategories error', {
+        error: error.message,
+        stack: error.stack
+      });
+    }
   });
 };
 
