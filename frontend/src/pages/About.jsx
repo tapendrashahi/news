@@ -44,7 +44,12 @@ function About() {
       <div className="about-container">
         {/* Mission Section */}
         <section className="about-section">
-          <h2 className="about-section__title">{aboutData.mission.title}</h2>
+          <div className="about-section__header">
+            <div className="about-section__icon">
+              <i className="fas fa-bullseye"></i>
+            </div>
+            <h2 className="about-section__title">{aboutData.mission.title}</h2>
+          </div>
           {aboutData.mission.content.map((paragraph, index) => (
             <p key={index} className="about-section__text">{paragraph}</p>
           ))}
@@ -52,7 +57,12 @@ function About() {
 
         {/* Values Section */}
         <section className="about-section">
-          <h2 className="about-section__title">{aboutData.values.title}</h2>
+          <div className="about-section__header">
+            <div className="about-section__icon">
+              <i className="fas fa-gem"></i>
+            </div>
+            <h2 className="about-section__title">{aboutData.values.title}</h2>
+          </div>
           <div className="values-grid">
             {aboutData.values.items.map((value, index) => (
               <div key={index} className="value-card">
@@ -68,7 +78,12 @@ function About() {
 
         {/* Story Section */}
         <section className="about-section">
-          <h2 className="about-section__title">{aboutData.story.title}</h2>
+          <div className="about-section__header">
+            <div className="about-section__icon">
+              <i className="fas fa-book-open"></i>
+            </div>
+            <h2 className="about-section__title">{aboutData.story.title}</h2>
+          </div>
           {aboutData.story.content.map((paragraph, index) => (
             <p key={index} className="about-section__text">{paragraph}</p>
           ))}
@@ -92,7 +107,12 @@ function About() {
       {/* Team Section */}
       <div className="about-container">
         <section className="about-section">
-          <h2 className="about-section__title">{aboutData.team.title}</h2>
+          <div className="about-section__header">
+            <div className="about-section__icon">
+              <i className="fas fa-users"></i>
+            </div>
+            <h2 className="about-section__title">{aboutData.team.title}</h2>
+          </div>
           <p className="about-section__text" style={{ marginBottom: '40px' }}>
             {aboutData.team.description}
           </p>

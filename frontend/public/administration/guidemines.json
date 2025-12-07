@@ -1,0 +1,627 @@
+{
+  "metadata": {
+    "title": "Editorial Guidelines",
+    "lastUpdated": "2024-12-01",
+    "effectiveDate": "2024-01-01",
+    "companyName": "News Portal",
+    "companyEmail": "editorial@newsportal.com",
+    "version": "2.0"
+  },
+  "introduction": {
+    "title": "Our Editorial Mission",
+    "content": [
+      "At News Portal, we are committed to delivering accurate, fair, and trustworthy journalism that serves the public interest. These Editorial Guidelines set the standards for all content published on our platform.",
+      "Our mission is to inform, educate, and empower our readers with high-quality news and analysis. We hold ourselves to the highest standards of journalistic integrity, transparency, and accountability.",
+      "These guidelines apply to all contributors, including staff writers, freelancers, editors, and guest contributors. Adherence to these standards is mandatory and essential to maintaining the trust of our audience."
+    ]
+  },
+  "sections": [
+    {
+      "id": "core-principles",
+      "title": "Core Editorial Principles",
+      "icon": "star",
+      "content": [
+        "Our editorial standards are built on the following fundamental principles:"
+      ],
+      "subsections": [
+        {
+          "title": "1. Accuracy",
+          "content": "Accuracy is the foundation of everything we do. We strive to ensure that all facts, figures, names, dates, and quotations are correct. All information must be verified through credible sources before publication.",
+          "items": [
+            "Verify all facts with at least two independent sources when possible",
+            "Cross-check data, statistics, and quotes for accuracy",
+            "Correct errors promptly and transparently",
+            "Clearly distinguish between facts and opinions",
+            "Use primary sources whenever possible"
+          ]
+        },
+        {
+          "title": "2. Independence",
+          "content": "We maintain editorial independence from commercial, political, and other external influences. Our editorial decisions are based solely on journalistic merit and public interest.",
+          "items": [
+            "Reject pressure from advertisers, sponsors, or political entities",
+            "Maintain a clear separation between editorial and commercial content",
+            "Avoid conflicts of interest that could compromise objectivity",
+            "Disclose any potential conflicts of interest",
+            "Make independent editorial decisions free from external influence"
+          ]
+        },
+        {
+          "title": "3. Fairness & Impartiality",
+          "content": "We present news and information fairly, giving all relevant parties an opportunity to respond. We strive for balance and avoid bias in our reporting.",
+          "items": [
+            "Present multiple perspectives on controversial issues",
+            "Give subjects of criticism the right to respond",
+            "Avoid language that shows bias or prejudice",
+            "Challenge all viewpoints with equal rigor",
+            "Acknowledge our own perspectives and limitations"
+          ]
+        },
+        {
+          "title": "4. Transparency",
+          "content": "We are open about our methods, sources, and any limitations in our reporting. Transparency builds trust with our audience.",
+          "items": [
+            "Clearly label opinion pieces, analysis, and sponsored content",
+            "Disclose the basis of our reporting",
+            "Explain our methodology when appropriate",
+            "Identify anonymous sources as specifically as possible",
+            "Acknowledge when information cannot be independently verified"
+          ]
+        },
+        {
+          "title": "5. Accountability",
+          "content": "We take responsibility for our work and correct errors promptly and prominently. We welcome feedback and are open to constructive criticism.",
+          "items": [
+            "Acknowledge and correct mistakes quickly",
+            "Respond to reader concerns and complaints",
+            "Maintain clear processes for corrections and complaints",
+            "Hold ourselves to the same standards we apply to others",
+            "Learn from errors and improve our practices"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accuracy-verification",
+      "title": "Accuracy & Fact-Checking",
+      "icon": "check",
+      "content": [
+        "Maintaining accuracy is our top priority. Every piece of content must undergo rigorous fact-checking before publication."
+      ],
+      "subsections": [
+        {
+          "title": "Verification Standards",
+          "items": [
+            "Verify all factual claims with credible sources",
+            "Confirm the authenticity of documents, images, and videos",
+            "Check the spelling of names and accuracy of titles",
+            "Verify dates, locations, and numerical data",
+            "Cross-reference information across multiple sources",
+            "Contact primary sources for verification when possible"
+          ]
+        },
+        {
+          "title": "Source Credibility",
+          "content": "Not all sources are equally reliable. Evaluate sources based on:",
+          "items": [
+            "Expertise and authority in the subject matter",
+            "Track record of accuracy and reliability",
+            "Potential biases or conflicts of interest",
+            "Access to first-hand information",
+            "Transparency about their information sources"
+          ]
+        },
+        {
+          "title": "When Speed Matters",
+          "content": "In breaking news situations, we balance speed with accuracy. If we cannot verify all details, we clearly state what is confirmed and what is not.",
+          "items": [
+            "Publish what we know with appropriate caveats",
+            "Clearly label unverified information",
+            "Update stories as more information becomes available",
+            "Avoid speculation and rumor",
+            "Prioritize accuracy over being first"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sources-attribution",
+      "title": "Sources & Attribution",
+      "icon": "users",
+      "content": [
+        "Proper sourcing and attribution are essential to credible journalism. We give credit where it's due and protect our sources when necessary."
+      ],
+      "subsections": [
+        {
+          "title": "On-the-Record Sources",
+          "content": "We prefer named sources who can be held accountable for their statements. Information from on-the-record sources should be clearly attributed.",
+          "items": [
+            "Identify sources by full name and relevant title/affiliation",
+            "Use direct quotes accurately without altering meaning",
+            "Provide context for who the source is and why they're relevant",
+            "Get permission before publishing someone's contact information"
+          ]
+        },
+        {
+          "title": "Anonymous Sources",
+          "content": "We use anonymous sources only when the information is crucial to the story and cannot be obtained on the record. Anonymous sources must be approved by an editor.",
+          "items": [
+            "Explain why anonymity was granted",
+            "Describe the source as specifically as possible without revealing identity",
+            "Verify information from anonymous sources with other sources",
+            "Never grant anonymity to someone making personal attacks",
+            "Honor promises of confidentiality"
+          ]
+        },
+        {
+          "title": "Attribution Standards",
+          "items": [
+            "Always attribute information to its source",
+            "Use 'according to' or 'said' for clear attribution",
+            "Link to original sources when citing published material",
+            "Give credit to other news organizations when appropriate",
+            "Distinguish between what we witnessed and what we were told"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-style",
+      "title": "Writing Style & Language",
+      "icon": "edit",
+      "content": [
+        "Clear, concise, and engaging writing is essential to effective journalism. We write for a general audience while maintaining professional standards."
+      ],
+      "subsections": [
+        {
+          "title": "General Style Guidelines",
+          "items": [
+            "Write in clear, simple language that readers can understand",
+            "Use active voice and strong verbs",
+            "Keep sentences and paragraphs short and focused",
+            "Define technical terms and jargon",
+            "Use proper grammar, punctuation, and spelling",
+            "Follow AP Style Guide unless otherwise specified",
+            "Avoid clichés and overused expressions",
+            "Be precise and specific rather than vague"
+          ]
+        },
+        {
+          "title": "Tone & Voice",
+          "content": "Our tone is professional, authoritative, and accessible. We inform without talking down to our audience.",
+          "items": [
+            "Maintain a neutral, professional tone in news articles",
+            "Use appropriate tone for different content types (news, opinion, features)",
+            "Avoid inflammatory or sensational language",
+            "Be respectful even when covering controversial topics",
+            "Show empathy when covering sensitive subjects"
+          ]
+        },
+        {
+          "title": "Headlines & Subheadings",
+          "items": [
+            "Write clear, accurate headlines that reflect the story",
+            "Avoid clickbait or misleading headlines",
+            "Use strong, active verbs in headlines",
+            "Keep headlines concise (ideally 8-12 words)",
+            "Use subheadings to break up long articles",
+            "Ensure headlines can stand alone without context"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "story-structure",
+      "title": "Story Structure & Format",
+      "icon": "document",
+      "content": [
+        "Well-structured stories help readers find and understand information quickly. Different story types require different structures."
+      ],
+      "subsections": [
+        {
+          "title": "News Stories",
+          "content": "Use the inverted pyramid structure: most important information first, followed by supporting details.",
+          "items": [
+            "Lead with the most newsworthy information",
+            "Answer who, what, when, where, why, and how in the first paragraph",
+            "Present information in descending order of importance",
+            "Include context and background",
+            "End with less critical details"
+          ]
+        },
+        {
+          "title": "Feature Stories",
+          "content": "Feature stories allow for more creative storytelling but still require strong structure.",
+          "items": [
+            "Start with a compelling lead or anecdote",
+            "Establish the story's theme early",
+            "Use narrative techniques to engage readers",
+            "Include vivid details and quotes",
+            "Bring the story full circle in the conclusion"
+          ]
+        },
+        {
+          "title": "Article Length",
+          "items": [
+            "Breaking news: 300-500 words",
+            "Standard news articles: 500-800 words",
+            "In-depth reports: 1,000-1,500 words",
+            "Feature stories: 1,200-2,000 words",
+            "Analysis pieces: 800-1,200 words"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "multimedia",
+      "title": "Multimedia & Visual Content",
+      "icon": "image",
+      "content": [
+        "Photos, videos, graphics, and other visual elements enhance storytelling and must meet the same standards as text."
+      ],
+      "subsections": [
+        {
+          "title": "Photography Standards",
+          "items": [
+            "Use only authentic, unaltered photos (except basic corrections)",
+            "Never stage or manipulate news photos",
+            "Caption all photos with accurate information",
+            "Credit photographers appropriately",
+            "Obtain permission for photos of private individuals",
+            "Be sensitive when using graphic or disturbing images",
+            "Ensure photos are high quality and relevant to the story"
+          ]
+        },
+        {
+          "title": "Video & Audio",
+          "items": [
+            "Clearly identify the source and date of video/audio",
+            "Do not edit video/audio in ways that misrepresent events",
+            "Provide transcripts or captions for accessibility",
+            "Verify the authenticity of user-generated content",
+            "Include trigger warnings for disturbing content"
+          ]
+        },
+        {
+          "title": "Graphics & Data Visualization",
+          "items": [
+            "Ensure all data in graphics is accurate and sourced",
+            "Use clear, appropriate visualizations for the data",
+            "Avoid misleading scales or presentations",
+            "Make graphics accessible to colorblind readers",
+            "Cite data sources clearly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethics",
+      "title": "Ethical Standards",
+      "icon": "shield",
+      "content": [
+        "Ethical journalism is the foundation of public trust. We adhere to the highest ethical standards in all our work."
+      ],
+      "subsections": [
+        {
+          "title": "Conflicts of Interest",
+          "content": "We avoid conflicts of interest and disclose them when they cannot be avoided.",
+          "items": [
+            "Do not cover stories where you have a personal or financial interest",
+            "Disclose any relationships with story subjects",
+            "Do not accept gifts, payments, or favors from sources",
+            "Avoid covering family members or close friends",
+            "Disclose previous employment or affiliations relevant to the story"
+          ]
+        },
+        {
+          "title": "Plagiarism & Copyright",
+          "content": "We respect the work of others and never present someone else's work as our own.",
+          "items": [
+            "Never copy text from other sources without attribution",
+            "Use proper quotation marks and attribution",
+            "Paraphrase appropriately while crediting original source",
+            "Obtain permission to use copyrighted material",
+            "Follow fair use guidelines",
+            "Report and remove plagiarized content immediately"
+          ]
+        },
+        {
+          "title": "Privacy & Consent",
+          "items": [
+            "Respect individuals' privacy rights",
+            "Obtain consent before publishing personal information",
+            "Be especially careful with minors and vulnerable individuals",
+            "Consider the public interest when reporting private matters",
+            "Protect the identity of victims when appropriate",
+            "Do not publish information that could endanger someone"
+          ]
+        },
+        {
+          "title": "Sensitive Topics",
+          "content": "When covering sensitive topics like crime, tragedy, or trauma, we balance public interest with compassion.",
+          "items": [
+            "Show sensitivity when interviewing victims or grieving families",
+            "Avoid gratuitous details of violence or suffering",
+            "Consider the long-term impact of publishing identifying information",
+            "Provide context for disturbing content",
+            "Include resources for affected individuals (hotlines, support services)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "corrections",
+      "title": "Corrections & Updates",
+      "icon": "refresh",
+      "content": [
+        "Everyone makes mistakes. What matters is how we handle them. We correct errors quickly, clearly, and completely."
+      ],
+      "subsections": [
+        {
+          "title": "Correction Policy",
+          "items": [
+            "Correct factual errors as soon as they are discovered",
+            "Note corrections clearly at the top or bottom of articles",
+            "Explain what was incorrect and what the correct information is",
+            "Do not silently edit errors without acknowledgment",
+            "Preserve the original error in the correction note for transparency",
+            "Notify readers who may have seen the incorrect version"
+          ]
+        },
+        {
+          "title": "Updates vs. Corrections",
+          "content": "Updates add new information to a developing story. Corrections fix errors in previously published information.",
+          "items": [
+            "Label updates clearly with date and time",
+            "Note significant changes to the story",
+            "Explain what new information was added",
+            "Update the article's timestamp appropriately"
+          ]
+        },
+        {
+          "title": "Major Errors",
+          "content": "For significant errors that materially affect the story's meaning, we may need to republish or retract the article entirely.",
+          "items": [
+            "Consult with editors on major corrections",
+            "Consider whether a new article is needed",
+            "In extreme cases, retract the article with full explanation",
+            "Learn from errors to prevent future mistakes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social-media",
+      "title": "Social Media & Online Conduct",
+      "icon": "share",
+      "content": [
+        "Social media is an important tool for journalism and audience engagement, but it requires the same editorial standards as our published content."
+      ],
+      "subsections": [
+        {
+          "title": "Social Media Use",
+          "items": [
+            "Verify information found on social media before reporting it",
+            "Clearly identify News Portal affiliation in social profiles",
+            "Maintain professional conduct on social media",
+            "Do not share unverified information or rumors",
+            "Be transparent about corrections on social media",
+            "Respect embargoes and confidential information",
+            "Avoid political advocacy or bias in personal posts"
+          ]
+        },
+        {
+          "title": "User-Generated Content",
+          "content": "When using photos, videos, or information from social media or audience members:",
+          "items": [
+            "Verify authenticity before using",
+            "Obtain permission from the creator",
+            "Credit the source appropriately",
+            "Be cautious of manipulated or misleading content",
+            "Consider privacy implications"
+          ]
+        },
+        {
+          "title": "Engagement Guidelines",
+          "items": [
+            "Engage respectfully with readers and critics",
+            "Do not argue with or insult commenters",
+            "Report harassment or threats to appropriate authorities",
+            "Correct misinformation about our reporting",
+            "Be professional even when facing criticism"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "opinion-analysis",
+      "title": "Opinion & Analysis",
+      "icon": "comment",
+      "content": [
+        "Opinion and analysis pieces provide valuable perspective but must be clearly distinguished from news reporting."
+      ],
+      "subsections": [
+        {
+          "title": "Labeling",
+          "items": [
+            "Clearly label all opinion pieces as 'Opinion' or 'Commentary'",
+            "Mark analysis pieces as 'Analysis' or 'Perspective'",
+            "Use visual indicators (labels, different layouts)",
+            "Ensure headlines indicate opinion/analysis content",
+            "Keep opinion content separate from news sections"
+          ]
+        },
+        {
+          "title": "Standards for Opinion",
+          "content": "While opinion pieces express viewpoints, they still must be factually accurate and ethical.",
+          "items": [
+            "Base opinions on accurate facts",
+            "Fact-check claims made in opinion pieces",
+            "Disclose relevant conflicts of interest",
+            "Avoid personal attacks or defamation",
+            "Present opposing viewpoints fairly",
+            "Maintain ethical and professional standards"
+          ]
+        },
+        {
+          "title": "Guest Contributors",
+          "items": [
+            "Vet guest contributors for credibility and expertise",
+            "Disclose contributors' relevant affiliations and interests",
+            "Edit submissions for clarity and accuracy",
+            "Ensure guest posts meet editorial standards",
+            "Include a clear author bio with each contribution"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sponsored-content",
+      "title": "Sponsored & Commercial Content",
+      "icon": "dollar",
+      "content": [
+        "We maintain a strict separation between editorial and commercial content. Sponsored content must be clearly labeled."
+      ],
+      "subsections": [
+        {
+          "title": "Disclosure Requirements",
+          "items": [
+            "Clearly label all sponsored or paid content",
+            "Use prominent labels: 'Sponsored', 'Advertisement', 'Paid Content'",
+            "Visually distinguish sponsored content from editorial content",
+            "Disclose the sponsor prominently",
+            "Never disguise advertising as editorial content"
+          ]
+        },
+        {
+          "title": "Editorial Independence",
+          "items": [
+            "Advertisers have no influence over editorial content",
+            "Editorial decisions are made independently",
+            "Do not promise coverage in exchange for advertising",
+            "Maintain separate teams for editorial and commercial content",
+            "Reject advertising that conflicts with editorial standards"
+          ]
+        },
+        {
+          "title": "Native Advertising",
+          "content": "If we publish native advertising (sponsored content in editorial style), it must be clearly labeled and meet quality standards.",
+          "items": [
+            "Use clear, unambiguous labels",
+            "Ensure content provides value to readers",
+            "Maintain factual accuracy in sponsored content",
+            "Do not allow misleading or deceptive sponsored content"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diversity-inclusion",
+      "title": "Diversity & Inclusion",
+      "icon": "users",
+      "content": [
+        "We strive to represent the diversity of our community in our coverage and ensure all people are treated with dignity and respect."
+      ],
+      "subsections": [
+        {
+          "title": "Inclusive Coverage",
+          "items": [
+            "Seek diverse sources and perspectives",
+            "Cover underrepresented communities fairly",
+            "Avoid stereotypes and generalizations",
+            "Be sensitive to cultural differences and traditions",
+            "Consider whose voices are missing from our stories"
+          ]
+        },
+        {
+          "title": "Inclusive Language",
+          "items": [
+            "Use gender-neutral language when appropriate",
+            "Respect individuals' preferred pronouns",
+            "Use person-first language for disabilities when appropriate",
+            "Avoid ageist, racist, or discriminatory language",
+            "Be precise rather than using broad generalizations",
+            "Consult style guides on inclusive language"
+          ]
+        },
+        {
+          "title": "Cultural Sensitivity",
+          "items": [
+            "Research cultural contexts before reporting",
+            "Consult with community members when covering their communities",
+            "Avoid cultural appropriation in language or imagery",
+            "Be aware of historical sensitivities",
+            "Acknowledge our own cultural perspectives and limitations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legal",
+      "title": "Legal & Safety Considerations",
+      "icon": "gavel",
+      "content": [
+        "We must be aware of legal issues and safety concerns in our reporting."
+      ],
+      "subsections": [
+        {
+          "title": "Defamation",
+          "items": [
+            "Verify all potentially damaging allegations",
+            "Give subjects the opportunity to respond",
+            "Distinguish between facts and opinions",
+            "Avoid publishing false information that damages reputation",
+            "Consult legal counsel when necessary"
+          ]
+        },
+        {
+          "title": "Safety & Security",
+          "items": [
+            "Prioritize journalist safety in dangerous situations",
+            "Assess risks before covering dangerous events",
+            "Protect sources who may face retaliation",
+            "Secure sensitive information appropriately",
+            "Consider the safety implications of what we publish"
+          ]
+        },
+        {
+          "title": "Legal Compliance",
+          "items": [
+            "Comply with copyright and intellectual property laws",
+            "Respect privacy laws and regulations",
+            "Follow court reporting restrictions when applicable",
+            "Understand and comply with relevant media law",
+            "Consult legal counsel for complex legal issues"
+          ]
+        }
+      ]
+    }
+  ],
+  "contact": {
+    "title": "Questions About These Guidelines?",
+    "content": [
+      "If you have questions about these Editorial Guidelines or need clarification on any policy, please contact our editorial team:"
+    ],
+    "methods": [
+      {
+        "type": "email",
+        "label": "Email",
+        "value": "editorial@newsportal.com"
+      },
+      {
+        "type": "email",
+        "label": "Report Concerns",
+        "value": "ethics@newsportal.com"
+      },
+      {
+        "type": "phone",
+        "label": "Phone",
+        "value": "+1 (555) 123-4567"
+      }
+    ]
+  },
+  "commitment": {
+    "title": "Our Commitment",
+    "content": "We are committed to maintaining the highest standards of journalism and continuously improving our practices. These guidelines are living documents that evolve with the industry and feedback from our community. We welcome your input on how we can better serve you."
+  }
+}

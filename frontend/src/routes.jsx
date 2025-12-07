@@ -5,6 +5,11 @@ import NewsDetail from './pages/NewsDetail';
 import Category from './pages/Category';
 import Search from './pages/Search';
 import About from './pages/About';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiePolicy from './pages/CookiePolicy';
+import EditorialGuidelines from './pages/EditorialGuidelines';
+import EthicsPolicy from './pages/EthicsPolicy';
 import NotFound from './pages/NotFound';
 
 function AppRoutes() {
@@ -16,6 +21,11 @@ function AppRoutes() {
         <Route path="category/:category" element={<Category />} />
         <Route path="search" element={<Search />} />
         <Route path="about" element={<About />} />
+        <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="terms-of-service" element={<TermsOfService />} />
+        <Route path="cookie-policy" element={<CookiePolicy />} />
+        <Route path="editorial-guidelines" element={<EditorialGuidelines />} />
+        <Route path="ethics-policy" element={<EthicsPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
