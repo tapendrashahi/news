@@ -20,31 +20,11 @@ const NewsDetail = () => {
   
   // Fetch more AI analysis articles for "Keep Learning" section
   const { data: moreArticles } = useNews({ page: 1 });
-  
-  // State for related articles
-  const [relatedArticles, setRelatedArticles] = useState([]);
 
   // Handle paginated API response - extract results array
   const comments = Array.isArray(commentsData) 
     ? commentsData 
     : (commentsData?.results || []);
-  
-  // Fetch related articles based on same category
-  useEffect(() => {
-    if (news?.category) {
-      fetch(`http://localhost:8000/api/news/?category=${news.category}&page_size=4`)
-        .then(response => response.json())
-        .then(data => {
-          const articles = data.results || data;
-          // Filter out current article and take only 3
-          const filtered = articles
-            .filter(article => article.id !== news.id)
-            .slice(0, 3);
-          setRelatedArticles(filtered);
-        })
-        .catch(error => console.error('Error fetching related articles:', error));
-    }
-  }, [news?.category, news?.id]);
 
   // Extract table of contents from article content
   useEffect(() => {
@@ -109,6 +89,19 @@ const NewsDetail = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const formatRelativeTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return formatDate(dateString);
   };
 
   const calculateReadTime = (content) => {
@@ -197,6 +190,18 @@ const NewsDetail = () => {
 
   const imageUrl = news.image || null;
   const shareUrl = window.location.href;
+
+  // Get related articles - same category, exclude current article
+  const allArticles = Array.isArray(moreArticles?.results) 
+    ? moreArticles.results 
+    : (Array.isArray(moreArticles) ? moreArticles : []);
+  
+  const relatedArticles = allArticles
+    .filter(article => 
+      article.id !== news.id && 
+      article.category === news.category
+    )
+    .slice(0, 3);
 
   return (
     <>
@@ -352,7 +357,7 @@ const NewsDetail = () => {
                   relatedArticles.map((article) => (
                     <Link 
                       key={article.id} 
-                      to={`/news/${article.slug || article.id}`} 
+                      to={`/news/${article.slug || article.id}`}
                       className="related-article"
                     >
                       <div className="related-article__image">
@@ -361,15 +366,16 @@ const NewsDetail = () => {
                           alt={article.title}
                           onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400'}
                         />
+                        {article.category && (
+                          <span className="related-article__category">
+                            {article.category.toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div className="related-article__content">
                         <h4>{article.title}</h4>
                         <p className="related-article__date">
-                          {new Date(article.created_at).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {formatRelativeTime(article.created_at)}
                         </p>
                       </div>
                     </Link>
