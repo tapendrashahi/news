@@ -2,16 +2,18 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .models import News, TeamMember, Comment, ShareCount, Subscriber
+from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication
 from .serializers import (
     NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer,
     TeamMemberSerializer, CommentSerializer, CommentListSerializer,
-    ShareCountSerializer, SubscriberSerializer, CategorySerializer
+    ShareCountSerializer, SubscriberSerializer, CategorySerializer,
+    JobOpeningSerializer, JobApplicationSerializer
 )
 
 
@@ -363,3 +365,61 @@ class CategoryViewSet(viewsets.ViewSet):
             'categories': categories,
             'total': sum(cat['count'] for cat in categories)
         })
+
+
+class JobOpeningViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Job Openings
+    Provides CRUD operations for job listings
+    """
+    queryset = JobOpening.objects.filter(is_active=True)
+    serializer_class = JobOpeningSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['department', 'employment_type', 'experience_level', 'location']
+    search_fields = ['title', 'description', 'requirements', 'responsibilities']
+    ordering_fields = ['posted_date', 'title']
+    ordering = ['-posted_date']
+    
+    def get_queryset(self):
+        """Filter active jobs or all if admin"""
+        queryset = self.queryset
+        
+        # Filter by department if specified
+        department = self.request.query_params.get('department', None)
+        if department:
+            queryset = queryset.filter(department=department)
+        
+        return queryset
+
+
+class JobApplicationViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Job Applications
+    Provides CRUD operations for job applications with file upload
+    """
+    queryset = JobApplication.objects.all()
+    serializer_class = JobApplicationSerializer
+    pagination_class = StandardResultsSetPagination
+    parser_classes = (MultiPartParser, FormParser)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'job_opening']
+    search_fields = ['full_name', 'email', 'phone']
+    ordering_fields = ['applied_date']
+    ordering = ['-applied_date']
+    
+    def create(self, request, *args, **kwargs):
+        """Handle job application creation with file upload"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {
+                'message': 'Application submitted successfully!',
+                'data': serializer.data
+            },
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+

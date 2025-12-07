@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import News, TeamMember, Comment, ShareCount
+from .models import News, TeamMember, Comment, ShareCount, JobOpening, JobApplication
 from django.utils.html import format_html
 
 @admin.register(News)
@@ -112,4 +112,81 @@ class ShareCountAdmin(admin.ModelAdmin):
     search_fields = ('news__title',)
     readonly_fields = ('last_shared',)
     ordering = ('-count',)
+
+
+@admin.register(JobOpening)
+class JobOpeningAdmin(admin.ModelAdmin):
+    list_display = ('title', 'department', 'location', 'employment_type', 'experience_level', 'is_active', 'posted_date', 'application_count')
+    list_filter = ('department', 'employment_type', 'experience_level', 'is_active', 'posted_date')
+    search_fields = ('title', 'description', 'location')
+    readonly_fields = ('posted_date', 'updated_date', 'application_count')
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'department', 'location', 'employment_type', 'experience_level')
+        }),
+        ('Job Details', {
+            'fields': ('description', 'responsibilities', 'requirements', 'salary_range')
+        }),
+        ('Status & Dates', {
+            'fields': ('is_active', 'application_deadline', 'posted_date', 'updated_date', 'application_count')
+        }),
+    )
+    
+    def application_count(self, obj):
+        count = obj.applications.count()
+        return format_html('<strong>{}</strong> application(s)', count)
+    application_count.short_description = 'Applications'
+
+
+@admin.register(JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'job_opening', 'email', 'phone', 'years_of_experience', 'status', 'applied_date', 'resume_link')
+    list_filter = ('status', 'applied_date', 'job_opening__department', 'years_of_experience')
+    search_fields = ('full_name', 'email', 'phone', 'job_opening__title')
+    readonly_fields = ('applied_date', 'updated_date', 'resume_preview')
+    actions = ['mark_under_review', 'mark_interview', 'mark_rejected', 'mark_accepted']
+    fieldsets = (
+        ('Job & Applicant Info', {
+            'fields': ('job_opening', 'full_name', 'email', 'phone', 'years_of_experience')
+        }),
+        ('Application Materials', {
+            'fields': ('resume', 'resume_preview', 'cover_letter', 'linkedin_url', 'portfolio_url')
+        }),
+        ('Application Status', {
+            'fields': ('status', 'notes', 'applied_date', 'updated_date')
+        }),
+    )
+    
+    def resume_link(self, obj):
+        if obj.resume:
+            return format_html('<a href="{}" target="_blank">View Resume</a>', obj.resume.url)
+        return "-"
+    resume_link.short_description = 'Resume'
+    
+    def resume_preview(self, obj):
+        if obj.resume:
+            return format_html('<a href="{}" target="_blank" class="button">Download Resume</a>', obj.resume.url)
+        return "No resume uploaded"
+    resume_preview.short_description = 'Resume File'
+    
+    def mark_under_review(self, request, queryset):
+        updated = queryset.update(status='under_review')
+        self.message_user(request, f'{updated} application(s) marked as Under Review.')
+    mark_under_review.short_description = "Mark as Under Review"
+    
+    def mark_interview(self, request, queryset):
+        updated = queryset.update(status='interview')
+        self.message_user(request, f'{updated} application(s) marked as Interview Scheduled.')
+    mark_interview.short_description = "Mark as Interview Scheduled"
+    
+    def mark_rejected(self, request, queryset):
+        updated = queryset.update(status='rejected')
+        self.message_user(request, f'{updated} application(s) marked as Rejected.')
+    mark_rejected.short_description = "Mark as Rejected"
+    
+    def mark_accepted(self, request, queryset):
+        updated = queryset.update(status='accepted')
+        self.message_user(request, f'{updated} application(s) marked as Accepted.')
+    mark_accepted.short_description = "Mark as Accepted"
+
 

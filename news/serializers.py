@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import News, TeamMember, Comment, ShareCount, Subscriber
+from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication
 
 
 class TeamMemberSerializer(serializers.ModelSerializer):
@@ -174,3 +174,53 @@ class CategorySerializer(serializers.Serializer):
     display_name = serializers.CharField()
     count = serializers.IntegerField()
     description = serializers.CharField(required=False)
+
+
+class JobOpeningSerializer(serializers.ModelSerializer):
+    department_display = serializers.CharField(source='get_department_display', read_only=True)
+    employment_type_display = serializers.CharField(source='get_employment_type_display', read_only=True)
+    experience_level_display = serializers.CharField(source='get_experience_level_display', read_only=True)
+    application_count = serializers.SerializerMethodField()
+    responsibilities_list = serializers.SerializerMethodField()
+    requirements_list = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = JobOpening
+        fields = [
+            'id', 'title', 'department', 'department_display', 'location',
+            'employment_type', 'employment_type_display', 'experience_level',
+            'experience_level_display', 'description', 'responsibilities',
+            'responsibilities_list', 'requirements', 'requirements_list',
+            'salary_range', 'is_active', 'posted_date', 'application_deadline',
+            'application_count'
+        ]
+    
+    def get_application_count(self, obj):
+        return obj.applications.count()
+    
+    def get_responsibilities_list(self, obj):
+        return [r.strip() for r in obj.responsibilities.split('\n') if r.strip()]
+    
+    def get_requirements_list(self, obj):
+        return [r.strip() for r in obj.requirements.split('\n') if r.strip()]
+
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    job_title = serializers.CharField(source='job_opening.title', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    
+    class Meta:
+        model = JobApplication
+        fields = [
+            'id', 'job_opening', 'job_title', 'full_name', 'email', 'phone',
+            'linkedin_url', 'portfolio_url', 'resume', 'cover_letter',
+            'years_of_experience', 'status', 'status_display', 'applied_date'
+        ]
+        read_only_fields = ['id', 'status', 'applied_date']
+    
+    def validate_resume(self, value):
+        # Validate file size (5MB max)
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("Resume file size cannot exceed 5MB.")
+        return value
+

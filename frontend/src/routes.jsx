@@ -5,6 +5,8 @@ import NewsDetail from './pages/NewsDetail';
 import Category from './pages/Category';
 import Search from './pages/Search';
 import About from './pages/About';
+import Team from './pages/Team';
+import Careers from './pages/Careers';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import CookiePolicy from './pages/CookiePolicy';
@@ -21,6 +23,8 @@ function AppRoutes() {
         <Route path="category/:category" element={<Category />} />
         <Route path="search" element={<Search />} />
         <Route path="about" element={<About />} />
+        <Route path="team" element={<Team />} />
+        <Route path="careers" element={<Careers />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="terms-of-service" element={<TermsOfService />} />
         <Route path="cookie-policy" element={<CookiePolicy />} />
