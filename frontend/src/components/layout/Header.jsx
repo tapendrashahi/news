@@ -7,6 +7,11 @@ function Header() {
   const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState('');
+  const [showSubscribe, setShowSubscribe] = useState(false);
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+  const [subscribeName, setSubscribeName] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +34,52 @@ function Header() {
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       setShowSearch(false);
+      setShowSubscribe(false);
+    }
+  };
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubscribeStatus({ type: '', message: '' });
+
+    try {
+      const response = await fetch('http://localhost:8000/api/subscribers/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: subscribeEmail,
+          name: subscribeName,
+        }),
+      });
+
+      if (response.ok) {
+        setSubscribeStatus({
+          type: 'success',
+          message: 'Successfully subscribed! Check your email for confirmation.',
+        });
+        setSubscribeEmail('');
+        setSubscribeName('');
+        setTimeout(() => {
+          setShowSubscribe(false);
+          setSubscribeStatus({ type: '', message: '' });
+        }, 2000);
+      } else {
+        const data = await response.json();
+        setSubscribeStatus({
+          type: 'error',
+          message: data.email ? data.email[0] : 'Subscription failed. Please try again.',
+        });
+      }
+    } catch (error) {
+      setSubscribeStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection.',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,9 +125,10 @@ function Header() {
       <div className="header__main">
         <div className="header__container">
           <Link to="/" className="header__logo">
-            <span className="header__logo-icon">🤖</span>
             <div className="header__logo-text">
-              <span className="header__logo-title">AI Analitica</span>
+              <span className="header__logo-title">
+                <span className="header__logo-accent">AI</span>Analatica
+              </span>
               <span className="header__logo-tagline">News Intelligence</span>
             </div>
           </Link>
@@ -161,13 +213,14 @@ function Header() {
             </ul>
           </nav>
           
-          {/* Search Button */}
-          <div className="header__search">
+          {/* Search & Subscribe Buttons */}
+          <div className="header__actions">
             <button 
               className="header__search-btn"
               onClick={() => {
                 setShowSearch(!showSearch);
                 setMobileMenuOpen(false);
+                setShowSubscribe(false);
               }}
               aria-label="Search"
             >
@@ -175,6 +228,22 @@ function Header() {
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
+            </button>
+            
+            <button 
+              className="header__subscribe-btn"
+              onClick={() => {
+                setShowSubscribe(!showSubscribe);
+                setMobileMenuOpen(false);
+                setShowSearch(false);
+              }}
+              aria-label="Subscribe"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <span className="header__subscribe-text">Subscribe</span>
             </button>
           </div>
         </div>
@@ -206,6 +275,64 @@ function Header() {
               />
               <p className="search-modal__hint">Press ESC to close, or ENTER to search</p>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Subscribe Modal Overlay */}
+      {showSubscribe && (
+        <div className="search-modal-overlay" onClick={() => setShowSubscribe(false)}>
+          <div className="subscribe-modal" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="search-modal__close"
+              onClick={() => setShowSubscribe(false)}
+              aria-label="Close subscribe"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <div className="subscribe-modal__content">
+              <h2 className="subscribe-modal__title">Subscribe to Our Newsletter</h2>
+              <p className="subscribe-modal__description">Get the latest AI-powered news analysis delivered to your inbox.</p>
+              
+              <form className="subscribe-modal__form" onSubmit={handleSubscribe}>
+                <input
+                  type="text"
+                  className="subscribe-modal__input"
+                  placeholder="Your name"
+                  value={subscribeName}
+                  onChange={(e) => setSubscribeName(e.target.value)}
+                  required
+                />
+                <input
+                  type="email"
+                  className="subscribe-modal__input"
+                  placeholder="Your email address"
+                  value={subscribeEmail}
+                  onChange={(e) => setSubscribeEmail(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  required
+                />
+                
+                {subscribeStatus.message && (
+                  <div className={`subscribe-modal__status subscribe-modal__status--${subscribeStatus.type}`}>
+                    {subscribeStatus.message}
+                  </div>
+                )}
+                
+                <button 
+                  type="submit" 
+                  className="subscribe-modal__button"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Subscribing...' : 'Subscribe Now'}
+                </button>
+                
+                <p className="subscribe-modal__hint">Press ESC to close</p>
+              </form>
+            </div>
           </div>
         </div>
       )}

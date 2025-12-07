@@ -89,12 +89,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  text-decoration: none;
-  transition: transform 0.3s;
+  text-decoration: none !important;
+  transition: opacity 0.3s;
 }
 
 .header__logo:hover {
-  transform: scale(1.05);
+  opacity: 0.85;
+  text-decoration: none !important;
 }
 
 .header__logo-icon {
@@ -111,11 +112,14 @@
 .header__logo-title {
   font-size: 1.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #4169E1;
   letter-spacing: -0.5px;
+  text-decoration: none !important;
+}
+
+.header__logo-accent {
+  color: #FF8C00;
+  font-weight: 900;
 }
 
 .header__logo-tagline {
@@ -185,11 +189,11 @@
   border-color: #7e22ce;
 }
 
-/* Search Button */
-.header__search {
-  position: relative;
+/* Search & Subscribe Actions */
+.header__actions {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .header__search-btn {
@@ -218,6 +222,37 @@
 .header__search-btn svg {
   width: 18px;
   height: 18px;
+}
+
+.header__subscribe-btn {
+  background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+  border: 2px solid #7e22ce;
+  color: #ffffff;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.header__subscribe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(126, 34, 206, 0.4);
+  background: linear-gradient(135deg, #6b21a8 0%, #7e22ce 100%);
+}
+
+.header__subscribe-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.header__subscribe-text {
+  font-size: 0.9rem;
 }
 
 /* Search Modal Overlay */
@@ -330,6 +365,119 @@
   text-align: center;
 }
 
+/* Subscribe Modal */
+.subscribe-modal {
+  width: 90%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.subscribe-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.subscribe-modal__title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  text-align: center;
+}
+
+.subscribe-modal__description {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.subscribe-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.subscribe-modal__input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.3s;
+  background: #ffffff;
+}
+
+.subscribe-modal__input::placeholder {
+  color: #94a3b8;
+}
+
+.subscribe-modal__input:focus {
+  border-color: #7e22ce;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.1);
+}
+
+.subscribe-modal__button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.subscribe-modal__button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(126, 34, 206, 0.3);
+}
+
+.subscribe-modal__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.subscribe-modal__status {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.subscribe-modal__status--success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.subscribe-modal__status--error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.subscribe-modal__hint {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 8px 0 0;
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .search-modal-overlay {
@@ -347,6 +495,18 @@
 
   .search-modal__hint {
     font-size: 0.85rem;
+  }
+
+  .subscribe-modal {
+    padding: 30px 25px;
+  }
+
+  .subscribe-modal__title {
+    font-size: 1.5rem;
+  }
+
+  .subscribe-modal__description {
+    font-size: 0.9rem;
   }
 }
 
@@ -369,8 +529,20 @@
     order: 1;
   }
 
-  .header__search {
+  .header__actions {
     order: 3;
+  }
+
+  .header__subscribe-text {
+    display: none;
+  }
+
+  .header__subscribe-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
   }
 
   .header__nav {
