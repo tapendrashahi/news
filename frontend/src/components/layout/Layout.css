@@ -6,16 +6,14 @@
 
 .main-content {
   flex: 1;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
   width: 100%;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
 }
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 15px;
+    padding: 0;
   }
 }
