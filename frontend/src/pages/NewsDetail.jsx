@@ -191,19 +191,6 @@ const NewsDetail = () => {
       />
       
       <article className="news-detail">
-        {/* Breadcrumbs */}
-        <nav className="breadcrumbs">
-          <Link to="/">Home</Link>
-          <span className="breadcrumb-separator">›</span>
-          {news.category && (
-            <>
-              <Link to={`/category/${news.category}`}>{news.category}</Link>
-              <span className="breadcrumb-separator">›</span>
-            </>
-          )}
-          <span className="breadcrumb-current">{news.title}</span>
-        </nav>
-
         {/* Article Header */}
         <header className="article-header">
           <div className="article-header__container">
