@@ -12,6 +12,17 @@ const Category = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
+  // Map URL category names to database category names
+  const getCategoryName = (urlCategory) => {
+    const categoryMap = {
+      'politics': 'political',
+      'technology': 'tech',
+    };
+    return categoryMap[urlCategory] || urlCategory;
+  };
+
+  const actualCategory = getCategoryName(category);
+
   useEffect(() => {
     fetchNews();
     fetchPopularNews();
@@ -20,10 +31,15 @@ const Category = () => {
 
   const fetchNews = () => {
     setLoading(true);
-    fetch(`http://localhost:8000/api/news/?category=${category}`)
+    fetch(`/api/news/?category=${actualCategory}`)
       .then(response => response.json())
       .then(data => {
-        let newsItems = data.results || data;
+        let newsItems = data.results || data || [];
+        
+        // Ensure newsItems is an array
+        if (!Array.isArray(newsItems)) {
+          newsItems = [];
+        }
         
         // Ensure newsItems is an array
         if (!Array.isArray(newsItems)) {
@@ -50,7 +66,7 @@ const Category = () => {
   };
 
   const fetchPopularNews = () => {
-    fetch(`http://localhost:8000/api/news/?category=${category}&page_size=5`)
+    fetch(`/api/news/?category=${actualCategory}&page_size=5`)
       .then(response => response.json())
       .then(data => {
         const newsItems = data.results || data;
@@ -64,7 +80,7 @@ const Category = () => {
   };
 
   const fetchCategories = () => {
-    fetch('http://localhost:8000/api/categories/')
+    fetch('/api/categories/')
       .then(response => response.json())
       .then(data => {
         const cats = data.categories || [];
@@ -151,7 +167,7 @@ const Category = () => {
           <div className="category-stats">
             <div className="stat-item">
               <i className="fas fa-newspaper"></i>
-              <span>{news.length} Articles</span>
+              <span>{Array.isArray(news) ? news.length : 0} Articles</span>
             </div>
             <div className="stat-item">
               <i className="fas fa-clock"></i>
