@@ -145,7 +145,7 @@ const NewsList = () => {
                       <img src={article.image} alt={article.title} className="article-thumb" />
                     )}
                     <div>
-                      <div className="article-title">{article.title}</div>
+                      <div className="news-list-title">{article.title}</div>
                       {article.excerpt && (
                         <div className="article-excerpt">{article.excerpt.substring(0, 80)}...</div>
                       )}

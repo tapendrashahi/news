@@ -119,12 +119,12 @@
 }
 
 .article-title {
-  font-size: 3.5rem;
+  font-size: 3.5rem !important;
   font-weight: 900;
   line-height: 1.2;
   margin: 0 0 20px;
   letter-spacing: -1px;
-  color: #ffffff;
+  color: #f0f0f0;
 }
 
 .article-excerpt {
