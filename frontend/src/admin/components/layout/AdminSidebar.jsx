@@ -13,6 +13,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { path: '/admin/reports', icon: '📈', label: 'Reports' },
   ];
 
+  const aiContentItems = [
+    { path: '/admin/ai-content/keywords', icon: '🔑', label: 'Keywords' },
+    { path: '/admin/ai-content/generation-queue', icon: '⚙️', label: 'Generation Queue' },
+    { path: '/admin/ai-content/review-queue', icon: '✓', label: 'Review Queue' },
+    { path: '/admin/ai-content/settings', icon: '⚙️', label: 'AI Settings' },
+    { path: '/admin/ai-content/analytics', icon: '📊', label: 'Analytics' },
+  ];
+
   return (
     <aside 
       className={`admin-sidebar ${isOpen ? 'admin-sidebar--open' : ''}`}
@@ -48,6 +56,24 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             <span className="admin-sidebar__label">{item.label}</span>
           </NavLink>
         ))}
+
+        <div className="admin-sidebar__section">
+          <h3 className="admin-sidebar__section-title">🤖 AI Content Generation</h3>
+          {aiContentItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `admin-sidebar__link ${isActive ? 'admin-sidebar__link--active' : ''}`
+              }
+              aria-label={`Navigate to ${item.label}`}
+            >
+              <span className="admin-sidebar__icon" aria-hidden="true">{item.icon}</span>
+              <span className="admin-sidebar__label">{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
       </nav>
     </aside>
   );

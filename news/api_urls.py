@@ -28,6 +28,12 @@ from .api_admin import (
     AdvertisementsAdminViewSet
 )
 from .legal_views import LegalPageViewSet
+from .ai_views import (
+    KeywordSourceViewSet,
+    AIArticleViewSet,
+    AIGenerationConfigViewSet,
+    AIWorkflowLogViewSet
+)
 
 # Public API router
 router = DefaultRouter()
@@ -49,6 +55,12 @@ admin_router.register(r'comments', CommentsAdminViewSet, basename='admin-comment
 admin_router.register(r'subscribers', SubscribersAdminViewSet, basename='admin-subscribers')
 admin_router.register(r'advertisements', AdvertisementsAdminViewSet, basename='admin-advertisements')
 admin_router.register(r'legal', LegalPageViewSet, basename='admin-legal')
+
+# AI Content Generation API routes (admin only)
+admin_router.register(r'ai/keywords', KeywordSourceViewSet, basename='admin-ai-keywords')
+admin_router.register(r'ai/articles', AIArticleViewSet, basename='admin-ai-articles')
+admin_router.register(r'ai/configs', AIGenerationConfigViewSet, basename='admin-ai-configs')
+admin_router.register(r'ai/logs', AIWorkflowLogViewSet, basename='admin-ai-logs')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [

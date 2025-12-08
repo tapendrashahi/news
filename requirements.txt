@@ -13,3 +13,14 @@ python-dotenv==1.2.1
 pytz==2025.2
 setuptools==80.9.0
 sqlparse==0.5.4
+
+# Phase 2: LangChain & AI Dependencies
+langchain==0.3.13
+langchain-openai==0.2.14
+langchain-anthropic==0.3.3
+openai==1.58.1
+anthropic==0.42.0
+tiktoken==0.8.0
+beautifulsoup4==4.12.3
+requests==2.32.3
+google-api-python-client==2.158.0

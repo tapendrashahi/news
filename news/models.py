@@ -290,3 +290,6 @@ class Advertisement(models.Model):
 # Import LegalPage model
 from .legal_models import LegalPage
 
+# Import AI Content Generation models
+from .ai_models import KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog
+

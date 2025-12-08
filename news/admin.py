@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import News, TeamMember, Comment, ShareCount, JobOpening, JobApplication, LegalPage
+from .ai_models import KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog
 from django.utils.html import format_html
 
 @admin.register(News)
@@ -230,4 +231,182 @@ class LegalPageAdmin(admin.ModelAdmin):
         updated = queryset.update(status='archived')
         self.message_user(request, f'{updated} page(s) archived successfully.')
     archive_pages.short_description = "Archive selected pages"
+
+
+# ============================================================================
+# AI Content Generation Admin
+# ============================================================================
+
+@admin.register(KeywordSource)
+class KeywordSourceAdmin(admin.ModelAdmin):
+    list_display = ['keyword', 'source', 'status', 'priority', 'category', 'search_volume', 'viability_score', 'created_at']
+    list_filter = ['status', 'source', 'priority', 'category', 'created_at']
+    search_fields = ['keyword', 'notes']
+    ordering = ['-created_at']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'approved_by', 'approved_at', 'viability_score']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('keyword', 'source', 'category', 'status', 'priority')
+        }),
+        ('Metrics', {
+            'fields': ('search_volume', 'competition', 'viability_score')
+        }),
+        ('AI Analysis', {
+            'fields': ('suggested_angles', 'related_keywords', 'suggested_template'),
+            'classes': ('collapse',)
+        }),
+        ('Approval', {
+            'fields': ('approved_by', 'approved_at', 'rejected_reason')
+        }),
+        ('Additional', {
+            'fields': ('notes', 'id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['approve_keywords', 'reject_keywords']
+    
+    def approve_keywords(self, request, queryset):
+        for keyword in queryset:
+            keyword.approve(request.user)
+        self.message_user(request, f'{queryset.count()} keyword(s) approved.')
+    approve_keywords.short_description = "Approve selected keywords"
+    
+    def reject_keywords(self, request, queryset):
+        updated = queryset.update(status=KeywordSource.Status.REJECTED)
+        self.message_user(request, f'{updated} keyword(s) rejected.')
+    reject_keywords.short_description = "Reject selected keywords"
+
+
+@admin.register(AIArticle)
+class AIArticleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'keyword', 'status', 'workflow_stage', 'overall_quality_score', 'created_at']
+    list_filter = ['status', 'workflow_stage', 'template_type', 'created_at']
+    search_fields = ['title', 'keyword__keyword']
+    ordering = ['-created_at']
+    readonly_fields = [
+        'id', 'slug', 'actual_word_count', 'ai_score', 'plagiarism_score',
+        'seo_score', 'readability_score', 'bias_score', 'fact_check_score',
+        'overall_quality_score', 'generation_time', 'cost_estimate',
+        'created_at', 'updated_at', 'generation_started_at', 'generation_completed_at'
+    ]
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('keyword', 'title', 'slug', 'template_type', 'status', 'workflow_stage')
+        }),
+        ('Content', {
+            'fields': ('raw_content', 'content_json', 'target_word_count', 'actual_word_count'),
+            'classes': ('collapse',)
+        }),
+        ('SEO & Meta', {
+            'fields': ('meta_title', 'meta_description', 'focus_keywords', 'og_title', 'og_description'),
+            'classes': ('collapse',)
+        }),
+        ('Quality Scores', {
+            'fields': (
+                'ai_score', 'plagiarism_score', 'seo_score', 'readability_score',
+                'bias_score', 'fact_check_score', 'overall_quality_score'
+            )
+        }),
+        ('Media', {
+            'fields': ('image_url', 'image_local_path', 'image_prompt', 'image_alt_text'),
+            'classes': ('collapse',)
+        }),
+        ('Performance', {
+            'fields': ('generation_time', 'cost_estimate', 'token_usage', 'ai_model_used'),
+            'classes': ('collapse',)
+        }),
+        ('Error Tracking', {
+            'fields': ('error_log', 'retry_count', 'last_error', 'failed_stage'),
+            'classes': ('collapse',)
+        }),
+        ('Review', {
+            'fields': ('reviewed_by', 'review_notes', 'published_article')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'generation_started_at', 'generation_completed_at', 'published_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AIGenerationConfig)
+class AIGenerationConfigAdmin(admin.ModelAdmin):
+    list_display = ['name', 'template_type', 'ai_provider', 'model_name', 'enabled', 'is_default']
+    list_filter = ['template_type', 'ai_provider', 'enabled', 'is_default']
+    search_fields = ['name', 'description']
+    ordering = ['-is_default', 'name']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'created_by']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'template_type', 'enabled', 'is_default')
+        }),
+        ('AI Provider', {
+            'fields': ('ai_provider', 'model_name')
+        }),
+        ('Prompts', {
+            'fields': ('system_prompt', 'user_prompt_template', 'outline_prompt', 'research_prompt'),
+            'classes': ('collapse',)
+        }),
+        ('Model Parameters', {
+            'fields': ('temperature', 'max_tokens', 'top_p', 'frequency_penalty', 'presence_penalty')
+        }),
+        ('Content Settings', {
+            'fields': (
+                'target_word_count', 'num_headings',
+                'include_statistics', 'include_quotes', 'include_internal_links'
+            )
+        }),
+        ('Quality Thresholds', {
+            'fields': (
+                'max_ai_score', 'max_plagiarism_score', 'min_seo_score',
+                'min_readability_score', 'max_bias_score'
+            )
+        }),
+        ('Automation', {
+            'fields': ('auto_humanize', 'auto_rewrite_plagiarism', 'auto_publish', 'max_retries')
+        }),
+        ('Metadata', {
+            'fields': ('version', 'created_by', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AIWorkflowLog)
+class AIWorkflowLogAdmin(admin.ModelAdmin):
+    list_display = ['article', 'stage', 'status', 'execution_time', 'cost', 'timestamp']
+    list_filter = ['stage', 'status', 'timestamp']
+    search_fields = ['article__title', 'article__keyword__keyword']
+    ordering = ['-timestamp']
+    readonly_fields = ['id', 'timestamp', 'completed_at']
+    
+    fieldsets = (
+        ('Article & Stage', {
+            'fields': ('article', 'stage', 'status', 'retry_number', 'triggered_by')
+        }),
+        ('Data', {
+            'fields': ('input_data', 'output_data'),
+            'classes': ('collapse',)
+        }),
+        ('Error Information', {
+            'fields': ('error_message', 'error_traceback'),
+            'classes': ('collapse',)
+        }),
+        ('Performance', {
+            'fields': ('execution_time', 'tokens_used', 'cost', 'ai_model')
+        }),
+        ('Timestamps', {
+            'fields': ('timestamp', 'completed_at')
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return False  # Logs are created automatically
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser  # Only superusers can delete logs
 

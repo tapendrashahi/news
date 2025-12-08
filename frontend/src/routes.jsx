@@ -35,6 +35,13 @@ import AdvertisementForm from './admin/pages/advertisements/AdvertisementForm';
 import LegalPagesList from './admin/pages/legal/LegalPagesList';
 import LegalPageForm from './admin/pages/legal/LegalPageForm';
 
+// AI Content imports
+import KeywordsList from './admin/pages/ai-content/keywords/KeywordsList';
+import GenerationQueue from './admin/pages/ai-content/generation-queue/GenerationQueue';
+import ReviewQueue from './admin/pages/ai-content/review-queue/ReviewQueue';
+import AISettings from './admin/pages/ai-content/settings/AISettings';
+import AIAnalytics from './admin/pages/ai-content/analytics/AIAnalytics';
+
 function AppRoutes() {
   return (
     <AdminAuthProvider>
@@ -84,6 +91,13 @@ function AppRoutes() {
           <Route path="legal" element={<LegalPagesList />} />
           <Route path="legal/create" element={<LegalPageForm />} />
           <Route path="legal/:id/edit" element={<LegalPageForm />} />
+          
+          {/* AI Content Routes */}
+          <Route path="ai-content/keywords" element={<KeywordsList />} />
+          <Route path="ai-content/generation-queue" element={<GenerationQueue />} />
+          <Route path="ai-content/review-queue" element={<ReviewQueue />} />
+          <Route path="ai-content/settings" element={<AISettings />} />
+          <Route path="ai-content/analytics" element={<AIAnalytics />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

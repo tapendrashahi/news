@@ -56,7 +56,7 @@ class KeywordSourceSerializer(serializers.ModelSerializer):
     """Full serializer for KeywordSource with all fields."""
     
     approved_by = UserMinimalSerializer(read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
     articles_count = serializers.SerializerMethodField()
     can_generate = serializers.SerializerMethodField()
     
@@ -64,7 +64,7 @@ class KeywordSourceSerializer(serializers.ModelSerializer):
         model = KeywordSource
         fields = [
             'id', 'keyword', 'source', 'search_volume', 'competition',
-            'status', 'priority', 'category', 'category_name', 'notes',
+            'status', 'priority', 'category', 'category_display', 'notes',
             'viability_score', 'suggested_angles', 'related_keywords',
             'suggested_template', 'created_at', 'updated_at',
             'approved_by', 'approved_at', 'rejected_reason',
@@ -87,7 +87,7 @@ class KeywordSourceSerializer(serializers.ModelSerializer):
 class KeywordSourceListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views."""
     
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
     approved_by_name = serializers.CharField(source='approved_by.username', read_only=True)
     has_articles = serializers.SerializerMethodField()
     
@@ -95,7 +95,7 @@ class KeywordSourceListSerializer(serializers.ModelSerializer):
         model = KeywordSource
         fields = [
             'id', 'keyword', 'source', 'search_volume', 'competition',
-            'status', 'priority', 'category', 'category_name',
+            'status', 'priority', 'category', 'category_display',
             'viability_score', 'created_at', 'approved_by_name',
             'approved_at', 'has_articles'
         ]
@@ -167,7 +167,7 @@ class AIArticleSerializer(serializers.ModelSerializer):
     
     keyword_data = KeywordSourceListSerializer(source='keyword', read_only=True)
     reviewed_by = UserMinimalSerializer(read_only=True)
-    category_name = serializers.CharField(source='keyword.category.name', read_only=True)
+    category_display = serializers.CharField(source='keyword.get_category_display', read_only=True)
     workflow_progress = serializers.SerializerMethodField()
     quality_summary = serializers.SerializerMethodField()
     is_ready_for_review = serializers.BooleanField(read_only=True)
@@ -189,7 +189,7 @@ class AIArticleSerializer(serializers.ModelSerializer):
             'generation_time', 'cost_estimate', 'token_usage',
             'created_at', 'updated_at', 'generation_started_at',
             'generation_completed_at', 'published_at',
-            'reviewed_by', 'review_notes', 'category_name',
+            'reviewed_by', 'review_notes', 'category_display',
             'workflow_progress', 'quality_summary',
             'is_ready_for_review', 'passes_quality_threshold'
         ]
@@ -262,7 +262,7 @@ class AIArticleListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for queue views and list displays."""
     
     keyword_text = serializers.CharField(source='keyword.keyword', read_only=True)
-    category_name = serializers.CharField(source='keyword.category.name', read_only=True)
+    category_display = serializers.CharField(source='keyword.get_category_display', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     workflow_stage_display = serializers.CharField(source='get_workflow_stage_display', read_only=True)
     progress_percentage = serializers.SerializerMethodField()
@@ -271,7 +271,7 @@ class AIArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = AIArticle
         fields = [
-            'id', 'title', 'keyword_text', 'category_name',
+            'id', 'title', 'keyword_text', 'category_display',
             'template_type', 'status', 'status_display',
             'workflow_stage', 'workflow_stage_display',
             'ai_model_used', 'actual_word_count',
