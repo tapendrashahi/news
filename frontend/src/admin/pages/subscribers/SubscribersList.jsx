@@ -138,7 +138,7 @@ const SubscribersList = () => {
   const thisMonth = new Date();
   thisMonth.setDate(1);
   const newThisMonth = subscribers.filter(s => 
-    new Date(s.created_at) >= thisMonth
+    new Date(s.subscribed_at) >= thisMonth
   ).length;
 
   return (
@@ -318,7 +318,7 @@ const SubscribersList = () => {
                   </td>
                   <td>
                     <div className="date-cell">
-                      {new Date(subscriber.created_at).toLocaleDateString('en-US', {
+                      {new Date(subscriber.subscribed_at).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric'
