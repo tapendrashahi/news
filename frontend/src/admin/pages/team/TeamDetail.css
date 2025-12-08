@@ -337,27 +337,36 @@
   flex: 1;
 }
 
-.article-title {
-  font-size: 16px;
+.team-detail-page .article-title {
+  font-size: 16px !important;
   font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
-}
-
-.article-excerpt {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-  margin: 0 0 12px 0;
+  color: #1a1a1a !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.4 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-clamp: 2;
+  max-height: 2.8em;
 }
 
-.article-meta {
+.team-detail-page .article-excerpt {
+  font-size: 13px !important;
+  color: #666 !important;
+  line-height: 1.5 !important;
+  margin: 0 0 12px 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  max-height: 2.6em;
+}
+
+.team-detail-page .article-meta {
   display: flex;
   align-items: center;
   gap: 12px;
