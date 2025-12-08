@@ -8,8 +8,8 @@ const KeywordsList = () => {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [showScraper, setShowScraper] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [showConfigsPage, setShowConfigsPage] = useState(false)
 
   useEffect(() => {
     fetchKeywords()
@@ -32,7 +32,7 @@ const KeywordsList = () => {
   }
 
   const handleKeywordsAdded = (newKeywords) => {
-    setShowScraper(false)
+    setShowModal(false)
     fetchKeywords()
   }
 
@@ -68,33 +68,56 @@ const KeywordsList = () => {
   return (
     <div className="keywords-page">
       <div className="keywords-header">
-        <h1>📋 Topic Research & Keyword Management</h1>
+        <h1>📋 Topic Research</h1>
         <div className="header-actions">
           <button 
-            className="btn btn-secondary" 
-            onClick={() => setShowModal(true)}
+            className="btn btn-success" 
+            onClick={() => {
+              // Trigger scrape all from here
+              const event = new CustomEvent('triggerScrapeAll')
+              window.dispatchEvent(event)
+            }}
           >
-            ⚙️ Setup Configuration
+            🚀 Scrape News
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => setShowConfigsPage(!showConfigsPage)}
+          >
+            {showConfigsPage ? '🚀 Back to Scraping' : '⚙️ Manage Configurations'}
           </button>
           <button 
             className="btn btn-primary" 
-            onClick={() => setShowScraper(!showScraper)}
+            onClick={() => setShowModal(true)}
           >
-            {showScraper ? '📋 View Topics' : '➕ Add New Topics'}
+            ➕ Setup Configuration
           </button>
         </div>
       </div>
 
-      {/* Always render KeywordScraper for modal functionality */}
-      <KeywordScraper 
-        onKeywordsAdded={handleKeywordsAdded} 
-        showModal={showModal} 
-        setShowModal={setShowModal}
-        showFullUI={showScraper}
-      />
+      {/* Render either Configurations Management or Scraping Page */}
+      {showConfigsPage ? (
+        <KeywordScraper 
+          onKeywordsAdded={handleKeywordsAdded} 
+          showModal={showModal} 
+          setShowModal={setShowModal}
+          showFullUI={true}
+          hideConfigurations={false}
+          showConfigsOnly={true}
+        />
+      ) : (
+        <KeywordScraper 
+          onKeywordsAdded={handleKeywordsAdded} 
+          showModal={showModal} 
+          setShowModal={setShowModal}
+          showFullUI={true}
+          hideConfigurations={true}
+        />
+      )}
 
-      {!showScraper && (
-        <div className="keywords-list">
+      {/* Topics list removed - scraping is primary functionality */}
+      {/*
+      <div className="keywords-list">
         <div className="list-header">
           <div className="filters">
             <div className="filter-group">
@@ -194,7 +217,7 @@ const KeywordsList = () => {
           </table>
         )}
         </div>
-      )}
+      */}
     </div>
   )
 }

@@ -9,8 +9,8 @@ import {
   bulkApproveArticles
 } from '../../../services/aiContentService'
 
-export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModal, showFullUI = true }) {
-  const [activeTab, setActiveTab] = useState('scrape')
+export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModal, showFullUI = true, hideConfigurations = false, showConfigsOnly = false }) {
+  const [activeTab, setActiveTab] = useState('review')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
   
@@ -32,9 +32,18 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
   const [scrapedArticles, setScrapedArticles] = useState([])
   const [selectedArticles, setSelectedArticles] = useState([])
   const [articleFilter, setArticleFilter] = useState('pending')
+  const [configFilter, setConfigFilter] = useState('all')
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
   
   // Scraping progress state
   const [scrapingProgress, setScrapingProgress] = useState({})
+  
+  // Configurations panel visibility
+  const [showConfigsPanel, setShowConfigsPanel] = useState(false)
 
   const categories = [
     'Politics', 'Business', 'Technology', 'Health', 'Education',
@@ -42,12 +51,17 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
   ]
 
   useEffect(() => {
-    if (activeTab === 'scrape') {
-      loadNewsSourceConfigs()
-    } else if (activeTab === 'review') {
-      loadScrapedArticles()
+    loadScrapedArticles()
+    loadNewsSourceConfigs()
+    
+    // Listen for scrape all trigger from header
+    const handleScrapeAllEvent = () => {
+      handleScrapeAll()
     }
-  }, [activeTab, articleFilter])
+    
+    window.addEventListener('triggerScrapeAll', handleScrapeAllEvent)
+    return () => window.removeEventListener('triggerScrapeAll', handleScrapeAllEvent)
+  }, [articleFilter, configFilter, currentPage])
 
   const loadNewsSourceConfigs = async () => {
     try {
@@ -61,9 +75,30 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
   const loadScrapedArticles = async () => {
     setLoading(true)
     try {
-      const params = articleFilter !== 'all' ? { status: articleFilter } : {}
+      const params = { page: currentPage }
+      
+      // Add status filter
+      if (articleFilter !== 'all') {
+        params.status = articleFilter
+      }
+      
+      // Add configuration filter
+      if (configFilter !== 'all') {
+        params.source_config = configFilter
+      }
+      
       const response = await getScrapedArticles(params)
-      setScrapedArticles(response.data.results || response.data)
+      
+      // Handle paginated response
+      if (response.data.results) {
+        setScrapedArticles(response.data.results)
+        setTotalCount(response.data.count || 0)
+        setTotalPages(Math.ceil((response.data.count || 0) / 50)) // 50 per page
+      } else {
+        setScrapedArticles(response.data)
+        setTotalCount(response.data.length)
+        setTotalPages(1)
+      }
     } catch (error) {
       console.error('Failed to load scraped articles:', error)
     } finally {
@@ -136,9 +171,31 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
       
       loadNewsSourceConfigs()
     } catch (error) {
+      console.error('Configuration creation error:', error)
+      console.error('Error response:', error.response)
+      
+      let errorMessage = 'Failed to create configuration'
+      
+      if (error.response?.data) {
+        // Handle validation errors
+        if (typeof error.response.data === 'object') {
+          const errors = Object.entries(error.response.data)
+            .map(([field, messages]) => {
+              const msgs = Array.isArray(messages) ? messages : [messages]
+              return `${field}: ${msgs.join(', ')}`
+            })
+            .join('; ')
+          errorMessage = errors || errorMessage
+        } else if (error.response.data.detail) {
+          errorMessage = error.response.data.detail
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data
+        }
+      }
+      
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.detail || 'Failed to create configuration' 
+        text: errorMessage
       })
     } finally {
       setLoading(false)
@@ -146,7 +203,21 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
   }
 
   const handleScrapeAll = async () => {
-    const activeConfigs = newsSourceConfigs.filter(c => c.status === 'active')
+    // Reload and get latest configs
+    let activeConfigs = newsSourceConfigs.filter(c => c.status === 'active')
+    
+    // If no configs loaded yet, fetch them
+    if (newsSourceConfigs.length === 0) {
+      try {
+        const response = await getNewsSources()
+        const configs = response.data.results || response.data
+        setNewsSourceConfigs(configs)
+        activeConfigs = configs.filter(c => c.status === 'active')
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Failed to load configurations' })
+        return
+      }
+    }
     
     if (activeConfigs.length === 0) {
       setMessage({ type: 'error', text: 'No active configurations to scrape' })
@@ -178,60 +249,91 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
     // Set initial progress
     setScrapingProgress(prev => ({
       ...prev,
-      [configId]: { status: 'starting', progress: 0, message: 'Initializing scraper...' }
+      [configId]: { 
+        status: 'starting', 
+        progress: 0, 
+        message: 'Initializing scraper...',
+        articlesFound: 0,
+        articlesCreated: 0
+      }
     }))
     
     try {
       // Update progress to scraping
       setScrapingProgress(prev => ({
         ...prev,
-        [configId]: { status: 'scraping', progress: 30, message: 'Scraping articles from websites...' }
+        [configId]: { 
+          status: 'scraping', 
+          progress: 30, 
+          message: 'Searching for articles on websites...',
+          articlesFound: 0,
+          articlesCreated: 0
+        }
       }))
       
-      await triggerScrape(configId)
+      const response = await triggerScrape(configId)
       
-      // Update progress to processing
+      // Update progress with actual results
       setScrapingProgress(prev => ({
         ...prev,
-        [configId]: { status: 'processing', progress: 70, message: 'Processing scraped content...' }
+        [configId]: { 
+          status: 'complete', 
+          progress: 100, 
+          message: 'Scraping completed!',
+          articlesFound: response.data.total_found || 0,
+          articlesCreated: response.data.articles_created || 0
+        }
       }))
       
-      // Simulate processing time
+      setMessage({ 
+        type: 'success', 
+        text: `✅ Found ${response.data.total_found || 0} articles, saved ${response.data.articles_created || 0} new articles for "${configName}"` 
+      })
+        
+      // Reload scraped articles if on review tab
+      if (activeTab === 'review') {
+        loadScrapedArticles()
+      }
+        
+      // Clear progress after 3 seconds
       setTimeout(() => {
-        setScrapingProgress(prev => ({
-          ...prev,
-          [configId]: { status: 'complete', progress: 100, message: 'Scraping completed!' }
-        }))
-        
-        setMessage({ 
-          type: 'success', 
-          text: `Scraping completed for "${configName}". Check Review tab to see results.` 
+        setScrapingProgress(prev => {
+          const newProgress = { ...prev }
+          delete newProgress[configId]
+          return newProgress
         })
-        
-        // Reload scraped articles if on review tab
-        if (activeTab === 'review') {
-          loadScrapedArticles()
-        }
-        
-        // Clear progress after 3 seconds
-        setTimeout(() => {
-          setScrapingProgress(prev => {
-            const newProgress = { ...prev }
-            delete newProgress[configId]
-            return newProgress
-          })
-        }, 3000)
-      }, 2000)
+      }, 3000)
       
     } catch (error) {
+      console.error('Scraping error:', error)
+      console.error('Error response:', error.response)
+      
+      let errorMessage = 'Failed to trigger scraping'
+      
+      if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error.message) {
+        errorMessage = error.message
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Scraping timeout - the operation took too long'
+      } else if (!error.response) {
+        errorMessage = 'Network error - cannot connect to server'
+      }
+      
       setScrapingProgress(prev => ({
         ...prev,
-        [configId]: { status: 'error', progress: 0, message: 'Scraping failed!' }
+        [configId]: { 
+          status: 'error', 
+          progress: 0, 
+          message: `Failed: ${errorMessage}`,
+          articlesFound: 0,
+          articlesCreated: 0
+        }
       }))
       
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.detail || 'Failed to trigger scraping' 
+        text: `❌ Scraping failed for "${configName}": ${errorMessage}` 
       })
       
       // Clear error progress after 3 seconds
@@ -321,17 +423,11 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
 
   return (
     <div className="keyword-scraper">
-      {showFullUI && (
+      {showFullUI && !showConfigsOnly && (
         <>
           <div className="scraper-tabs">
             <button 
-              className={`tab ${activeTab === 'scrape' ? 'active' : ''}`}
-              onClick={() => setActiveTab('scrape')}
-            >
-              🚀 Scrape News
-            </button>
-            <button 
-              className={`tab ${activeTab === 'review' ? 'active' : ''}`}
+              className={`tab active`}
               onClick={() => setActiveTab('review')}
             >
               📰 Review Articles ({scrapedArticles.length})
@@ -405,13 +501,16 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
                       required
                     >
                       <option value="">Select category</option>
-                      <option value="technology">Technology</option>
-                      <option value="business">Business</option>
-                      <option value="politics">Politics</option>
-                      <option value="sports">Sports</option>
-                      <option value="entertainment">Entertainment</option>
-                      <option value="science">Science</option>
-                      <option value="health">Health</option>
+                      <option value="Politics">Politics</option>
+                      <option value="Business">Business</option>
+                      <option value="Technology">Technology</option>
+                      <option value="Health">Health</option>
+                      <option value="Education">Education</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Sports">Sports</option>
+                      <option value="Science">Science</option>
+                      <option value="Environment">Environment</option>
+                      <option value="Culture">Culture</option>
                     </select>
                   </div>
 
@@ -445,77 +544,122 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
         </div>
       )}
 
-      {showFullUI && activeTab === 'scrape' && (
+      {showConfigsOnly && (
         <div className="scrape-page">
-          {/* Main Content - Configurations List */}
           <div className="configurations-section">
-            <div className="configs-header">
-              <div>
-                <h2>📋 News Source Configurations</h2>
-                <p className="subtitle">Manage your scraping sources and trigger bulk scraping</p>
-              </div>
-              {newsSourceConfigs.filter(c => c.status === 'active').length > 0 && (
-                <button
-                  className="btn btn-primary btn-large scrape-all-btn"
-                  onClick={handleScrapeAll}
-                  disabled={Object.keys(scrapingProgress).length > 0}
-                >
-                  🚀 Scrape All ({newsSourceConfigs.filter(c => c.status === 'active').length} active)
-                </button>
-              )}
-            </div>
-
-            {newsSourceConfigs.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">📋</div>
-                <h3>No Configurations Yet</h3>
-                <p>Click "⚙️ Setup Configuration" in the header to create your first news scraping source</p>
-              </div>
-            ) : (
-              <div className="configs-list">
-                {newsSourceConfigs.map(config => (
-                  <div key={config.id} className="config-card">
-                    <div className="config-header">
-                      <h4>{config.name}</h4>
-                      <span className={`status-badge ${config.status}`}>{config.status}</span>
-                    </div>
-                    <div className="config-details">
-                      <p><strong>Category:</strong> {config.category}</p>
-                      <p><strong>Keywords:</strong> {config.keywords.join(', ')}</p>
-                      <p><strong>Websites:</strong> {config.source_websites.length} source(s)</p>
-                      <p><strong>Last scraped:</strong> {config.last_scraped_at ? new Date(config.last_scraped_at).toLocaleString() : 'Never'}</p>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    {scrapingProgress[config.id] && (
-                      <div className="scraping-progress">
-                        <div className="progress-info">
-                          <span className="progress-message">{scrapingProgress[config.id].message}</span>
-                          <span className="progress-percent">{scrapingProgress[config.id].progress}%</span>
-                        </div>
-                        <div className="progress-bar-container">
-                          <div 
-                            className={`progress-bar ${scrapingProgress[config.id].status}`}
-                            style={{ width: `${scrapingProgress[config.id].progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    <button 
-                      className="btn btn-secondary btn-small"
-                      onClick={() => handleTriggerScrape(config.id, config.name)}
-                      disabled={scrapingProgress[config.id]}
-                      title="Scrape only this configuration"
-                    >
-                      {scrapingProgress[config.id] ? '⏳ Scraping...' : '🔄 Scrape'}
-                    </button>
+            <div className="configs-management-page">
+                <div className="configs-page-header">
+                  <div>
+                    <h2>⚙️ Manage Configurations</h2>
+                    <p className="subtitle">View, edit, and manage all your news scraping configurations</p>
                   </div>
-                ))}
+                  {newsSourceConfigs.filter(c => c.status === 'active').length > 0 && (
+                    <button
+                      className="btn btn-primary btn-large"
+                      onClick={handleScrapeAll}
+                      disabled={Object.keys(scrapingProgress).length > 0}
+                    >
+                      🚀 Scrape All ({newsSourceConfigs.filter(c => c.status === 'active').length} active)
+                    </button>
+                  )}
+                </div>
+
+                {newsSourceConfigs.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">📋</div>
+                    <h3>No Configurations Yet</h3>
+                    <p>Click "➕ Setup Configuration" in the header to create your first news scraping source</p>
+                  </div>
+                ) : (
+                  <div className="configs-full-list">
+                    {newsSourceConfigs.map(config => (
+                      <div key={config.id} className="config-card-full">
+                        <div className="config-card-header">
+                          <div>
+                            <h3>{config.name}</h3>
+                            <span className={`status-badge ${config.status}`}>{config.status}</span>
+                          </div>
+                          <div className="config-actions">
+                            <button 
+                              className="btn btn-primary"
+                              onClick={() => handleTriggerScrape(config.id, config.name)}
+                              disabled={scrapingProgress[config.id]}
+                            >
+                              {scrapingProgress[config.id] ? '⏳ Scraping...' : '🔄 Scrape Now'}
+                            </button>
+                            <button className="btn btn-secondary">
+                              ✏️ Edit
+                            </button>
+                            <button className="btn btn-danger">
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="config-details-grid">
+                          <div className="detail-item">
+                            <span className="detail-label">Category:</span>
+                            <span className="detail-value">{config.category}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Keywords:</span>
+                            <span className="detail-value">{config.keywords.join(', ')}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Websites:</span>
+                            <div className="detail-value">
+                              {config.source_websites.map((site, idx) => (
+                                <div key={idx} className="website-tag">{site}</div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Max Articles:</span>
+                            <span className="detail-value">{config.max_articles_per_scrape}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Last Scraped:</span>
+                            <span className="detail-value">
+                              {config.last_scraped_at ? new Date(config.last_scraped_at).toLocaleString() : 'Never'}
+                            </span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">Created:</span>
+                            <span className="detail-value">
+                              {new Date(config.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        {scrapingProgress[config.id] && (
+                          <div className="scraping-progress" style={{ marginTop: '16px' }}>
+                            <div className="progress-info">
+                              <span className="progress-message">
+                                {scrapingProgress[config.id].message}
+                                {scrapingProgress[config.id].status === 'complete' && (
+                                  <span className="article-count">
+                                    {' '}📰 Found: {scrapingProgress[config.id].articlesFound} | ✅ New: {scrapingProgress[config.id].articlesCreated}
+                                  </span>
+                                )}
+                              </span>
+                              <span className="progress-percent">{scrapingProgress[config.id].progress}%</span>
+                            </div>
+                            <div className="progress-bar-container">
+                              <div 
+                                className={`progress-bar ${scrapingProgress[config.id].status}`}
+                                style={{ width: `${scrapingProgress[config.id].progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
       )}
 
       {showFullUI && activeTab === 'review' && (
@@ -524,11 +668,27 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
             <h3>📰 Review Scraped Articles</h3>
             <div className="review-actions">
               <select 
-                value={articleFilter} 
-                onChange={(e) => setArticleFilter(e.target.value)}
+                value={configFilter} 
+                onChange={(e) => {
+                  setConfigFilter(e.target.value)
+                  setCurrentPage(1) // Reset to page 1 when filter changes
+                }}
                 className="filter-select"
               >
-                <option value="all">All Articles</option>
+                <option value="all">All Configurations</option>
+                {newsSourceConfigs.map(config => (
+                  <option key={config.id} value={config.id}>{config.name}</option>
+                ))}
+              </select>
+              <select 
+                value={articleFilter} 
+                onChange={(e) => {
+                  setArticleFilter(e.target.value)
+                  setCurrentPage(1) // Reset to page 1 when filter changes
+                }}
+                className="filter-select"
+              >
+                <option value="all">All Status</option>
                 <option value="pending">Pending Review</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
@@ -546,6 +706,39 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
             </div>
           </div>
 
+          {/* Scraping Progress Display */}
+          {Object.keys(scrapingProgress).length > 0 && (
+            <div className="active-scraping-container">
+              {Object.entries(scrapingProgress).map(([configId, progress]) => {
+                const config = newsSourceConfigs.find(c => c.id === configId)
+                return (
+                  <div key={configId} className="scraping-progress-card">
+                    <div className="scraping-header">
+                      <span className="scraping-config-name">🔄 {config?.name || 'Unknown Source'}</span>
+                      <span className="progress-percent">{progress.progress}%</span>
+                    </div>
+                    <div className="progress-bar-container">
+                      <div 
+                        className={`progress-bar ${progress.status}`}
+                        style={{ width: `${progress.progress}%` }}
+                      />
+                    </div>
+                    <div className="scraping-status">
+                      <span className="progress-message">
+                        {progress.message}
+                        {progress.status === 'complete' && (
+                          <span className="article-count">
+                            {' '}📰 Found: {progress.articlesFound} | ✅ New: {progress.articlesCreated}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           {loading && <div className="loading">⏳ Loading articles...</div>}
 
           {!loading && scrapedArticles.length === 0 && (
@@ -557,95 +750,123 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
           )}
 
           {!loading && scrapedArticles.length > 0 && (
-            <div className="articles-grid">
+            <div className="articles-list-view">
               {scrapedArticles.map(article => (
-                <div key={article.id} className="article-card">
-                  {article.status === 'pending' && (
-                    <div className="card-checkbox">
+                <div key={article.id} className={`article-row ${
+                  selectedArticles.includes(article.id) ? 'selected' : ''
+                }`}>
+                  <div className="article-checkbox">
+                    {article.status === 'pending' && (
                       <input
                         type="checkbox"
                         checked={selectedArticles.includes(article.id)}
                         onChange={() => toggleArticleSelection(article.id)}
                       />
-                    </div>
-                  )}
-                  
-                  <div className="article-content">
-                    <div className="article-header">
-                      <h4>{article.title}</h4>
-                      <span className={`status-badge ${article.status}`}>{article.status}</span>
-                    </div>
-                    
+                    )}
+                  </div>
+                  <div className="article-main">
+                    <h3 className="article-title">{article.title}</h3>
+                    <p className="article-summary">{article.summary || article.content?.substring(0, 200) + '...'}</p>
                     <div className="article-meta">
-                      <span className="meta-item">🌐 {article.source_website}</span>
-                      <span className="meta-item">📁 {article.category}</span>
-                      <span className="meta-item">📅 {new Date(article.scraped_at).toLocaleDateString()}</span>
+                      <span className="meta-item">
+                        <strong>Source:</strong> {article.source_website}
+                      </span>
+                      <span className="meta-item">
+                        <strong>Category:</strong> {article.category}
+                      </span>
+                      <span className="meta-item">
+                        <strong>Author:</strong> {article.author || 'Unknown'}
+                      </span>
+                      <span className="meta-item">
+                        <strong>Date:</strong> {article.published_date ? new Date(article.published_date).toLocaleDateString() : 'N/A'}
+                      </span>
+                      <span className="meta-item">
+                        <strong>Status:</strong> <span className={`status-badge ${article.status}`}>{article.status}</span>
+                      </span>
                     </div>
-
-                    {article.matched_keywords && article.matched_keywords.length > 0 && (
-                      <div className="keywords-tags">
-                        {article.matched_keywords.map((kw, idx) => (
-                          <span key={idx} className="keyword-tag">{kw}</span>
-                        ))}
+                    <div className="article-tags">
+                      {article.matched_keywords?.map((keyword, idx) => (
+                        <span key={idx} className="keyword-tag">{keyword}</span>
+                      ))}
+                    </div>
+                    {article.image_urls && article.image_urls.length > 0 && (
+                      <div className="article-images-count">
+                        🖼️ {article.image_urls.length} image(s)
                       </div>
                     )}
-
-                    <p className="article-summary">
-                      {article.summary || article.content?.substring(0, 200) + '...'}
-                    </p>
-
-                    <div className="article-footer">
-                      <a 
-                        href={article.source_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="source-link"
-                      >
-                        🔗 View Original
-                      </a>
-                      
-                      {article.image_urls && article.image_urls.length > 0 && (
-                        <span className="meta-item">🖼️ {article.image_urls.length} image(s)</span>
-                      )}
-                      
-                      {article.reference_urls && article.reference_urls.length > 0 && (
-                        <span className="meta-item">📎 {article.reference_urls.length} reference(s)</span>
-                      )}
-                    </div>
-
+                  </div>
+                  <div className="article-actions-col">
                     {article.status === 'pending' && (
-                      <div className="article-actions">
+                      <>
                         <button 
-                          className="action-btn approve"
+                          className="btn btn-primary btn-small"
                           onClick={() => handleApproveArticle(article.id)}
                           disabled={loading}
                         >
-                          ✓ Approve & Generate
+                          ✓ Approve
                         </button>
                         <button 
-                          className="action-btn reject"
+                          className="btn btn-danger btn-small"
                           onClick={() => handleRejectArticle(article.id)}
                           disabled={loading}
                         >
                           ✗ Reject
                         </button>
-                      </div>
+                      </>
                     )}
-
-                    {article.status === 'approved' && article.ai_article_id && (
-                      <div className="article-status-info">
-                        ✅ Approved - AI Article ID: {article.ai_article_id.substring(0, 8)}...
-                      </div>
-                    )}
-
-                    {article.status === 'rejected' && article.rejection_reason && (
-                      <div className="article-status-info rejection">
-                        ❌ Rejected: {article.rejection_reason}
-                      </div>
-                    )}
+                    <a 
+                      href={article.source_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary btn-small"
+                    >
+                      🔗 View Source
+                    </a>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          
+          {/* Pagination Controls */}
+          {!loading && scrapedArticles.length > 0 && totalPages > 1 && (
+            <div className="pagination-controls">
+              <div className="pagination-info">
+                Showing {((currentPage - 1) * 50) + 1} - {Math.min(currentPage * 50, totalCount)} of {totalCount} articles
+              </div>
+              <div className="pagination-buttons">
+                <button
+                  className="btn btn-small"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  « First
+                </button>
+                <button
+                  className="btn btn-small"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  ‹ Previous
+                </button>
+                <span className="page-indicator">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  className="btn btn-small"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next ›
+                </button>
+                <button
+                  className="btn btn-small"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  Last »
+                </button>
+              </div>
             </div>
           )}
         </div>

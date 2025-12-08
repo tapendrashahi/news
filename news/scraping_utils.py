@@ -334,7 +334,8 @@ class NewsArticleScraper:
 def scrape_articles_for_config(config):
     """
     Scrape articles based on a NewsSourceConfig.
-    Processes all websites and keywords in a single batch operation.
+    OPTIMIZED: Scrapes homepage articles only, then filters by keywords.
+    This is MUCH faster than searching for each keyword individually.
     
     Args:
         config: NewsSourceConfig instance
@@ -346,78 +347,65 @@ def scrape_articles_for_config(config):
     scraped_articles = []
     seen_urls = set()  # Track unique URLs
     
-    # Calculate articles per website
-    num_websites = len(config.source_websites) if config.source_websites else 1
-    articles_per_website = max(3, config.max_articles_per_scrape // num_websites)
+    # Limit websites to prevent timeout (120s max)
+    websites_to_use = config.source_websites[:10] if len(config.source_websites) > 10 else config.source_websites
     
-    logger.info(f"Starting batch scrape: {len(config.source_websites)} websites, {len(config.keywords)} keywords")
+    # Convert keywords to lowercase for matching
+    keywords_lower = [kw.lower() for kw in config.keywords]
     
-    # Process each website
-    for website in config.source_websites:
+    logger.info(f"🚀 FAST SCRAPE: {len(websites_to_use)} websites, filtering by {len(keywords_lower)} keywords")
+    
+    # Process each website (limited list)
+    for idx, website in enumerate(websites_to_use, 1):
         # Ensure URL has a scheme
         if not website.startswith(('http://', 'https://')):
             website = 'https://' + website
         
         try:
-            # Collect article URLs from this website for ALL keywords at once
-            all_article_urls = set()
+            logger.info(f"[{idx}/{len(websites_to_use)}] Scraping homepage: {website}")
             
-            # Try to find articles matching any keyword
-            for keyword in config.keywords:
-                try:
-                    urls = scraper.search_website_for_keyword(
-                        website, 
-                        keyword, 
-                        max_results=max(2, articles_per_website // len(config.keywords))
-                    )
-                    all_article_urls.update(urls)
-                    
-                    if len(all_article_urls) >= articles_per_website:
-                        break
-                        
-                except Exception as e:
-                    logger.debug(f"Error searching {website} for '{keyword}': {str(e)}")
-                    continue
+            # FAST APPROACH: Get recent articles from homepage directly (no search!)
+            article_urls = scraper._scrape_homepage_articles(website, max_results=10)
             
-            # If no keyword matches found, get recent articles from homepage
-            if not all_article_urls:
-                logger.info(f"No keyword matches on {website}, scraping homepage")
-                all_article_urls = set(scraper._scrape_homepage_articles(website, articles_per_website))
+            if not article_urls:
+                logger.warning(f"No articles found on {website}")
+                continue
             
-            # Extract content from collected URLs
-            for url in list(all_article_urls)[:articles_per_website]:
+            # Extract content and filter by keywords
+            for url in article_urls:
                 if url in seen_urls:
                     continue
+                
+                seen_urls.add(url)
                     
                 try:
                     article_data = scraper.scrape_article_from_url(url)
                     
                     if article_data and len(article_data.get('content', '')) > 200:
-                        # Determine which keywords match this article
+                        # Check if article matches ANY keyword
                         matched = []
                         content_lower = article_data['content'].lower()
                         title_lower = article_data['title'].lower()
                         
-                        for keyword in config.keywords:
-                            if keyword.lower() in content_lower or keyword.lower() in title_lower:
+                        for keyword in keywords_lower:
+                            if keyword in content_lower or keyword in title_lower:
                                 matched.append(keyword)
                         
-                        # Use all keywords if none matched
-                        if not matched:
-                            matched = config.keywords[:3]  # Use first 3 keywords as fallback
-                        
-                        article_data['matched_keywords'] = matched
-                        article_data['category'] = config.category
-                        article_data['reference_urls'] = []
-                        
-                        scraped_articles.append(article_data)
-                        seen_urls.add(url)
-                        
-                        logger.info(f"Scraped: {article_data['title'][:60]}... ({len(article_data['content'])} chars)")
-                        
-                        # Stop if we've reached max articles
-                        if len(scraped_articles) >= config.max_articles_per_scrape:
-                            return scraped_articles
+                        # Only save if matches at least one keyword
+                        if matched:
+                            article_data['matched_keywords'] = matched
+                            article_data['category'] = config.category
+                            article_data['reference_urls'] = []
+                            
+                            scraped_articles.append(article_data)
+                            logger.info(f"✅ Found: {article_data['title'][:50]}... (keywords: {', '.join(matched[:3])})")
+                            
+                            # Stop if we've reached max articles
+                            if len(scraped_articles) >= config.max_articles_per_scrape:
+                                logger.info(f"🎯 Reached max: {config.max_articles_per_scrape} articles")
+                                return scraped_articles
+                        else:
+                            logger.debug(f"⏭️  Skipped (no match): {article_data['title'][:50]}...")
                             
                 except Exception as e:
                     logger.error(f"Error extracting article from {url}: {str(e)}")

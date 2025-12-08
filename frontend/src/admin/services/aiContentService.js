@@ -28,7 +28,8 @@ export const getNewsSource = (id) => api.get(`/admin/ai/news-sources/${id}/`)
 export const createNewsSource = (data) => api.post('/admin/ai/news-sources/', data)
 export const updateNewsSource = (id, data) => api.patch(`/admin/ai/news-sources/${id}/`, data)
 export const deleteNewsSource = (id) => api.delete(`/admin/ai/news-sources/${id}/`)
-export const triggerScrape = (id) => api.post(`/admin/ai/news-sources/${id}/trigger_scrape/`)
+// Scraping can take a long time, so use extended timeout (2 minutes)
+export const triggerScrape = (id) => api.post(`/admin/ai/news-sources/${id}/trigger_scrape/`, {}, { timeout: 120000 })
 
 // Scraped Articles
 export const getScrapedArticles = (params) => api.get('/admin/ai/scraped-articles/', { params })

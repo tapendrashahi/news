@@ -898,56 +898,63 @@ class ScrapedArticleViewSet(viewsets.ModelViewSet):
         POST /api/scraped-articles/{id}/approve/
         Body: {"auto_generate": true}
         """
-        article = self.get_object()
-        
-        if article.status == ScrapedArticle.Status.APPROVED:
+        try:
+            article = self.get_object()
+            
+            if article.status == ScrapedArticle.Status.APPROVED:
+                return Response(
+                    {'detail': 'Article is already approved.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            article.approve(request.user)
+            
+            # Optionally auto-queue for generation
+            auto_generate = request.data.get('auto_generate', True)
+            if auto_generate:
+                # Ensure category is lowercase
+                category = article.category.lower() if article.category else 'politics'
+                
+                # Create keyword source from this article
+                keyword, created = KeywordSource.objects.get_or_create(
+                    keyword=article.title[:255],
+                    defaults={
+                        'source': 'scraper',
+                        'category': category,
+                        'status': KeywordSource.Status.APPROVED,
+                        'approved_by': request.user,
+                        'approved_at': timezone.now(),
+                        'notes': f'From scraped article: {article.source_url}'
+                    }
+                )
+                
+                # Create AI article for generation
+                ai_article = AIArticle.objects.create(
+                    keyword=keyword,
+                    status=AIArticle.Status.QUEUED,
+                    template_type=AIArticle.TemplateType.BREAKING_NEWS
+                )
+                
+                article.ai_article = ai_article
+                article.status = ScrapedArticle.Status.GENERATED
+                article.save(update_fields=['ai_article', 'status'])
+                
+                logger.info(f"Article approved and queued: {article.title[:50]}... -> AI Article {ai_article.id}")
+                
+                return Response({
+                    'detail': 'Article approved and generation queued.',
+                    'ai_article_id': str(ai_article.id),
+                    'scraped_article_id': str(article.id)
+                })
+            
+            return Response({'detail': 'Article approved successfully.'})
+            
+        except Exception as e:
+            logger.error(f"Error approving article {pk}: {str(e)}", exc_info=True)
             return Response(
-                {'detail': 'Article is already approved.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'detail': f'Failed to approve article: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
-        article.approve(request.user)
-        
-        # Optionally auto-queue for generation
-        auto_generate = request.data.get('auto_generate', True)
-        if auto_generate:
-            # Create keyword source from this article
-            keyword, created = KeywordSource.objects.get_or_create(
-                keyword=article.title[:255],
-                defaults={
-                    'source': 'scraper',
-                    'category': article.category.lower(),
-                    'status': KeywordSource.Status.APPROVED,
-                    'approved_by': request.user,
-                    'approved_at': timezone.now(),
-                    'notes': f'From scraped article: {article.source_url}'
-                }
-            )
-            
-            # Create AI article for generation
-            ai_article = AIArticle.objects.create(
-                keyword=keyword,
-                status=AIArticle.Status.QUEUED,
-                template_type=AIArticle.TemplateType.NEWS_REPORT,
-                source_reference=article.content[:1000],  # Use scraped content as reference
-                target_tone='professional'
-            )
-            
-            article.ai_article = ai_article
-            article.status = ScrapedArticle.Status.GENERATED
-            article.save(update_fields=['ai_article', 'status'])
-            
-            # TODO: Trigger async generation task
-            # from .ai_tasks import generate_article_pipeline
-            # generate_article_pipeline.delay(str(ai_article.id))
-            
-            return Response({
-                'detail': 'Article approved and generation queued.',
-                'ai_article_id': str(ai_article.id),
-                'scraped_article_id': str(article.id)
-            })
-        
-        return Response({'detail': 'Article approved successfully.'})
     
     @action(detail=True, methods=['post'])
     def reject(self, request, pk=None):
@@ -978,54 +985,76 @@ class ScrapedArticleViewSet(viewsets.ModelViewSet):
         POST /api/scraped-articles/bulk_approve/
         Body: {"article_ids": ["uuid1", "uuid2"], "auto_generate": true}
         """
-        article_ids = request.data.get('article_ids', [])
-        auto_generate = request.data.get('auto_generate', True)
-        
-        if not article_ids:
-            return Response(
-                {'detail': 'No article IDs provided.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        articles = ScrapedArticle.objects.filter(
-            id__in=article_ids,
-            status=ScrapedArticle.Status.PENDING
-        )
-        
-        approved_count = 0
-        ai_article_ids = []
-        
-        for article in articles:
-            article.approve(request.user)
-            approved_count += 1
+        try:
+            article_ids = request.data.get('article_ids', [])
+            auto_generate = request.data.get('auto_generate', True)
             
-            if auto_generate:
-                keyword, created = KeywordSource.objects.get_or_create(
-                    keyword=article.title[:255],
-                    defaults={
-                        'source': 'scraper',
-                        'category': article.category.lower(),
-                        'status': KeywordSource.Status.APPROVED,
-                        'approved_by': request.user,
-                        'approved_at': timezone.now()
-                    }
+            if not article_ids:
+                return Response(
+                    {'detail': 'No article IDs provided.'},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
+            
+            articles = ScrapedArticle.objects.filter(
+                id__in=article_ids,
+                status=ScrapedArticle.Status.PENDING
+            )
+            
+            approved_count = 0
+            ai_article_ids = []
+            errors = []
+            
+            for article in articles:
+                try:
+                    article.approve(request.user)
+                    approved_count += 1
+                    
+                    if auto_generate:
+                        # Ensure category is lowercase
+                        category = article.category.lower() if article.category else 'politics'
+                        
+                        keyword, created = KeywordSource.objects.get_or_create(
+                            keyword=article.title[:255],
+                            defaults={
+                                'source': 'scraper',
+                                'category': category,
+                                'status': KeywordSource.Status.APPROVED,
+                                'approved_by': request.user,
+                                'approved_at': timezone.now()
+                            }
+                        )
+                        
+                        ai_article = AIArticle.objects.create(
+                            keyword=keyword,
+                            status=AIArticle.Status.QUEUED,
+                            template_type=AIArticle.TemplateType.BREAKING_NEWS
+                        )
+                        
+                        article.ai_article = ai_article
+                        article.status = ScrapedArticle.Status.GENERATED
+                        article.save()
+                        
+                        ai_article_ids.append(str(ai_article.id))
+                        
+                except Exception as e:
+                    logger.error(f"Error approving article {article.id}: {str(e)}")
+                    errors.append(f"Article '{article.title[:50]}...': {str(e)}")
+                    continue
+            
+            response_data = {
+                'detail': f'Approved {approved_count} articles.',
+                'approved_count': approved_count,
+                'ai_article_ids': ai_article_ids if auto_generate else []
+            }
+            
+            if errors:
+                response_data['errors'] = errors
                 
-                ai_article = AIArticle.objects.create(
-                    keyword=keyword,
-                    status=AIArticle.Status.QUEUED,
-                    template_type=AIArticle.TemplateType.NEWS_REPORT
-                )
-                
-                article.ai_article = ai_article
-                article.status = ScrapedArticle.Status.GENERATED
-                article.save()
-                
-                ai_article_ids.append(str(ai_article.id))
-                # TODO: generate_article_pipeline.delay(str(ai_article.id))
-        
-        return Response({
-            'detail': f'Approved {approved_count} articles.',
-            'approved_count': approved_count,
-            'ai_article_ids': ai_article_ids if auto_generate else []
-        })
+            return Response(response_data)
+            
+        except Exception as e:
+            logger.error(f"Bulk approve error: {str(e)}", exc_info=True)
+            return Response(
+                {'detail': f'Failed to approve articles: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
