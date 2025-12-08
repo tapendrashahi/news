@@ -40,8 +40,17 @@ const NewsCreate = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const response = await api.get('/api/admin/team/');
-      setTeamMembers(response.data.results || response.data);
+      const response = await api.get('/admin/team/', {
+        params: { page_size: 100 } // Get all team members
+      });
+      
+      // Handle both paginated and non-paginated responses
+      const members = response.data.results || response.data;
+      
+      // Filter only active members for the dropdown
+      const activeMembers = Array.isArray(members) ? members.filter(m => m.is_active) : [];
+      
+      setTeamMembers(activeMembers);
     } catch (error) {
       console.error('Failed to fetch team members:', error);
       toast.error('Failed to load team members');
@@ -53,13 +62,25 @@ const NewsCreate = () => {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast.error('Image size must be less than 5MB');
+        e.target.value = ''; // Clear the input
         return;
       }
+      
+      // Update react-hook-form value
+      setValue('image', e.target.files);
+      
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+      
+      console.log('📸 Image selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type
+      });
     }
   };
 
@@ -88,6 +109,9 @@ const NewsCreate = () => {
     try {
       setLoading(true);
 
+      console.log('📝 Form data received:', data);
+      console.log('🖼️ Image file:', data.image?.[0]);
+
       const formData = new FormData();
       formData.append('title', data.title);
       formData.append('slug', data.slug);
@@ -95,7 +119,7 @@ const NewsCreate = () => {
       formData.append('excerpt', data.excerpt || '');
       formData.append('category', data.category);
       formData.append('tags', tags.join(', '));
-      formData.append('author', data.author);
+      formData.append('author_id', data.author);
       formData.append('meta_description', data.meta_description || '');
       formData.append('visibility', data.visibility);
       
@@ -105,9 +129,29 @@ const NewsCreate = () => {
 
       if (data.image && data.image[0]) {
         formData.append('image', data.image[0]);
+        console.log('✅ Image added to FormData:', {
+          name: data.image[0].name,
+          size: data.image[0].size,
+          type: data.image[0].type
+        });
+      } else {
+        console.warn('⚠️ No image file selected');
       }
 
-      await adminNewsService.createNews(formData);
+      // Log FormData contents
+      console.log('📦 FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}:`, { name: value.name, size: value.size, type: value.type });
+        } else {
+          console.log(`  ${key}:`, value);
+        }
+      }
+
+      const response = await adminNewsService.createNews(formData);
+      console.log('🎉 Article created successfully:', response);
+      console.log('🖼️ Image path saved:', response.image);
+      
       toast.success('Article published successfully!');
       navigate('/admin/news');
     } catch (error) {
@@ -166,12 +210,17 @@ const NewsCreate = () => {
               <span className="permalink-label">URL:</span>
               <input 
                 type="text"
-                {...register('slug', { required: 'Slug is required' })}
+                {...register('slug', { 
+                  required: 'Slug is required',
+                  pattern: {
+                    value: /^[a-z0-9\-]+$/,
+                    message: 'Only lowercase letters, numbers, and hyphens allowed'
+                  }
+                })}
                 className="slug-input" 
                 placeholder="article-url-slug"
-                pattern="[a-z0-9-]+"
-                title="Only lowercase letters, numbers, and hyphens"
               />
+              {errors.slug && <div className="error-text" style={{marginTop: '4px'}}>{errors.slug.message}</div>}
               <button type="button" className="btn-edit" onClick={() => setSlugEdited(true)}>
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -367,7 +416,7 @@ const NewsCreate = () => {
                 <input 
                   type="file"
                   id="image"
-                  {...register('image')}
+                  name="image"
                   accept="image/jpeg,image/png,image/jpg,image/webp"
                   onChange={handleImageChange}
                   style={{ display: 'none' }}
