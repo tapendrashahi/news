@@ -9,8 +9,24 @@ from .api import (
     JobOpeningViewSet,
     JobApplicationViewSet
 )
+from .api_admin import (
+    # Auth endpoints
+    get_csrf_token,
+    admin_login,
+    admin_logout,
+    admin_user,
+    # Dashboard
+    dashboard_stats,
+    # Analytics
+    analytics,
+    # ViewSets
+    NewsAdminViewSet,
+    TeamAdminViewSet,
+    CommentsAdminViewSet,
+    SubscribersAdminViewSet
+)
 
-# Create a router and register our viewsets
+# Public API router
 router = DefaultRouter()
 router.register(r'news', NewsViewSet, basename='news')
 router.register(r'team', TeamMemberViewSet, basename='team')
@@ -20,7 +36,24 @@ router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'jobs', JobOpeningViewSet, basename='job')
 router.register(r'applications', JobApplicationViewSet, basename='application')
 
+# Admin API router
+admin_router = DefaultRouter()
+admin_router.register(r'news', NewsAdminViewSet, basename='admin-news')
+admin_router.register(r'team', TeamAdminViewSet, basename='admin-team')
+admin_router.register(r'comments', CommentsAdminViewSet, basename='admin-comments')
+admin_router.register(r'subscribers', SubscribersAdminViewSet, basename='admin-subscribers')
+
 # The API URLs are determined automatically by the router
 urlpatterns = [
+    # Public API
     path('', include(router.urls)),
+    
+    # Admin API
+    path('admin/auth/csrf/', get_csrf_token, name='admin-csrf'),
+    path('admin/auth/login/', admin_login, name='admin-login'),
+    path('admin/auth/logout/', admin_logout, name='admin-logout'),
+    path('admin/auth/user/', admin_user, name='admin-user'),
+    path('admin/dashboard/stats/', dashboard_stats, name='admin-dashboard-stats'),
+    path('admin/reports/analytics/', analytics, name='admin-analytics'),
+    path('admin/', include(admin_router.urls)),
 ]

@@ -224,3 +224,119 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Resume file size cannot exceed 5MB.")
         return value
 
+
+# ============================================================================
+# ADMIN SERIALIZERS
+# ============================================================================
+
+class NewsAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer for News with all fields"""
+    author = TeamMemberSerializer(read_only=True)
+    author_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
+    visibility_display = serializers.CharField(source='get_visibility_display', read_only=True)
+    comment_count = serializers.SerializerMethodField()
+    approved_comment_count = serializers.SerializerMethodField()
+    total_shares = serializers.SerializerMethodField()
+    tags_list = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = News
+        fields = [
+            'id', 'title', 'slug', 'content', 'excerpt', 'category', 
+            'category_display', 'author', 'author_id', 'image', 'created_at', 
+            'updated_at', 'publish_date', 'meta_description', 'tags', 'tags_list',
+            'visibility', 'visibility_display', 'comment_count', 
+            'approved_comment_count', 'total_shares'
+        ]
+    
+    def get_comment_count(self, obj):
+        return obj.comments.count()
+    
+    def get_approved_comment_count(self, obj):
+        return obj.comments.filter(is_approved=True).count()
+    
+    def get_total_shares(self, obj):
+        return sum(share.count for share in obj.shares.all())
+    
+    def get_tags_list(self, obj):
+        return obj.get_tags_list()
+
+
+class TeamMemberAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer for TeamMember with all fields"""
+    role_display = serializers.CharField(source='get_role_display', read_only=True)
+    article_count = serializers.SerializerMethodField()
+    recent_articles = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TeamMember
+        fields = [
+            'id', 'name', 'role', 'role_display', 'bio', 'photo',
+            'email', 'twitter_url', 'linkedin_url', 'is_active',
+            'order', 'joined_date', 'article_count', 'recent_articles'
+        ]
+    
+    def get_article_count(self, obj):
+        return obj.articles.count()
+    
+    def get_recent_articles(self, obj):
+        from .models import News
+        articles = obj.articles.order_by('-created_at')[:5]
+        return [{'id': a.id, 'title': a.title, 'created_at': a.created_at} for a in articles]
+
+
+class CommentAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer for Comment with news details"""
+    news_title = serializers.CharField(source='news.title', read_only=True)
+    news_id = serializers.IntegerField(source='news.id', read_only=True)
+    
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'news', 'news_id', 'news_title', 'name', 'email', 
+            'text', 'created_at', 'is_approved'
+        ]
+
+
+class SubscriberAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer for Subscriber with all fields"""
+    
+    class Meta:
+        model = Subscriber
+        fields = [
+            'id', 'email', 'name', 'is_active', 'subscribed_at', 
+            'unsubscribed_at'
+        ]
+
+
+class DashboardStatsSerializer(serializers.Serializer):
+    """Serializer for dashboard statistics"""
+    total_news = serializers.IntegerField()
+    total_team = serializers.IntegerField()
+    total_comments = serializers.IntegerField()
+    pending_comments = serializers.IntegerField()
+    total_subscribers = serializers.IntegerField()
+    active_subscribers = serializers.IntegerField()
+    news_last_month = serializers.IntegerField()
+    comments_last_month = serializers.IntegerField()
+    recent_news = NewsListSerializer(many=True)
+    recent_comments = CommentAdminSerializer(many=True)
+    categories = serializers.ListField()
+    top_shared = serializers.ListField()
+
+
+class AnalyticsSerializer(serializers.Serializer):
+    """Serializer for analytics/reports data"""
+    total_news = serializers.IntegerField()
+    news_period = serializers.IntegerField()
+    category_stats = serializers.ListField()
+    total_comments = serializers.IntegerField()
+    approved_comments = serializers.IntegerField()
+    pending_comments = serializers.IntegerField()
+    comments_period = serializers.IntegerField()
+    approval_rate = serializers.IntegerField()
+    share_stats = serializers.ListField()
+    top_authors = serializers.ListField()
+    most_commented = serializers.ListField()
+
