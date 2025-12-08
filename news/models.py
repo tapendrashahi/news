@@ -287,3 +287,6 @@ class Advertisement(models.Model):
         return 0
 
 
+# Import LegalPage model
+from .legal_models import LegalPage
+

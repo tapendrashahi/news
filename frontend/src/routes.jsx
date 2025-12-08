@@ -32,6 +32,8 @@ import SubscribersList from './admin/pages/subscribers/SubscribersList';
 import Reports from './admin/pages/reports/Reports';
 import AdvertisementsList from './admin/pages/advertisements/AdvertisementsList';
 import AdvertisementForm from './admin/pages/advertisements/AdvertisementForm';
+import LegalPagesList from './admin/pages/legal/LegalPagesList';
+import LegalPageForm from './admin/pages/legal/LegalPageForm';
 
 function AppRoutes() {
   return (
@@ -79,6 +81,9 @@ function AppRoutes() {
           <Route path="advertisements" element={<AdvertisementsList />} />
           <Route path="advertisements/create" element={<AdvertisementForm />} />
           <Route path="advertisements/:id/edit" element={<AdvertisementForm />} />
+          <Route path="legal" element={<LegalPagesList />} />
+          <Route path="legal/create" element={<LegalPageForm />} />
+          <Route path="legal/:id/edit" element={<LegalPageForm />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

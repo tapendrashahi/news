@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import News, TeamMember, Comment, ShareCount, JobOpening, JobApplication
+from .models import News, TeamMember, Comment, ShareCount, JobOpening, JobApplication, LegalPage
 from django.utils.html import format_html
 
 @admin.register(News)
@@ -189,4 +189,45 @@ class JobApplicationAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} application(s) marked as Accepted.')
     mark_accepted.short_description = "Mark as Accepted"
 
+
+@admin.register(LegalPage)
+class LegalPageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'page_type', 'status', 'version', 'effective_date', 'last_updated')
+    list_filter = ('page_type', 'status', 'effective_date')
+    search_fields = ('title', 'slug', 'page_type')
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ('last_updated', 'created_at')
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('page_type', 'title', 'slug', 'status')
+        }),
+        ('Version & Dates', {
+            'fields': ('version', 'effective_date', 'last_updated', 'created_at')
+        }),
+        ('Content', {
+            'fields': ('content_json',)
+        }),
+        ('Metadata', {
+            'fields': ('meta_description', 'contact_email'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['publish_pages', 'unpublish_pages', 'archive_pages']
+    
+    def publish_pages(self, request, queryset):
+        updated = queryset.update(status='published')
+        self.message_user(request, f'{updated} page(s) published successfully.')
+    publish_pages.short_description = "Publish selected pages"
+    
+    def unpublish_pages(self, request, queryset):
+        updated = queryset.update(status='draft')
+        self.message_user(request, f'{updated} page(s) unpublished successfully.')
+    unpublish_pages.short_description = "Unpublish selected pages"
+    
+    def archive_pages(self, request, queryset):
+        updated = queryset.update(status='archived')
+        self.message_user(request, f'{updated} page(s) archived successfully.')
+    archive_pages.short_description = "Archive selected pages"
 

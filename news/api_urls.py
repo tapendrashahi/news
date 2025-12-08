@@ -27,6 +27,7 @@ from .api_admin import (
     SubscribersAdminViewSet,
     AdvertisementsAdminViewSet
 )
+from .legal_views import LegalPageViewSet
 
 # Public API router
 router = DefaultRouter()
@@ -38,6 +39,7 @@ router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'jobs', JobOpeningViewSet, basename='job')
 router.register(r'applications', JobApplicationViewSet, basename='application')
 router.register(r'advertisements', AdvertisementViewSet, basename='advertisement')
+router.register(r'legal', LegalPageViewSet, basename='legal')
 
 # Admin API router
 admin_router = DefaultRouter()
@@ -46,6 +48,7 @@ admin_router.register(r'team', TeamAdminViewSet, basename='admin-team')
 admin_router.register(r'comments', CommentsAdminViewSet, basename='admin-comments')
 admin_router.register(r'subscribers', SubscribersAdminViewSet, basename='admin-subscribers')
 admin_router.register(r'advertisements', AdvertisementsAdminViewSet, basename='admin-advertisements')
+admin_router.register(r'legal', LegalPageViewSet, basename='admin-legal')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [

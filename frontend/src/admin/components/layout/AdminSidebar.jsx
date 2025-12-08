@@ -9,6 +9,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { path: '/admin/comments', icon: '💬', label: 'Comments' },
     { path: '/admin/subscribers', icon: '📧', label: 'Subscribers' },
     { path: '/admin/advertisements', icon: '📢', label: 'Advertisements' },
+    { path: '/admin/legal', icon: '⚖️', label: 'Legal Pages' },
     { path: '/admin/reports', icon: '📈', label: 'Reports' },
   ];
 

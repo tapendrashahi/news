@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import adminNewsService from '../../services/adminNewsService';
 import api from '../../../services/api';
+import RichTextEditor from '../../components/common/RichTextEditor';
 import './NewsForm.css';
 
 const NewsCreate = () => {
@@ -21,6 +22,7 @@ const NewsCreate = () => {
   const [tagInput, setTagInput] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [slugEdited, setSlugEdited] = useState(false);
+  const [content, setContent] = useState('');
 
   const titleValue = watch('title');
   const categories = adminNewsService.getCategoryChoices();
@@ -106,7 +108,7 @@ const NewsCreate = () => {
       const formData = new FormData();
       formData.append('title', data.title);
       formData.append('slug', data.slug);
-      formData.append('content', data.content);
+      formData.append('content', content); // Use rich text editor content
       formData.append('excerpt', data.excerpt || '');
       formData.append('category', data.category);
       formData.append('tags', tags.join(', '));
@@ -200,24 +202,20 @@ const NewsCreate = () => {
               </button>
             </div>
 
-            {/* Content Editor */}
+            {/* Rich Text Content Editor */}
             <div className="form-group">
               <label className="label-text">Content *</label>
-              <textarea 
-                {...register('content', { 
-                  required: 'Content is required',
-                  minLength: { value: 50, message: 'Content must be at least 50 characters' }
-                })}
-                className="content-textarea"
-                placeholder="Start writing your content..."
-                rows="15"
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Start writing your article content..."
               />
-              {errors.content && <div className="error-text">{errors.content.message}</div>}
+              {!content && errors.content && <div className="error-text">{errors.content?.message}</div>}
               <div className="field-hint">
                 <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
                 </svg>
-                Write your article content with proper formatting
+                Use the toolbar to format text, add images, create lists, tables, and more
               </div>
             </div>
 
