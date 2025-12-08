@@ -1,0 +1,815 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ZtFZ3gJ7Ui8EIeDneryqR1$F4LCyDYpBu0X1bpV5aaRiINBvwnyOzFqeRSQbdXc/Eg=",
+    "last_login": "2025-12-08T05:42:38.037Z",
+    "is_superuser": true,
+    "username": "tapendra-shahi",
+    "first_name": "",
+    "last_name": "",
+    "email": "info.tapendra@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-22T15:06:19.464Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "news.teammember",
+  "pk": 1,
+  "fields": {
+    "name": "Tapendra Shahi",
+    "role": "business_reporter",
+    "bio": "",
+    "photo": "team_photos/1759064693397.jpg",
+    "email": "info.tapendra@gmail.com",
+    "twitter_url": "",
+    "linkedin_url": "https://www.linkedin.com/in/tapendrashahi/",
+    "is_active": true,
+    "order": 0,
+    "joined_date": "2025-11-23"
+  }
+},
+{
+  "model": "news.teammember",
+  "pk": 2,
+  "fields": {
+    "name": "Dharmendra Timilsina",
+    "role": "sports_reporter",
+    "bio": "",
+    "photo": "team_photos/web_image.jpg",
+    "email": "dharmendratimilsina@gmail.com",
+    "twitter_url": "",
+    "linkedin_url": "",
+    "is_active": true,
+    "order": 0,
+    "joined_date": "2025-11-23"
+  }
+},
+{
+  "model": "news.teammember",
+  "pk": 4,
+  "fields": {
+    "name": "Nabin",
+    "role": "editor_in_chief",
+    "bio": "Cool Boy",
+    "photo": "team_photos/download.png",
+    "email": "info.tapendra@gmail.com",
+    "twitter_url": "",
+    "linkedin_url": "",
+    "is_active": true,
+    "order": 3,
+    "joined_date": "2025-12-01"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 1,
+  "fields": {
+    "title": "पासकी के हो र कसले प्रयोग गर्न मिल्छ ?",
+    "slug": "",
+    "content": "काठमाडौँ । अनलाइन अकाउन्टहरूको सुरक्षाका लागि दशकौँदेखि प्रयोग भइरहेका पासवर्डको कमजोरीका कारण अहिले प्रमाणीकरणको नयाँ विधि चर्चामा छ । कमजोर वा दोहोर्‍याएर प्रयोग गरिने पासवर्डहरूले प्रयोगकर्तालाई उच्च सुरक्षा जोखिममा पारिरहेका बेला उपभोक्ताहरूलाई पासकी (Passkeys) नामक नयाँ प्रमाणीकरण प्रणाली अपनाउन प्रोत्साहन गरिएको छ । \r\n\r\nपासकीहरूलाई 'नयाँ पासवर्ड' भनिए तापनि यसले अहिले नै पासवर्डलाई पूर्ण रूपमा विस्थापित भने गरिसकेको छैन । पासकी एक नयाँ (तुलनात्मक रूपमा) प्रमाणीकरण विधि हो, जसले पासवर्डको जस्तै अनुभव प्रदान गर्दछ । तर यसमा कुनै पनि प्रकारको वास्तविक पासवर्ड समावेश हुँदैन । यो विधिले पासवर्डको सुविधालाई टु-फ्याक्टर अथेन्टिकेसन (2FA) को सुरक्षासँग जोड्छ र यसमा प्रयोगकर्ताले कुनै कुरा सम्झनुपर्ने आवश्यकता पनि पर्दैन ।\r\n\r\nपासकी पब्लिक कि क्रिप्टोग्राफी (public key cryptography) मा आधारित हुन्छन् । जब कुनै नयाँ अकाउन्टमा पासकी सिर्जना गरिन्छ, एउटा 'कि पेयर' (जोडी साँचो) तयार हुन्छ । जसमा एउटा पब्लिक कि अर्थात सार्वजनिक साँचो हुन्छ, यस्तो कि गोप्य हुँदैन र यसलाई अकाउन्ट चलाउने कम्पनीले स्टोर गर्दछ । सैद्धान्तिक रूपमा यो कि ह्याक वा डेटा ब्रिचका क्रममा चोरी हुन सक्छ ।",
+    "excerpt": "",
+    "category": "tech",
+    "tags": "",
+    "author": null,
+    "meta_description": "",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-11-23T06:16:20.247Z",
+    "updated_at": "2025-11-23T06:16:36.477Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 2,
+  "fields": {
+    "title": "आपत्कालीन स्वास्थ्य समस्यामा प्राथमिक उपचार तथा हेरचाह गर्न सिकाउने ‘सीईआरटी’ एप सार्वजनिक",
+    "slug": "",
+    "content": "काठमाडौँ । दक्षिण एसियाली स्वास्थ्य समुन्नति कार्यक्रम नेपाल (हाप्सा नेपाल) ले आपत्कालीन स्वास्थ्य समस्या तथा चोटपटको बारेमा जानकारी दिने एप सार्वजनिक गरेको छ । संस्थाले बुधबार काठमाडौँको दरबार हाई स्कुलमा एक कार्यक्रमका बिच ‘कम्युनिटि इमर्जेन्सी रेस्पोन्स टुलकिट, सीआईआरटी’ नामक एप सार्वजनिक गरेको हो । \r\n\r\n‘सडक साथी’ नामक संस्थाको प्राविधिक सहयोगमा तयार पारिएको सो एपमा आपत्कालीन स्वास्थ्य अवस्थामा बिरामीलाई सहयोग गर्ने तरिकालाई नेपाली भाषामा सरल तरिकाले सिकाउने भिडिओ राखिएका छन् । एपमा घाँटीमा कुनै वस्तु अड्किएर निसासिँदाको प्राथमिक उपचार (चोकिङ), रक्तस्राव नियन्त्रण, जलन, हड्डी भाँचिदाको प्राथमिक उपचार, मुटुको चाल रोकिएको अवस्था (कार्डियाक एरेस्ट) तथा अन्य आपत्कालीन अवस्थाहरूमा कसरी हेरचाह गर्न सकिन्छ भन्ने विषय समेटिएका छन् ।",
+    "excerpt": "",
+    "category": "tech",
+    "tags": "",
+    "author": null,
+    "meta_description": "",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-11-23T06:26:28.942Z",
+    "updated_at": "2025-11-23T06:26:28.942Z",
+    "image": "news_images/cert-app-techpana-news_qklkWlnpCQ.jpg"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 3,
+  "fields": {
+    "title": "मुद्रण केन्द्रमा छापिएका ड्राइभिङ लाइसेन्स यातायात व्यवस्था विभागलाई हस्तान्त्रण",
+    "slug": "",
+    "content": "काठमाडौँ । सुरक्षण मुद्रण केन्द्र (सेक्युरिटी प्रिन्टिङ प्रेस) ले नेपालमै छपाइ गरेको सवारीचालक अनुमति पत्र (लाइसेन्स) पहिलो पटक यातायात व्यवस्था विभागलाई हस्तान्तरण गरेको छ । शुक्रबार आयोजित एक कार्यक्रमबिच केन्द्रका कार्यकारी निर्देशक देवराज ढुङ्गानाले विभागका सूचना तथा प्रविधि निर्देशक केशव खतिवडालाई पहिलो चरणमा ५२० थान लाइसेन्स हस्तान्तरण गरेका हुन् ।\r\n\r\nक्यूआर कोडसहितको उक्त लाइसेन्सको ल्याब परीक्षण सफल भएपछि विभागलाई बुझाइएको हो । लाइसेन्स बुझ्दै विभागका निर्देशक खतिवडाले यससँगै विगत ४–५ वर्षदेखि कायम लाइसेन्स अभावको समस्या समाधान हुने विश्वास व्यक्त गरे । \"संस्थाको समस्या समाधान भएको छ, हामी हर्षित छौँ । यो सेवाग्राहीको समस्या समाधानको सकारात्मक पहल हो,\" खतिवडाले भने ।",
+    "excerpt": "",
+    "category": "tech",
+    "tags": "",
+    "author": null,
+    "meta_description": "",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-11-23T06:41:28.815Z",
+    "updated_at": "2025-11-23T06:41:51.262Z",
+    "image": "news_images/driving-license-security-printing_tUL5dcUO7o.jpg"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 4,
+  "fields": {
+    "title": "कतै तपाईँ पनि एआईसँग एकतर्फी प्रेममा त हुनुहुन्न ? यस्तै सम्बन्ध बन्यो, २०२५ को वर्ष शब्द",
+    "slug": "",
+    "content": "काठमाडौँ । क्याम्ब्रिज डिक्सनरीले २०२५ का लागि पारासोसल (parasocial) लाई वर्षको शब्द (Word of the Year) घोषणा गरेको छ । यो शब्द चयनमा एआई च्याटबट, गायिका टेलर स्विफ्ट र सामाजिक सञ्जालका इन्फ्लुएन्सर सबैले महत्त्वपूर्ण भूमिका खेलेका छन् ।\r\n\r\nग्लोबल डिक्सनरीले सार्वजनिक गरेको पारासोसल अर्थात पारासामाजिक शब्दले सेलिब्रेटी, पोडकास्टर र एआई जस्ता अनलाइन व्यक्तित्वसँग समेत कुनै एक व्यक्तिले महसुस गर्ने सम्बन्धलाई जनाउँछ ।\r\n\r\nक्याम्ब्रिज डिक्सनरीका कोलिन म्याकइन्टसका अनुसार पारासामाजिक शब्दले सन् २०२५ को समय–भावना (zeitgeist) समेट्छ । यो भाषा कसरी परिवर्तन हुँदै जान्छ भन्ने कुराको एक उत्कृष्ट उदाहरण हो । जुन शब्द एक समय केवल शैक्षिक क्षेत्रमा प्रयोग हुने गर्थ्यो, अब मूलधारमा प्रवेश गरिसकेको छ ।\r\n\r\n\"लाखौँ मानिसहरू पारासामाजिक सम्बन्धहरूमा संलग्न छन्; अझ धेरै मानिसहरू त यसको बढ्दो प्रभावप्रति केवल जिज्ञासु छन् । तथ्याङ्कमा पनि यो कुरा देखिन्छ, किनकि ‘पारासोसल’ शब्दका लागि क्याम्ब्रिज डिक्सनरी वेबसाइटमा खोजी गर्नेहरूको सङ्ख्या धेरै बढेको छ,\" उनले भनेका छन् ।\r\n\r\n“पारासोसल घटनाक्रम वरिपरिको भाषा निकै छिटो परिवर्तन हुँदैछ । किनकि प्रविधि, समाज र संस्कृतिमा निरन्तर रूपान्तरण भैरहेको छ । सेलिब्रिटीदेखि लिएर च्याटबटसम्मका पारासोसल प्रवृत्तिहरू भाषा विकासमा रुचि राख्नेहरूका लागि अत्यन्तै रोचक विषय बनेका छन् ।”\r\n\r\nयुनिभर्सिटी अफ क्याम्ब्रिजमा प्रयोगात्मक सामाजिक मनोविज्ञानकी प्रोफेसर सिमोन श्नालका अनुसार पारासामाजिक सम्बन्ध तब हुन्छ, जब हामी कसैलाई चिन्छौँ वा नजिक महसुस गर्छौँ । तर वास्तवमा त्यो व्यक्ति हामीले कहिल्यै भेटेकै हुँदैन ।\r\n\r\nउनले यो सम्बन्ध केवल एकतर्फी हुने बताएकी छिन् । यो शब्दको उत्पत्ति सन् १९५६ मा भएको थियो, जब समाजशास्त्रीहरू डोनाल्ड हर्टन र रिचर्ड वोहलले टेलिभिजन हेर्ने मानिसहरूले पर्दामा देखिएका अभिनेताहरूलाई साथी वा परिवार जस्तो व्यवहार गरिरहेको पत्ता लगाएका थिए ।\r\n\r\nएआई र एक्लोपन संस्कृति\r\n\r\nप्रोफेसर श्नालका अनुसार यो परिघटना (phenomenon) हाम्रो संस्कृतिमा पहिलेदेखि नै भए तापनि अहिले धेरै मानिसहरूले यो शब्दको प्रयोग गरिरहेका छन् । अहिलेको संस्कृतिमा धेरै अवसरहरू उपलब्ध भएकाले 'पारासामाजिक सम्बन्ध चरम सीमामा पुगेको हो ।\r\n\r\nपारासामाजिक शब्दको बढ्दो लोकप्रियताको एउटा मुख्य कारण एआई च्याटबटहरूसँग विकसित भइरहेको सम्बन्ध पनि हो । श्नाल भन्छिन् कि च्याटबटहरूलाई 'च्याटबट' भनिएको छ । किनभने प्रयोगकर्ताहरूले आफू कसैसँग कुरा गरिरहेको महसुस गर्छन् । यसरी मानिसहरूले च्याटबटसँग साथी वा रोमान्टिक जस्तो सम्बन्ध विकास गर्न सक्छन् । यद्यपि वास्तविकतामा 'त्यहाँ कोही पनि संलग्न हुँदैन'।\r\n\r\nयस सन्दर्भमा भएका केही सर्वेक्षणले एआईसँगको बढ्दो भावनात्मक संलग्नता देखाउँछन् । यसै अङ्ग्रेजी वर्षको कमन सेन्स मिडिया को एक रिपोर्ट अनुसार अमेरिकाका १३ देखि १७ वर्षका ७२ प्रतिशत किशोर-किशोरीले कम्तीमा एक पटक एआई साथी (AI companion) प्रयोग गरेका थिए । उनीहरूले यो एआई साथीलाई भावनात्मक वा मानसिक स्वास्थ्य सहयोगको लागि वा साथी वा मिल्ने साथीको रूपमा प्रयोग गरेका थिए ।\r\n\r\nत्यस्तै भ्यान्टेज पोइन्ट काउन्सिलिङले गरेको एक सर्वेक्षणले एक हजारभन्दा बढी अमेरिकी वयस्कहरूमध्ये २८ प्रतिशतले एआईसँग रोमान्टिक वा आत्मीय सम्बन्ध रहेको बताएका थिए ।\r\n\r\nएक्लोपन र स्क्रिन टाइमको प्रभाव\r\n\r\nप्रोफेसर श्नालका अनुसार मानिसहरू पारासामाजिक सम्बन्धतर्फ झुक्नुका दुई कारण छन्: विश्वव्यापी एक्लोपन महामारी र बढेको स्क्रिन टाइम । उनका अनुसार अहिले मानिसहरू विगतका पुस्ताहरूभन्दा बढी एक्लोपन महसुस गर्छन् ।\r\n\r\nयस्ता पारासामाजिक सम्बन्धहरू फोन र स्क्रिनमा 'एक क्लिकको दूरीमा' मात्र हुन्छन् । जसले तत्काल सामाजिक स्वीकृति प्राप्त गर्न सजिलो बनाउँछ । यसका साथै च्याटबटहरू पनि प्रयोगकर्तालाई खुसी पार्न (flatter) डिजाइन गरिएका हुन्छन् ।\r\n\r\nखतराहरू र समाधान\r\n\r\nपारासामाजिक सम्बन्धले सुरक्षाको जोखिम पनि बढाउन सक्छ । प्रोफेसर श्नालले सेलिब्रेटी र सामाजिक सञ्जालका इन्फ्लुएन्सरहरूलाई पछ्याउनुमा 'खतरा' रहेको चेतावनी दिएकी छन् । उनीहरूले गलत चिकित्सकीय सल्लाह बाँड्न, नराम्रा उत्पादनहरू बेच्न वा अनैतिक व्यवहारलाई प्रोत्साहन गर्न सक्छन् । जसले गर्दा पारासामाजिक सम्बन्धमा संलग्न फलोअरहरूलाई गम्भीर हानि पुग्न सक्छ ।\r\n\r\nयसको समाधानका लागि प्रोफेसर श्नालले वास्तविक जीवनका सम्बन्धहरूमा ध्यान दिनुपर्ने सल्लाह दिएकी छिन् । उनका अनुसार हामीले च्याटबटसँग जति धेरै समय बिताउँछौँ, त्यति नै कम समय वास्तविक मानिसहरूसँग कुरा गर्नमा खर्च गर्छौँ । अर्थात् तपाईँले जति धेरै समय अनलाइनमा खर्च गर्नुहुन्छ, उति नै कम समय वास्तविक जीवनका प्रत्यक्ष सम्बन्धहरू बनाउन र कायम राख्नमा खर्च गर्नुहुन्छ ।",
+    "excerpt": "",
+    "category": "tech",
+    "tags": "",
+    "author": null,
+    "meta_description": "",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-11-23T08:21:43.911Z",
+    "updated_at": "2025-11-23T08:21:43.911Z",
+    "image": "news_images/are-you-also-in-one-sided-love-with-ai-2025-word-of-the-year-techpana-news_0_QgtYxSn.jpg"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 5,
+  "fields": {
+    "title": "abcd",
+    "slug": "",
+    "content": "hi",
+    "excerpt": "",
+    "category": "political",
+    "tags": "",
+    "author": 1,
+    "meta_description": "",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-11-25T12:36:43.504Z",
+    "updated_at": "2025-11-25T12:36:43.504Z",
+    "image": "news_images/download.png"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 6,
+  "fields": {
+    "title": "nbvesdnc",
+    "slug": "nbvesdnc",
+    "content": "ndfbnx",
+    "excerpt": "mvfbcjhv\r\n",
+    "category": "business",
+    "tags": "hello",
+    "author": 1,
+    "meta_description": "kdhfdk\r\n",
+    "visibility": "public",
+    "publish_date": "2025-11-30T09:05:00Z",
+    "created_at": "2025-11-30T03:21:14.828Z",
+    "updated_at": "2025-11-30T03:21:14.828Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 9,
+  "fields": {
+    "title": "Researchers discover a shortcoming that makes LLMs less reliable",
+    "slug": "researchers-discover-a-shortcoming-that-makes-llms-less-reliable",
+    "content": "Large language models (LLMs) sometimes learn the wrong lessons, according to an MIT study.\r\n\r\nRather than answering a query based on domain knowledge, an LLM could respond by leveraging grammatical patterns it learned during training. This can cause a model to fail unexpectedly when deployed on new tasks.\r\n\r\nThe researchers found that models can mistakenly link certain sentence patterns to specific topics, so an LLM might give a convincing answer by recognizing familiar phrasing instead of understanding the question.\r\n\r\nTheir experiments showed that even the most powerful LLMs can make this mistake.\r\n\r\nThis shortcoming could reduce the reliability of LLMs that perform tasks like handling customer inquiries, summarizing clinical notes, and generating financial reports.\r\n\r\nIt could also have safety risks. A nefarious actor could exploit this to trick LLMs into producing harmful content, even when the models have safeguards to prevent such responses.\r\n\r\nAfter identifying this phenomenon and exploring its implications, the researchers developed a benchmarking procedure to evaluate a model’s reliance on these incorrect correlations. The procedure could help developers mitigate the problem before deploying LLMs.\r\n\r\n“This is a byproduct of how we train models, but models are now used in practice in safety-critical domains far beyond the tasks that created these syntactic failure modes. If you’re not familiar with model training as an end-user, this is likely to be unexpected,” says Marzyeh Ghassemi, an associate professor in the MIT Department of Electrical Engineering and Computer Science (EECS), a member of the MIT Institute of Medical Engineering Sciences and the Laboratory for Information and Decision Systems, and the senior author of the study.\r\n\r\nGhassemi is joined by co-lead authors Chantal Shaib, a graduate student at Northeastern University and visiting student at MIT; and Vinith Suriyakumar, an MIT graduate student; as well as Levent Sagun, a research scientist at Meta; and Byron Wallace, the Sy and Laurie Sternberg Interdisciplinary Associate Professor and associate dean of research at Northeastern University’s Khoury College of Computer Sciences. A paper describing the work will be presented at the Conference on Neural Information Processing Systems.\r\n\r\nStuck on syntax\r\n\r\nLLMs are trained on a massive amount of text from the internet. During this training process, the model learns to understand the relationships between words and phrases — knowledge it uses later when responding to queries.\r\n\r\nIn prior work, the researchers found that LLMs pick up patterns in the parts of speech that frequently appear together in training data. They call these part-of-speech patterns “syntactic templates.”\r\n\r\nLLMs need this understanding of syntax, along with semantic knowledge, to answer questions in a particular domain.\r\n\r\n“In the news domain, for instance, there is a particular style of writing. So, not only is the model learning the semantics, it is also learning the underlying structure of how sentences should be put together to follow a specific style for that domain,” Shaib explains.   \r\n\r\nBut in this research, they determined that LLMs learn to associate these syntactic templates with specific domains. The model may incorrectly rely solely on this learned association when answering questions, rather than on an understanding of the query and subject matter.\r\n\r\nFor instance, an LLM might learn that a question like “Where is Paris located?” is structured as adverb/verb/proper noun/verb. If there are many examples of sentence construction in the model’s training data, the LLM may associate that syntactic template with questions about countries.\r\n\r\nSo, if the model is given a new question with the same grammatical structure but nonsense words, like “Quickly sit Paris clouded?” it might answer “France” even though that answer makes no sense.\r\n\r\n“This is an overlooked type of association that the model learns in order to answer questions correctly. We should be paying closer attention to not only the semantics but the syntax of the data we use to train our models,” Shaib says.\r\n\r\nMissing the meaning\r\n\r\nThe researchers tested this phenomenon by designing synthetic experiments in which only one syntactic template appeared in the model’s training data for each domain. They tested the models by substituting words with synonyms, antonyms, or random words, but kept the underlying syntax the same.\r\n\r\nIn each instance, they found that LLMs often still responded with the correct answer, even when the question was complete nonsense.\r\n\r\nWhen they restructured the same question using a new part-of-speech pattern, the LLMs often failed to give the correct response, even though the underlying meaning of the question remained the same.\r\n\r\nThey used this approach to test pre-trained LLMs like GPT-4 and Llama, and found that this same learned behavior significantly lowered their performance.\r\n\r\nCurious about the broader implications of these findings, the researchers studied whether someone could exploit this phenomenon to elicit harmful responses from an LLM that has been deliberately trained to refuse such requests.\r\n\r\nThey found that, by phrasing the question using a syntactic template the model associates with a “safe” dataset (one that doesn’t contain harmful information), they could trick the model into overriding its refusal policy and generating harmful content.\r\n\r\n“From this work, it is clear to me that we need more robust defenses to address security vulnerabilities in LLMs. In this paper, we identified a new vulnerability that arises due to the way LLMs learn. So, we need to figure out new defenses based on how LLMs learn language, rather than just ad hoc solutions to different vulnerabilities,” Suriyakumar says.\r\n\r\nWhile the researchers didn’t explore mitigation strategies in this work, they developed an automatic benchmarking technique one could use to evaluate an LLM’s reliance on this incorrect syntax-domain correlation. This new test could help developers proactively address this shortcoming in their models, reducing safety risks and improving performance.\r\n\r\nIn the future, the researchers want to study potential mitigation strategies, which could involve augmenting training data to provide a wider variety of syntactic templates. They are also interested in exploring this phenomenon in reasoning models, special types of LLMs designed to tackle multi-step tasks.\r\n\r\n“I think this is a really creative angle to study failure modes of LLMs. This work highlights the importance of linguistic knowledge and analysis in LLM safety research, an aspect that hasn’t been at the center stage but clearly should be,” says Jessy Li, an associate professor at the University of Texas at Austin, who was not involved with this work.\r\n\r\nThis work is funded, in part, by a Bridgewater AIA Labs Fellowship, the National Science Foundation, the Gordon and Betty Moore Foundation, a Google Research Award, and Schmidt Sciences.",
+    "excerpt": "Large language models can learn to mistakenly link certain sentence patterns with specific topics — and may then repeat these patterns instead of reasoning.",
+    "category": "tech",
+    "tags": "ai, artificial-itelligence",
+    "author": 1,
+    "meta_description": "Large language models can learn to mistakenly link certain sentence patterns with specific topics — and may then repeat these patterns instead of reasoning.",
+    "visibility": "public",
+    "publish_date": "2025-12-01T12:23:00Z",
+    "created_at": "2025-12-01T06:39:36.712Z",
+    "updated_at": "2025-12-01T06:39:36.712Z",
+    "image": "news_images/LLM-Lessons-01a-press_0.jpg"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 10,
+  "fields": {
+    "title": "How artificial intelligence can help achieve a clean energy future",
+    "slug": "how-artificial-intelligence-can-help-achieve-a-clean-energy-future",
+    "content": "There is growing attention on the links between artificial intelligence and increased energy demands. But while the power-hungry data centers being built to support AI could potentially stress electricity grids, increase customer prices and service interruptions, and generally slow the transition to clean energy, the use of artificial intelligence can also help the energy transition.\r\n\r\nFor example, use of AI is reducing energy consumption and associated emissions in buildings, transportation, and industrial processes. In addition, AI is helping to optimize the design and siting of new wind and solar installations and energy storage facilities.\r\n\r\nOn electric power grids, using AI algorithms to control operations is helping to increase efficiency and reduce costs, integrate the growing share of renewables, and even predict when key equipment needs servicing to prevent failure and possible blackouts. AI can help grid planners schedule investments in generation, energy storage, and other infrastructure that will be needed in the future. AI is also helping researchers discover or design novel materials for nuclear reactors, batteries, and electrolyzers.\r\n\r\nResearchers at MIT and elsewhere are actively investigating aspects of those and other opportunities for AI to support the clean energy transition. At its 2025 research conference, MITEI announced the Data Center Power Forum, a targeted research effort for MITEI member companies interested in addressing the challenges of data center power demand.\r\n\r\nControlling real-time operations\r\n\r\nCustomers generally rely on receiving a continuous supply of electricity, and grid operators get help from AI to make that happen — while optimizing the storage and distribution of energy from renewable sources at the same time.\r\n\r\nBut with more installation of solar and wind farms — both of which provide power in smaller amounts, and intermittently — and the growing threat of weather events and cyberattacks, ensuring reliability is getting more complicated. “That’s exactly where AI can come into the picture,” explains Anuradha Annaswamy, a senior research scientist in MIT’s Department of Mechanical Engineering and director of MIT’s Active-Adaptive Control Laboratory. “Essentially, you need to introduce a whole information infrastructure to supplement and complement the physical infrastructure.”\r\n\r\nThe electricity grid is a complex system that requires meticulous control on time scales ranging from decades all the way down to microseconds. The challenge can be traced to the basic laws of power physics: electricity supply must equal electricity demand at every instant, or generation can be interrupted. In past decades, grid operators generally assumed that generation was fixed — they could count on how much electricity each large power plant would produce — while demand varied over time in a fairly predictable way. As a result, operators could commission specific power plants to run as needed to meet demand the next day. If some outages occurred, specially designated units would start up as needed to make up the shortfall.\r\n\r\nToday and in the future, that matching of supply and demand must still happen, even as the number of small, intermittent sources of generation grows and weather disturbances and other threats to the grid increase. AI algorithms provide a means of achieving the complex management of information needed to forecast within just a few hours which plants should run while also ensuring that the frequency, voltage, and other characteristics of the incoming power are as required for the grid to operate properly.\r\n\r\nMoreover, AI can make possible new ways of increasing supply or decreasing demand at times when supplies on the grid run short. As Annaswamy points out, the battery in your electric vehicle (EV), as well as the one charged up by solar panels or wind turbines, can — when needed — serve as a source of extra power to be fed into the grid. And given real-time price signals, EV owners can choose to shift charging from a time when demand is peaking and prices are high to a time when demand and therefore prices are both lower. In addition, new smart thermostats can be set to allow the indoor temperature to drop or rise —  a range defined by the customer — when demand on the grid is peaking. And data centers themselves can be a source of demand flexibility: selected AI calculations could be delayed as needed to smooth out peaks in demand. Thus, AI can provide many opportunities to fine-tune both supply and demand as needed.\r\n\r\nIn addition, AI makes possible “predictive maintenance.” Any downtime is costly for the company and threatens shortages for the customers served. AI algorithms can collect key performance data during normal operation and, when readings veer off from that normal, the system can alert operators that something might be going wrong, giving them a chance to intervene. That capability prevents equipment failures, reduces the need for routine inspections, increases worker productivity, and extends the lifetime of key equipment.\r\n\r\nAnnaswamy stresses that “figuring out how to architect this new power grid with these AI components will require many different experts to come together.” She notes that electrical engineers, computer scientists, and energy economists “will have to rub shoulders with enlightened regulators and policymakers to make sure that this is not just an academic exercise, but will actually get implemented. All the different stakeholders have to learn from each other. And you need guarantees that nothing is going to fail. You can’t have blackouts.”\r\n\r\nUsing AI to help plan investments in infrastructure for the future\r\n\r\nGrid companies constantly need to plan for expanding generation, transmission, storage, and more, and getting all the necessary infrastructure built and operating may take many years, in some cases more than a decade. So, they need to predict what infrastructure they’ll need to ensure reliability in the future. “It’s complicated because you have to forecast over a decade ahead of time what to build and where to build it,” says Deepjyoti Deka, a research scientist in MITEI.\r\n\r\nOne challenge with anticipating what will be needed is predicting how the future system will operate. “That’s becoming increasingly difficult,” says Deka, because more renewables are coming online and displacing traditional generators. In the past, operators could rely on “spinning reserves,” that is, generating capacity that’s not currently in use but could come online in a matter of minutes to meet any shortfall on the system. The presence of so many intermittent generators — wind and solar — means there’s now less stability and inertia built into the grid. Adding to the complication is that those intermittent generators can be built by various vendors, and grid planners may not have access to the physics-based equations that govern the operation of each piece of equipment at sufficiently fine time scales. “So, you probably don’t know exactly how it’s going to run,” says Deka.\r\n\r\nAnd then there’s the weather. Determining the reliability of a proposed future energy system requires knowing what it’ll be up against in terms of weather. The future grid has to be reliable not only in everyday weather, but also during low-probability but high-risk events such as hurricanes, floods, and wildfires, all of which are becoming more and more frequent, notes Deka. AI can help by predicting such events and even tracking changes in weather patterns due to climate change.\r\n\r\nDeka points out another, less-obvious benefit of the speed of AI analysis. Any infrastructure development plan must be reviewed and approved, often by several regulatory and other bodies. Traditionally, an applicant would develop a plan, analyze its impacts, and submit the plan to one set of reviewers. After making any requested changes and repeating the analysis, the applicant would resubmit a revised version to the reviewers to see if the new version was acceptable. AI tools can speed up the required analysis so the process moves along more quickly. Planners can even reduce the number of times a proposal is rejected by using large language models to search regulatory publications and summarize what’s important for a proposed infrastructure installation.\r\n\r\nHarnessing AI to discover and exploit advanced materials needed for the energy transition\r\n\r\n“Use of AI for materials development is booming right now,” says Ju Li, MIT’s Carl Richard Soderberg Professor of Power Engineering. He notes two main directions.\r\n\r\nFirst, AI makes possible faster physics-based simulations at the atomic scale. The result is a better atomic-level understanding of how composition, processing, structure, and chemical reactivity relate to the performance of materials. That understanding provides design rules to help guide the development and discovery of novel materials for energy generation, storage, and conversion needed for a sustainable future energy system.\r\n\r\nAnd second, AI can help guide experiments in real time as they take place in the lab. Li explains: “AI assists us in choosing the best experiment to do based on our previous experiments and — based on literature searches — makes hypotheses and suggests new experiments.”\r\n\r\nHe describes what happens in his own lab. Human scientists interact with a large language model, which then makes suggestions about what specific experiments to do next. The human researcher accepts or modifies the suggestion, and a robotic arm responds by setting up and performing the next step in the experimental sequence, synthesizing the material, testing the performance, and taking images of samples when appropriate. Based on a mix of literature knowledge, human intuition, and previous experimental results, AI thus coordinates active learning that balances the goals of reducing uncertainty with improving performance. And, as Li points out, “AI has read many more books and papers than any human can, and is thus naturally more interdisciplinary.”\r\n\r\nThe outcome, says Li, is both better design of experiments and speeding up the “work flow.” Traditionally, the process of developing new materials has required synthesizing the precursors, making the material, testing its performance and characterizing the structure, making adjustments, and repeating the same series of steps. AI guidance speeds up that process, “helping us to design critical, cheap experiments that can give us the maximum amount of information feedback,” says Li.\r\n\r\n“Having this capability certainly will accelerate material discovery, and this may be the thing that can really help us in the clean energy transition,” he concludes. “AI [has the potential to] lubricate the material-discovery and optimization process, perhaps shortening it from decades, as in the past, to just a few years.” \r\n\r\nMITEI’s contributions\r\n\r\nAt MIT, researchers are working on various aspects of the opportunities described above. In projects supported by MITEI, teams are using AI to better model and predict disruptions in plasma flows inside fusion reactors — a necessity in achieving practical fusion power generation. Other MITEI-supported teams are using AI-powered tools to interpret regulations, climate data, and infrastructure maps in order to achieve faster, more adaptive electric grid planning. AI-guided development of advanced materials continues, with one MITEI project using AI to optimize solar cells and thermoelectric materials.\r\n\r\nOther MITEI researchers are developing robots that can learn maintenance tasks based on human feedback, including physical intervention and verbal instructions. The goal is to reduce costs, improve safety, and accelerate the deployment of the renewable energy infrastructure. And MITEI-funded work continues on ways to reduce the energy demand of data centers, from designing more efficient computer chips and computing algorithms to rethinking the architectural design of the buildings, for example, to increase airflow so as to reduce the need for air conditioning.\r\n\r\nIn addition to providing leadership and funding for many research projects, MITEI acts as a convenor, bringing together interested parties to consider common problems and potential solutions. In May 2025, MITEI’s annual spring symposium — titled “AI and energy: Peril and promise” — brought together AI and energy experts from across academia, industry, government, and nonprofit organizations to explore AI as both a problem and a potential solution for the clean energy transition. At the close of the symposium, William H. Green, director of MITEI and Hoyt C. Hottel Professor in the MIT Department of Chemical Engineering, noted, “The challenge of meeting data center energy demand and of unlocking the potential benefits of AI to the energy transition is now a research priority for MITEI.”",
+    "excerpt": "AI supports the clean energy transition as it manages power grid operations, helps plan infrastructure investments, guides development of novel materials, and more.",
+    "category": "tech",
+    "tags": "ai",
+    "author": 1,
+    "meta_description": "AI supports the clean energy transition as it manages power grid operations, helps plan infrastructure investments, guides development of novel materials, and m",
+    "visibility": "public",
+    "publish_date": "2025-12-01T12:31:00Z",
+    "created_at": "2025-12-01T06:46:36.907Z",
+    "updated_at": "2025-12-01T06:46:36.907Z",
+    "image": "news_images/iStock-1151571867.jpg"
+  }
+},
+{
+  "model": "news.news",
+  "pk": 11,
+  "fields": {
+    "title": "Python OOP",
+    "slug": "python-oop",
+    "content": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.\r\n\r\nOOP is a way of organizing code that uses objects and classes to represent real-world entities and their behavior. In OOP, object has attributes thing that has specific data and can perform certain actions using methods.\r\n\r\nKey Features of OOP in Python:\r\nOrganizes code into classes and objects\r\nSupports encapsulation to group data and methods together\r\nEnables inheritance for reusability and hierarchy\r\nAllows polymorphism for flexible method implementation\r\nImproves modularity, scalability, and maintainability\r\nCharacteristics of OOP (Object Oriented Programming)\r\nPython supports the core principles of object-oriented programming, which are the building blocks for designing robust and reusable software. The diagram below demonstrates these core principles",
+    "excerpt": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "category": "business",
+    "tags": "python oop",
+    "author": null,
+    "meta_description": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "visibility": "public",
+    "publish_date": "2025-12-08T12:41:00Z",
+    "created_at": "2025-12-08T06:57:50.553Z",
+    "updated_at": "2025-12-08T06:57:50.553Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 12,
+  "fields": {
+    "title": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "slug": "object-oriented-programming-is-a-fundamental-concept-in-python-empowering-developers-to-build-modular-maintainable-and-scalable-applications",
+    "content": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "excerpt": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "category": "tech",
+    "tags": "aha",
+    "author": null,
+    "meta_description": "Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable and scalable applications.",
+    "visibility": "public",
+    "publish_date": "2025-12-08T12:45:00Z",
+    "created_at": "2025-12-08T07:00:18.269Z",
+    "updated_at": "2025-12-08T07:00:18.269Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 13,
+  "fields": {
+    "title": "Pattern attribute value [a-z0-9-]+ is not a valid regular expression: Uncaught SyntaxError: Invalid regular expression: /[a-z0-9-]+/v: Invalid character classUnderstand this error api.js:18 🚀 [AXIOS",
+    "slug": "pattern-attribute-value-a-z0-9-is-not-a-valid-regular-expression-uncaught-syntaxerror-invalid-regular-expression-a-z0-9-v-invalid-character-classunderstand-this-error-apijs18-axios-",
+    "content": "Pattern attribute value [a-z0-9-]+ is not a valid regular expression: Uncaught SyntaxError: Invalid regular expression: /[a-z0-9-]+/v: Invalid character classUnderstand this error\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'POST', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: undefined, …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 201, statusText: 'Created', url: '/admin/news/', method: 'POST', dataKeys: Array(20), …}\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'GET', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: {…}, …}\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'GET', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: {…}, …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 200, statusText: 'OK', url: '/admin/news/', method: 'GET', dataKeys: Array(4), …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 200, statusText: 'OK', url: '/admin/news/', method: 'GET', dataKeys: Array(4), …}",
+    "excerpt": "Pattern attribute value [a-z0-9-]+ is not a valid regular expression: Uncaught SyntaxError: Invalid regular expression: /[a-z0-9-]+/v: Invalid character classUnderstand this error\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'POST', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http:",
+    "category": "business",
+    "tags": "ai",
+    "author": 2,
+    "meta_description": "Pattern attribute value [a-z0-9-]+ is not a valid regular expression: Uncaught SyntaxError: Invalid regular expression: /[a-z0-9-]+/v: Invalid character classUn",
+    "visibility": "public",
+    "publish_date": "2025-12-08T12:46:00Z",
+    "created_at": "2025-12-08T07:02:16.638Z",
+    "updated_at": "2025-12-08T07:02:16.638Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 14,
+  "fields": {
+    "title": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "slug": "the-source-provided-is-a-reference-to-the-official-python-classes-tutorial-foundations-",
+    "content": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "excerpt": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "category": "tech",
+    "tags": "ai",
+    "author": 1,
+    "meta_description": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "visibility": "public",
+    "publish_date": "2025-12-08T12:51:00Z",
+    "created_at": "2025-12-08T07:07:06.659Z",
+    "updated_at": "2025-12-08T07:07:06.659Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 15,
+  "fields": {
+    "title": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "slug": "the-source-provided-is-a-reference-to-the-official-python-classes-tutorial-foundations-",
+    "content": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "excerpt": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "category": "business",
+    "tags": "ai",
+    "author": 2,
+    "meta_description": "The source provided is a reference to the official Python Classes Tutorial: Foundations",
+    "visibility": "public",
+    "publish_date": null,
+    "created_at": "2025-12-08T07:09:15.130Z",
+    "updated_at": "2025-12-08T07:09:15.130Z",
+    "image": ""
+  }
+},
+{
+  "model": "news.news",
+  "pk": 16,
+  "fields": {
+    "title": "meta_description: The source provided is a reference to the official Python Classes Tutorial: F",
+    "slug": "metadescription-the-source-provided-is",
+    "content": "meta_description: The source provided is a reference to the official Python Classes Tutorial: Foundations \r\nNewsCreate.jsx:135   visibility: public\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'POST', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: undefined, …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 201, statusText: 'Created', url: '/admin/news/', method: 'POST', dataKeys: Array(20), …}\r\nNewsCreate.jsx:140 🎉 Article created successfully: {id: 15, title: 'The source provided is a reference to the official Python Classes Tutorial: Foundations', slug: 'the-source-provided-is-a-reference-to-the-official-python-classes-tutorial-foundations-', content: 'The source provided is a reference to the official Python Classes Tutorial: Foundations', excerpt: 'The source provided is a reference to the official Python Classes Tutorial: Foundations', …}\r\nNewsCreate.jsx:141 🖼️ Image path saved: null\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'GET', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: {…}, …}\r\napi.js:18 🚀 [AXIOS REQUEST] {method: 'GET', url: '/admin/news/', baseURL: 'http://localhost:8000/api', fullURL: 'http://localhost:8000/api/admin/news/', params: {…}, …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 200, statusText: 'OK', url: '/admin/news/', method: 'GET', dataKeys: Array(4), …}\r\napi.js:72 ✅ [AXIOS RESPONSE SUCCESS] {status: 200, statusText: 'OK', url: '/admin/news/', method: 'GET', dataKeys: Array(4), …}",
+    "excerpt": "meta_description: The source provided is a reference to the official Python Classes Tutorial: Foundations \r\nNewsCreate.jsx:135   visibility: public",
+    "category": "political",
+    "tags": "xdv",
+    "author": 1,
+    "meta_description": "meta_description: The source provided is a reference to the official Python Classes Tutorial: Foundations \r\nNewsCreate.jsx:135   visibility: public\r\napi.js:18",
+    "visibility": "public",
+    "publish_date": "2025-12-08T12:56:00Z",
+    "created_at": "2025-12-08T07:11:59.181Z",
+    "updated_at": "2025-12-08T07:11:59.181Z",
+    "image": "news_images/LLM-Lessons-01a-press_0_oZEQWnu.jpg"
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 1,
+  "fields": {
+    "news": 4,
+    "name": "Tapendra Shahi",
+    "email": "info.tapendra@gmail.com",
+    "text": "Good Job",
+    "created_at": "2025-11-29T14:59:20.561Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 2,
+  "fields": {
+    "news": 1,
+    "name": "Tapendra Shahi",
+    "email": "info.tapendra@gmail.com",
+    "text": "very informative",
+    "created_at": "2025-11-30T08:21:59.120Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 3,
+  "fields": {
+    "news": 3,
+    "name": "Tapendra Shahi",
+    "email": "info.tapendra@gmail.com",
+    "text": "good",
+    "created_at": "2025-12-04T11:19:58.719Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 4,
+  "fields": {
+    "news": 1,
+    "name": "Test User",
+    "email": "test@example.com",
+    "text": "This is a test comment from curl",
+    "created_at": "2025-12-07T07:10:53.440Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 5,
+  "fields": {
+    "news": 9,
+    "name": "Tapendra",
+    "email": "info.tapendra@gmail.com",
+    "text": "Good",
+    "created_at": "2025-12-07T09:33:18.297Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.comment",
+  "pk": 6,
+  "fields": {
+    "news": 10,
+    "name": "Tapendra",
+    "email": "info.tapendra@gmail.com",
+    "text": "good",
+    "created_at": "2025-12-08T06:08:25.992Z",
+    "is_approved": true
+  }
+},
+{
+  "model": "news.sharecount",
+  "pk": 1,
+  "fields": {
+    "news": 4,
+    "platform": "facebook",
+    "count": 2,
+    "last_shared": "2025-11-29T15:08:12.577Z"
+  }
+},
+{
+  "model": "news.sharecount",
+  "pk": 2,
+  "fields": {
+    "news": 4,
+    "platform": "twitter",
+    "count": 1,
+    "last_shared": "2025-11-29T15:08:21.592Z"
+  }
+},
+{
+  "model": "news.sharecount",
+  "pk": 3,
+  "fields": {
+    "news": 3,
+    "platform": "facebook",
+    "count": 1,
+    "last_shared": "2025-12-04T11:19:16.856Z"
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 1,
+  "fields": {
+    "email": "info.tapendra@gmail.com",
+    "name": "Tapendra Shahi",
+    "is_active": true,
+    "subscribed_at": "2025-12-01T10:47:39.707Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 2,
+  "fields": {
+    "email": "tapendra@ambition.guru",
+    "name": "",
+    "is_active": true,
+    "subscribed_at": "2025-12-01T11:56:31.803Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 3,
+  "fields": {
+    "email": "arifxansari7@gmail.com",
+    "name": "",
+    "is_active": true,
+    "subscribed_at": "2025-12-01T11:57:05.424Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 4,
+  "fields": {
+    "email": "tapendra@gmail.com",
+    "name": "",
+    "is_active": true,
+    "subscribed_at": "2025-12-07T04:58:11.344Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 5,
+  "fields": {
+    "email": "balen@gmail.com",
+    "name": "Balen",
+    "is_active": true,
+    "subscribed_at": "2025-12-07T09:05:43.617Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.subscriber",
+  "pk": 6,
+  "fields": {
+    "email": "pmsushila@gmail.com",
+    "name": "Sushila Karki",
+    "is_active": true,
+    "subscribed_at": "2025-12-07T09:06:23.769Z",
+    "unsubscribed_at": null
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 3,
+  "fields": {
+    "title": "Senior News Editor",
+    "department": "editorial",
+    "location": "New York, NY (Remote)",
+    "employment_type": "full_time",
+    "experience_level": "senior",
+    "description": "We are seeking an experienced Senior News Editor to lead our editorial team in delivering high-quality, AI-enhanced news content.",
+    "responsibilities": "Lead editorial team and set content strategy\nReview and edit news articles for accuracy\nCollaborate with AI analysts on story development\nManage publication schedules\nMentor junior writers and editors",
+    "requirements": "5+ years of experience in news editing\nStrong understanding of journalism ethics\nExperience with digital publishing platforms\nExcellent communication skills\nBachelor's degree in Journalism or related field",
+    "salary_range": "$80,000 - $120,000",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.167Z",
+    "updated_date": "2025-12-07T08:58:06.167Z",
+    "application_deadline": "2026-01-06"
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 4,
+  "fields": {
+    "title": "AI Data Analyst",
+    "department": "technology",
+    "location": "San Francisco, CA (Hybrid)",
+    "employment_type": "full_time",
+    "experience_level": "mid",
+    "description": "Join our technology team to build and maintain AI systems that power our news analysis platform.",
+    "responsibilities": "Develop machine learning models for news analysis\nProcess and analyze large datasets\nCollaborate with editorial team on AI features\nMonitor system performance and optimization\nCreate data visualizations and reports",
+    "requirements": "3+ years of experience in data science or ML\nProficiency in Python and data libraries (pandas, scikit-learn)\nExperience with NLP and text analysis\nStrong statistical analysis skills\nMaster's degree in Computer Science or related field",
+    "salary_range": "$90,000 - $130,000",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.168Z",
+    "updated_date": "2025-12-07T08:58:06.168Z",
+    "application_deadline": "2026-01-21"
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 5,
+  "fields": {
+    "title": "Business Reporter",
+    "department": "business",
+    "location": "Remote",
+    "employment_type": "full_time",
+    "experience_level": "mid",
+    "description": "Cover business and economic news with the support of our AI-powered research tools.",
+    "responsibilities": "Research and write business news stories\nConduct interviews with industry leaders\nAnalyze financial data and market trends\nBreak complex business topics into clear stories\nCollaborate with data analysts on investigative pieces",
+    "requirements": "3+ years of business journalism experience\nStrong financial literacy\nExcellent writing and communication skills\nAbility to meet tight deadlines\nBachelor's degree in Journalism, Business, or Economics",
+    "salary_range": "$60,000 - $85,000",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.170Z",
+    "updated_date": "2025-12-07T08:58:06.170Z",
+    "application_deadline": "2026-01-01"
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 6,
+  "fields": {
+    "title": "UX/UI Designer",
+    "department": "design",
+    "location": "Austin, TX (Hybrid)",
+    "employment_type": "full_time",
+    "experience_level": "mid",
+    "description": "Design beautiful and intuitive user experiences for our news platform and mobile apps.",
+    "responsibilities": "Create wireframes, mockups, and prototypes\nDesign responsive web and mobile interfaces\nConduct user research and usability testing\nMaintain and evolve design system\nCollaborate with developers on implementation",
+    "requirements": "3+ years of UX/UI design experience\nProficiency in Figma, Sketch, or Adobe XD\nStrong portfolio demonstrating user-centered design\nUnderstanding of web accessibility standards\nBachelor's degree in Design or related field",
+    "salary_range": "$70,000 - $100,000",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.171Z",
+    "updated_date": "2025-12-07T08:58:06.171Z",
+    "application_deadline": "2025-12-27"
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 7,
+  "fields": {
+    "title": "Content Marketing Intern",
+    "department": "marketing",
+    "location": "Remote",
+    "employment_type": "internship",
+    "experience_level": "entry",
+    "description": "Gain hands-on experience in content marketing and social media at a cutting-edge news organization.",
+    "responsibilities": "Assist with social media content creation\nHelp manage editorial content calendar\nSupport email marketing campaigns\nConduct competitor and market research\nCreate marketing analytics reports",
+    "requirements": "Currently enrolled in Marketing, Communications, or related program\nStrong writing and communication skills\nFamiliarity with social media platforms\nBasic understanding of SEO principles\nCreative mindset and attention to detail",
+    "salary_range": "$20/hour",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.172Z",
+    "updated_date": "2025-12-07T08:58:06.172Z",
+    "application_deadline": "2025-12-22"
+  }
+},
+{
+  "model": "news.jobopening",
+  "pk": 8,
+  "fields": {
+    "title": "Political Correspondent",
+    "department": "editorial",
+    "location": "Washington, DC (On-site)",
+    "employment_type": "full_time",
+    "experience_level": "senior",
+    "description": "Cover political news and policy from the nation's capital with AI-assisted research capabilities.",
+    "responsibilities": "Cover Congress, White House, and federal agencies\nDevelop and maintain political sources\nAnalyze policy proposals and legislation\nProvide live coverage of major political events\nCollaborate with data team on election analysis",
+    "requirements": "5+ years of political journalism experience\nStrong network in DC political circles\nDeep understanding of US government and politics\nExcellent on-camera and writing skills\nBachelor's degree in Journalism, Political Science, or related field",
+    "salary_range": "$75,000 - $110,000",
+    "is_active": true,
+    "posted_date": "2025-12-07T08:58:06.174Z",
+    "updated_date": "2025-12-07T08:58:06.174Z",
+    "application_deadline": "2026-01-16"
+  }
+},
+{
+  "model": "news.advertisement",
+  "pk": 1,
+  "fields": {
+    "title": "ads testing",
+    "position": "sidebar",
+    "size": "300x250",
+    "image": "advertisements/Types-of-OOPS-2.gif",
+    "link_url": "https://app.ambition.guru/course",
+    "alt_text": "good job",
+    "is_active": true,
+    "clicks": 0,
+    "impressions": 2,
+    "start_date": "2025-12-08T09:40:31.395Z",
+    "end_date": "2026-01-14T14:56:00Z",
+    "created_at": "2025-12-08T09:17:17.039Z",
+    "updated_at": "2025-12-08T09:40:31.395Z",
+    "order": 0
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2025-11-23T06:16:20.252Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "1",
+    "object_repr": "पासकी के हो र कसले प्रयोग गर्न मिल्छ ?",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2025-11-23T06:16:36.482Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "1",
+    "object_repr": "पासकी के हो र कसले प्रयोग गर्न मिल्छ ?",
+    "action_flag": 2,
+    "change_message": "[]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2025-11-23T06:26:28.951Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "2",
+    "object_repr": "आपत्कालीन स्वास्थ्य समस्यामा प्राथमिक उपचार तथा हेरचाह गर्न सिकाउने ‘सीईआरटी’ एप सार्वजनिक",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2025-11-23T06:41:28.822Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "3",
+    "object_repr": "messenger sharing button twitter sharing button linkedin sharing button sharethis sharing button सुरक्षण मुद्रण केन्द्रमा छापिएका ड्राइभिङ लाइसेन्स यातायात व्यवस्था विभागलाई हस्तान्त्रण",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2025-11-23T06:41:51.267Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "3",
+    "object_repr": "मुद्रण केन्द्रमा छापिएका ड्राइभिङ लाइसेन्स यातायात व्यवस्था विभागलाई हस्तान्त्रण",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Title\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2025-11-23T07:29:06.396Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "teammember"
+    ],
+    "object_id": "1",
+    "object_repr": "Tapendra Shahi - Business Reporter",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2025-11-23T07:30:14.301Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "teammember"
+    ],
+    "object_id": "2",
+    "object_repr": "Dharmendra Timilsina - Sports Reporter",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2025-11-23T08:21:43.919Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "4",
+    "object_repr": "कतै तपाईँ पनि एआईसँग एकतर्फी प्रेममा त हुनुहुन्न ? यस्तै सम्बन्ध बन्यो, २०२५ को वर्ष शब्द",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2025-11-25T12:36:43.507Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "news"
+    ],
+    "object_id": "5",
+    "object_repr": "abcd",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2025-11-29T14:55:32.760Z",
+    "user": [
+      "tapendra-shahi"
+    ],
+    "content_type": [
+      "news",
+      "teammember"
+    ],
+    "object_id": "3",
+    "object_repr": "Nabin - Political Analyst",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+}
+]
