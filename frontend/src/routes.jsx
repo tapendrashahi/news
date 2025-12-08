@@ -22,6 +22,14 @@ import AdminLayout from './admin/components/layout/AdminLayout';
 import Dashboard from './admin/pages/Dashboard';
 import NewsList from './admin/pages/news/NewsList';
 import NewsCreate from './admin/pages/news/NewsCreate';
+import NewsEdit from './admin/pages/news/NewsEdit';
+import TeamList from './admin/pages/team/TeamList';
+import TeamCreate from './admin/pages/team/TeamCreate';
+import TeamEdit from './admin/pages/team/TeamEdit';
+import TeamDetail from './admin/pages/team/TeamDetail';
+import CommentsList from './admin/pages/comments/CommentsList';
+import SubscribersList from './admin/pages/subscribers/SubscribersList';
+import Reports from './admin/pages/reports/Reports';
 
 function AppRoutes() {
   return (
@@ -58,11 +66,14 @@ function AppRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="news" element={<NewsList />} />
           <Route path="news/create" element={<NewsCreate />} />
-          {/* News edit route - to be added */}
-          {/* Team management routes - to be added */}
-          {/* Comments moderation routes - to be added */}
-          {/* Subscribers management routes - to be added */}
-          {/* Reports/Analytics routes - to be added */}
+          <Route path="news/:id/edit" element={<NewsEdit />} />
+          <Route path="team" element={<TeamList />} />
+          <Route path="team/create" element={<TeamCreate />} />
+          <Route path="team/:id" element={<TeamDetail />} />
+          <Route path="team/:id/edit" element={<TeamEdit />} />
+          <Route path="comments" element={<CommentsList />} />
+          <Route path="subscribers" element={<SubscribersList />} />
+          <Route path="reports" element={<Reports />} />
         </Route>
       </Routes>
     </AdminAuthProvider>
