@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNewsDetail, useComments, useAddComment, useShareNews, useNews } from '../hooks';
 import { SEO } from '../components';
+import Advertisement from '../components/Advertisement';
 import './NewsDetail.css';
 
 const NewsDetail = () => {
@@ -349,6 +350,9 @@ const NewsDetail = () => {
 
           {/* Sidebar */}
           <aside className="article-sidebar">
+            {/* Advertisement */}
+            <Advertisement position="sidebar" />
+
             {/* Related Articles */}
             <div className="sidebar-card">
               <h3 className="sidebar-title">Related Articles</h3>

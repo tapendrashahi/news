@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication
+from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication, Advertisement
 
 
 class TeamMemberSerializer(serializers.ModelSerializer):
@@ -339,4 +339,34 @@ class AnalyticsSerializer(serializers.Serializer):
     share_stats = serializers.ListField()
     top_authors = serializers.ListField()
     most_commented = serializers.ListField()
+
+
+class AdvertisementSerializer(serializers.ModelSerializer):
+    """Serializer for Advertisement model - Public view"""
+    position_display = serializers.CharField(source='get_position_display', read_only=True)
+    size_display = serializers.CharField(source='get_size_display', read_only=True)
+    
+    class Meta:
+        model = Advertisement
+        fields = [
+            'id', 'title', 'position', 'position_display', 'size', 'size_display',
+            'image', 'link_url', 'alt_text', 'order'
+        ]
+
+
+class AdvertisementAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer for Advertisement with all fields including stats"""
+    position_display = serializers.CharField(source='get_position_display', read_only=True)
+    size_display = serializers.CharField(source='get_size_display', read_only=True)
+    click_through_rate = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = Advertisement
+        fields = [
+            'id', 'title', 'position', 'position_display', 'size', 'size_display',
+            'image', 'link_url', 'alt_text', 'is_active', 'clicks', 'impressions',
+            'click_through_rate', 'start_date', 'end_date', 'created_at', 
+            'updated_at', 'order'
+        ]
+        read_only_fields = ['clicks', 'impressions', 'click_through_rate', 'created_at', 'updated_at']
 

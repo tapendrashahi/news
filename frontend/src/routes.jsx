@@ -30,6 +30,8 @@ import TeamDetail from './admin/pages/team/TeamDetail';
 import CommentsList from './admin/pages/comments/CommentsList';
 import SubscribersList from './admin/pages/subscribers/SubscribersList';
 import Reports from './admin/pages/reports/Reports';
+import AdvertisementsList from './admin/pages/advertisements/AdvertisementsList';
+import AdvertisementForm from './admin/pages/advertisements/AdvertisementForm';
 
 function AppRoutes() {
   return (
@@ -74,6 +76,9 @@ function AppRoutes() {
           <Route path="comments" element={<CommentsList />} />
           <Route path="subscribers" element={<SubscribersList />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="advertisements" element={<AdvertisementsList />} />
+          <Route path="advertisements/create" element={<AdvertisementForm />} />
+          <Route path="advertisements/:id/edit" element={<AdvertisementForm />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

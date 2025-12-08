@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import adminDashboardService from '../services/adminDashboardService';
 import StatsCard from '../components/common/StatsCard';
 import './Dashboard.css';
+import '../styles/shared.css';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -29,9 +30,22 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="dashboard-loading">
-        <div className="spinner"></div>
-        <p>Loading dashboard...</p>
+      <div className="dashboard">
+        <div className="dashboard__header">
+          <div className="skeleton skeleton-title"></div>
+          <div className="skeleton skeleton-text" style={{ width: '40%' }}></div>
+        </div>
+        
+        <div className="dashboard__stats">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="skeleton skeleton-card"></div>
+          ))}
+        </div>
+
+        <div className="dashboard__content">
+          <div className="skeleton skeleton-card" style={{ height: '300px' }}></div>
+          <div className="skeleton skeleton-card" style={{ height: '300px' }}></div>
+        </div>
       </div>
     );
   }

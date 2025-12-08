@@ -9,11 +9,32 @@
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  transition: transform 0.3s ease;
 }
 
 .admin-sidebar__header {
   padding: 24px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-sidebar__close {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.admin-sidebar__close:hover {
+  opacity: 1;
 }
 
 .admin-sidebar__header h2 {
@@ -71,8 +92,14 @@
 
 @media (max-width: 768px) {
   .admin-sidebar {
-    width: 100%;
-    position: relative;
-    height: auto;
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar--open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar__close {
+    display: block;
   }
 }

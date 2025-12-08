@@ -75,12 +75,6 @@ const NewsCreate = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-      
-      console.log('📸 Image selected:', {
-        name: file.name,
-        size: file.size,
-        type: file.type
-      });
     }
   };
 
@@ -109,9 +103,6 @@ const NewsCreate = () => {
     try {
       setLoading(true);
 
-      console.log('📝 Form data received:', data);
-      console.log('🖼️ Image file:', data.image?.[0]);
-
       const formData = new FormData();
       formData.append('title', data.title);
       formData.append('slug', data.slug);
@@ -129,28 +120,9 @@ const NewsCreate = () => {
 
       if (data.image && data.image[0]) {
         formData.append('image', data.image[0]);
-        console.log('✅ Image added to FormData:', {
-          name: data.image[0].name,
-          size: data.image[0].size,
-          type: data.image[0].type
-        });
-      } else {
-        console.warn('⚠️ No image file selected');
-      }
-
-      // Log FormData contents
-      console.log('📦 FormData contents:');
-      for (let [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(`  ${key}:`, { name: value.name, size: value.size, type: value.type });
-        } else {
-          console.log(`  ${key}:`, value);
-        }
       }
 
       const response = await adminNewsService.createNews(formData);
-      console.log('🎉 Article created successfully:', response);
-      console.log('🖼️ Image path saved:', response.image);
       
       toast.success('Article published successfully!');
       navigate('/admin/news');

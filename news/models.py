@@ -228,3 +228,62 @@ class JobApplication(models.Model):
         return f"{self.full_name} - {self.job_opening.title}"
 
 
+class Advertisement(models.Model):
+    """Advertisement model for managing ads on the website"""
+    POSITION_CHOICES = [
+        ('sidebar', 'Sidebar'),
+        ('header', 'Header'),
+        ('footer', 'Footer'),
+        ('inline', 'Inline Content'),
+    ]
+    
+    SIZE_CHOICES = [
+        ('300x250', 'Medium Rectangle (300x250)'),
+        ('728x90', 'Leaderboard (728x90)'),
+        ('160x600', 'Wide Skyscraper (160x600)'),
+        ('300x600', 'Half Page (300x600)'),
+        ('320x50', 'Mobile Banner (320x50)'),
+        ('custom', 'Custom Size'),
+    ]
+    
+    title = models.CharField(max_length=200, help_text="Internal title for the advertisement")
+    position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='sidebar')
+    size = models.CharField(max_length=50, choices=SIZE_CHOICES, default='300x250')
+    image = models.ImageField(upload_to='advertisements/', help_text="Advertisement image")
+    link_url = models.URLField(help_text="Target URL when ad is clicked")
+    alt_text = models.CharField(max_length=200, help_text="Alternative text for accessibility")
+    is_active = models.BooleanField(default=True, help_text="Is this ad currently active?")
+    clicks = models.PositiveIntegerField(default=0, help_text="Number of times ad was clicked")
+    impressions = models.PositiveIntegerField(default=0, help_text="Number of times ad was viewed")
+    start_date = models.DateTimeField(help_text="When to start showing this ad")
+    end_date = models.DateTimeField(null=True, blank=True, help_text="When to stop showing this ad (optional)")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    order = models.IntegerField(default=0, help_text="Display order (lower numbers appear first)")
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = 'Advertisement'
+        verbose_name_plural = 'Advertisements'
+    
+    def __str__(self):
+        return f"{self.title} - {self.get_position_display()}"
+    
+    def increment_impressions(self):
+        """Increment the impressions counter"""
+        self.impressions += 1
+        self.save(update_fields=['impressions'])
+    
+    def increment_clicks(self):
+        """Increment the clicks counter"""
+        self.clicks += 1
+        self.save(update_fields=['clicks'])
+    
+    @property
+    def click_through_rate(self):
+        """Calculate CTR (Click-Through Rate)"""
+        if self.impressions > 0:
+            return (self.clicks / self.impressions) * 100
+        return 0
+
+

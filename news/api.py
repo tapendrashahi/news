@@ -8,12 +8,12 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication
+from .models import News, TeamMember, Comment, ShareCount, Subscriber, JobOpening, JobApplication, Advertisement
 from .serializers import (
     NewsListSerializer, NewsDetailSerializer, NewsCreateUpdateSerializer,
     TeamMemberSerializer, CommentSerializer, CommentListSerializer,
     ShareCountSerializer, SubscriberSerializer, CategorySerializer,
-    JobOpeningSerializer, JobApplicationSerializer
+    JobOpeningSerializer, JobApplicationSerializer, AdvertisementSerializer
 )
 
 
@@ -430,4 +430,43 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
             headers=headers
         )
+
+
+class AdvertisementViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for Advertisements - Public read-only access
+    Provides active advertisements for display
+    """
+    serializer_class = AdvertisementSerializer
+    
+    def get_queryset(self):
+        """Get active advertisements within date range"""
+        now = timezone.now()
+        queryset = Advertisement.objects.filter(
+            is_active=True,
+            start_date__lte=now
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=now)
+        )
+        
+        # Filter by position if provided
+        position = self.request.query_params.get('position', None)
+        if position:
+            queryset = queryset.filter(position=position)
+        
+        return queryset.order_by('order', '-created_at')
+    
+    @action(detail=True, methods=['post'])
+    def track_impression(self, request, pk=None):
+        """Track advertisement impression"""
+        advertisement = self.get_object()
+        advertisement.increment_impressions()
+        return Response({'status': 'impression tracked'})
+    
+    @action(detail=True, methods=['post'])
+    def track_click(self, request, pk=None):
+        """Track advertisement click"""
+        advertisement = self.get_object()
+        advertisement.increment_clicks()
+        return Response({'status': 'click tracked', 'redirect_url': advertisement.link_url})
 

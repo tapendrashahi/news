@@ -12,11 +12,11 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from datetime import timedelta
 import csv
 
-from .models import News, TeamMember, Comment, ShareCount, Subscriber
+from .models import News, TeamMember, Comment, ShareCount, Subscriber, Advertisement
 from .serializers import (
     NewsAdminSerializer, TeamMemberAdminSerializer, CommentAdminSerializer,
     SubscriberAdminSerializer, DashboardStatsSerializer, AnalyticsSerializer,
-    NewsListSerializer
+    NewsListSerializer, AdvertisementAdminSerializer
 )
 from .permissions import IsAdmin
 
@@ -531,3 +531,73 @@ def analytics(request):
     }
     
     return Response(data)
+
+
+# ============================================================================
+# ADVERTISEMENTS ADMIN VIEWSET
+# ============================================================================
+
+class AdvertisementsAdminViewSet(viewsets.ModelViewSet):
+    """Admin ViewSet for managing advertisements"""
+    queryset = Advertisement.objects.all()
+    serializer_class = AdvertisementAdminSerializer
+    permission_classes = [IsAdmin]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    
+    def get_queryset(self):
+        """Filter advertisements based on query params"""
+        queryset = Advertisement.objects.all()
+        
+        # Filter by position
+        position = self.request.query_params.get('position', None)
+        if position:
+            queryset = queryset.filter(position=position)
+        
+        # Filter by active status
+        is_active = self.request.query_params.get('is_active', None)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        
+        # Search by title
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(title__icontains=search)
+        
+        return queryset.order_by('order', '-created_at')
+    
+    @action(detail=True, methods=['post'])
+    def toggle(self, request, pk=None):
+        """Toggle advertisement active status"""
+        advertisement = self.get_object()
+        advertisement.is_active = not advertisement.is_active
+        advertisement.save()
+        serializer = self.get_serializer(advertisement)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get advertisement statistics"""
+        total_ads = Advertisement.objects.count()
+        active_ads = Advertisement.objects.filter(is_active=True).count()
+        total_clicks = Advertisement.objects.aggregate(total=Count('id'))['total'] or 0
+        total_impressions = Advertisement.objects.aggregate(total=Count('id'))['total'] or 0
+        
+        # Calculate stats
+        ads_with_stats = Advertisement.objects.exclude(impressions=0)
+        total_clicks_count = sum(ad.clicks for ad in ads_with_stats)
+        total_impressions_count = sum(ad.impressions for ad in ads_with_stats)
+        avg_ctr = (total_clicks_count / total_impressions_count * 100) if total_impressions_count > 0 else 0
+        
+        # Top performing ads
+        top_ads = Advertisement.objects.filter(is_active=True).order_by('-clicks')[:5]
+        
+        data = {
+            'total_ads': total_ads,
+            'active_ads': active_ads,
+            'total_clicks': total_clicks_count,
+            'total_impressions': total_impressions_count,
+            'average_ctr': round(avg_ctr, 2),
+            'top_ads': AdvertisementAdminSerializer(top_ads, many=True).data
+        }
+        
+        return Response(data)

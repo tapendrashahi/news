@@ -7,7 +7,8 @@ from .api import (
     SubscriberViewSet,
     CategoryViewSet,
     JobOpeningViewSet,
-    JobApplicationViewSet
+    JobApplicationViewSet,
+    AdvertisementViewSet
 )
 from .api_admin import (
     # Auth endpoints
@@ -23,7 +24,8 @@ from .api_admin import (
     NewsAdminViewSet,
     TeamAdminViewSet,
     CommentsAdminViewSet,
-    SubscribersAdminViewSet
+    SubscribersAdminViewSet,
+    AdvertisementsAdminViewSet
 )
 
 # Public API router
@@ -35,6 +37,7 @@ router.register(r'subscribers', SubscriberViewSet, basename='subscriber')
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'jobs', JobOpeningViewSet, basename='job')
 router.register(r'applications', JobApplicationViewSet, basename='application')
+router.register(r'advertisements', AdvertisementViewSet, basename='advertisement')
 
 # Admin API router
 admin_router = DefaultRouter()
@@ -42,6 +45,7 @@ admin_router.register(r'news', NewsAdminViewSet, basename='admin-news')
 admin_router.register(r'team', TeamAdminViewSet, basename='admin-team')
 admin_router.register(r'comments', CommentsAdminViewSet, basename='admin-comments')
 admin_router.register(r'subscribers', SubscribersAdminViewSet, basename='admin-subscribers')
+admin_router.register(r'advertisements', AdvertisementsAdminViewSet, basename='admin-advertisements')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [
