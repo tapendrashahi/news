@@ -866,3 +866,41 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
     async def retry_article(self, article_id: str, failed_stage: str) -> Dict[str, Any]:
         """
         Retry article generation from a specific stage.
+        
+        Args:
+            article_id: UUID of the AIArticle to retry
+            failed_stage: Stage name where failure occurred
+            
+        Returns:
+            Dictionary with retry results
+        """
+        logger.info(f"Retrying article {article_id} from stage {failed_stage}")
+        
+        # Load article
+        article = await self._load_article(article_id)
+        
+        # Find stage index
+        stage_names = list(self.stages.keys())
+        if failed_stage not in stage_names:
+            raise ValueError(f"Invalid stage: {failed_stage}")
+        
+        start_index = stage_names.index(failed_stage)
+        
+        # Execute from failed stage onwards
+        context = {}
+        for stage_name in stage_names[start_index:]:
+            logger.info(f"Executing stage: {stage_name}")
+            stage_func = self.stages[stage_name]
+            context = await stage_func(article_id, context)
+        
+        return context
+    
+    def get_pipeline_status(self, article_id: str) -> Dict[str, Any]:
+        """Get current status of article in pipeline."""
+        # TODO: Implement status tracking
+        return {
+            'article_id': article_id,
+            'current_stage': 'unknown',
+            'status': 'unknown',
+            'progress_percentage': 0
+        }

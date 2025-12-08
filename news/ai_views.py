@@ -27,12 +27,17 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .ai_models import (
     KeywordSource,
     AIArticle,
     AIGenerationConfig,
-    AIWorkflowLog
+    AIWorkflowLog,
+    NewsSourceConfig,
+    ScrapedArticle
 )
 from .ai_serializers import (
     KeywordSourceSerializer,
@@ -41,7 +46,10 @@ from .ai_serializers import (
     AIArticleListSerializer,
     AIArticleDetailSerializer,
     AIGenerationConfigSerializer,
-    AIWorkflowLogSerializer
+    AIWorkflowLogSerializer,
+    NewsSourceConfigSerializer,
+    ScrapedArticleSerializer,
+    ScrapedArticleListSerializer
 )
 
 # Import Celery task (will be created in Phase 4)
@@ -79,7 +87,7 @@ class KeywordSourceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Get keywords with optional filtering."""
         queryset = KeywordSource.objects.select_related(
-            'category', 'approved_by'
+            'approved_by'
         ).prefetch_related('articles')
         
         # Filter by status if provided in query params
@@ -780,4 +788,244 @@ class AIWorkflowLogViewSet(viewsets.ReadOnlyModelViewSet):
             'total_execution_time': total_time,
             'total_cost': float(total_cost),
             'logs': serializer.data
+        })
+
+
+# ============================================================================
+# News Source Config ViewSet
+# ============================================================================
+
+class NewsSourceConfigViewSet(viewsets.ModelViewSet):
+    """
+    API endpoints for managing news source configurations.
+    Setup keywords and target websites for scraping.
+    """
+    
+    queryset = NewsSourceConfig.objects.all()
+    serializer_class = NewsSourceConfigSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'category']
+    search_fields = ['name', 'keywords']
+    ordering = ['-created_at']
+    
+    def perform_create(self, serializer):
+        """Set created_by to current user."""
+        serializer.save(created_by=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def trigger_scrape(self, request, pk=None):
+        """
+        Manually trigger scraping for this configuration.
+        
+        POST /api/news-sources/{id}/trigger_scrape/
+        """
+        config = self.get_object()
+        
+        try:
+            from .scraping_utils import scrape_articles_for_config
+            
+            # Scrape articles from configured websites
+            scraped_data = scrape_articles_for_config(config)
+            
+            # Create ScrapedArticle records
+            created_count = 0
+            for article_data in scraped_data:
+                try:
+                    # Check if article already exists (by URL)
+                    if not ScrapedArticle.objects.filter(source_url=article_data['source_url']).exists():
+                        ScrapedArticle.objects.create(
+                            source_config=config,
+                            **article_data
+                        )
+                        created_count += 1
+                except Exception as e:
+                    logger.error(f"Error saving article: {str(e)}")
+                    continue
+            
+            # Update last scraped timestamp
+            config.last_scraped_at = timezone.now()
+            config.save(update_fields=['last_scraped_at'])
+            
+            return Response({
+                'detail': f'Scraping completed! Found and saved {created_count} new articles.',
+                'config_id': str(config.id),
+                'config_name': config.name,
+                'articles_created': created_count,
+                'total_found': len(scraped_data)
+            })
+            
+        except Exception as e:
+            logger.error(f"Scraping error: {str(e)}")
+            return Response({
+                'detail': f'Scraping failed: {str(e)}',
+                'config_id': str(config.id),
+                'config_name': config.name
+            }, status=500)
+
+
+# ============================================================================
+# Scraped Article ViewSet
+# ============================================================================
+
+class ScrapedArticleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoints for managing scraped articles.
+    Review and approve articles for AI generation.
+    """
+    
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'category', 'source_config']
+    search_fields = ['title', 'content', 'matched_keywords']
+    ordering = ['-scraped_at']
+    
+    def get_queryset(self):
+        return ScrapedArticle.objects.select_related(
+            'source_config', 'reviewed_by', 'ai_article'
+        ).all()
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ScrapedArticleListSerializer
+        return ScrapedArticleSerializer
+    
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        """
+        Approve scraped article and send to AI generation pipeline.
+        
+        POST /api/scraped-articles/{id}/approve/
+        Body: {"auto_generate": true}
+        """
+        article = self.get_object()
+        
+        if article.status == ScrapedArticle.Status.APPROVED:
+            return Response(
+                {'detail': 'Article is already approved.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        article.approve(request.user)
+        
+        # Optionally auto-queue for generation
+        auto_generate = request.data.get('auto_generate', True)
+        if auto_generate:
+            # Create keyword source from this article
+            keyword, created = KeywordSource.objects.get_or_create(
+                keyword=article.title[:255],
+                defaults={
+                    'source': 'scraper',
+                    'category': article.category.lower(),
+                    'status': KeywordSource.Status.APPROVED,
+                    'approved_by': request.user,
+                    'approved_at': timezone.now(),
+                    'notes': f'From scraped article: {article.source_url}'
+                }
+            )
+            
+            # Create AI article for generation
+            ai_article = AIArticle.objects.create(
+                keyword=keyword,
+                status=AIArticle.Status.QUEUED,
+                template_type=AIArticle.TemplateType.NEWS_REPORT,
+                source_reference=article.content[:1000],  # Use scraped content as reference
+                target_tone='professional'
+            )
+            
+            article.ai_article = ai_article
+            article.status = ScrapedArticle.Status.GENERATED
+            article.save(update_fields=['ai_article', 'status'])
+            
+            # TODO: Trigger async generation task
+            # from .ai_tasks import generate_article_pipeline
+            # generate_article_pipeline.delay(str(ai_article.id))
+            
+            return Response({
+                'detail': 'Article approved and generation queued.',
+                'ai_article_id': str(ai_article.id),
+                'scraped_article_id': str(article.id)
+            })
+        
+        return Response({'detail': 'Article approved successfully.'})
+    
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """
+        Reject a scraped article.
+        
+        POST /api/scraped-articles/{id}/reject/
+        Body: {"reason": "Not relevant"}
+        """
+        article = self.get_object()
+        reason = request.data.get('reason', '')
+        
+        if not reason:
+            return Response(
+                {'detail': 'Rejection reason is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        article.reject(request.user, reason)
+        
+        return Response({'detail': 'Article rejected.'})
+    
+    @action(detail=False, methods=['post'])
+    def bulk_approve(self, request):
+        """
+        Bulk approve multiple articles.
+        
+        POST /api/scraped-articles/bulk_approve/
+        Body: {"article_ids": ["uuid1", "uuid2"], "auto_generate": true}
+        """
+        article_ids = request.data.get('article_ids', [])
+        auto_generate = request.data.get('auto_generate', True)
+        
+        if not article_ids:
+            return Response(
+                {'detail': 'No article IDs provided.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        articles = ScrapedArticle.objects.filter(
+            id__in=article_ids,
+            status=ScrapedArticle.Status.PENDING
+        )
+        
+        approved_count = 0
+        ai_article_ids = []
+        
+        for article in articles:
+            article.approve(request.user)
+            approved_count += 1
+            
+            if auto_generate:
+                keyword, created = KeywordSource.objects.get_or_create(
+                    keyword=article.title[:255],
+                    defaults={
+                        'source': 'scraper',
+                        'category': article.category.lower(),
+                        'status': KeywordSource.Status.APPROVED,
+                        'approved_by': request.user,
+                        'approved_at': timezone.now()
+                    }
+                )
+                
+                ai_article = AIArticle.objects.create(
+                    keyword=keyword,
+                    status=AIArticle.Status.QUEUED,
+                    template_type=AIArticle.TemplateType.NEWS_REPORT
+                )
+                
+                article.ai_article = ai_article
+                article.status = ScrapedArticle.Status.GENERATED
+                article.save()
+                
+                ai_article_ids.append(str(ai_article.id))
+                # TODO: generate_article_pipeline.delay(str(ai_article.id))
+        
+        return Response({
+            'detail': f'Approved {approved_count} articles.',
+            'approved_count': approved_count,
+            'ai_article_ids': ai_article_ids if auto_generate else []
         })

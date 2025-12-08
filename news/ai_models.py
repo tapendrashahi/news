@@ -746,3 +746,205 @@ class AIWorkflowLog(models.Model):
         self.error_traceback = error_traceback or ''
         self.completed_at = timezone.now()
         self.save(update_fields=['status', 'error_message', 'error_traceback', 'completed_at'])
+
+
+# ============================================================================
+# News Source Configuration Model
+# ============================================================================
+
+class NewsSourceConfig(models.Model):
+    """
+    Configuration for news scraping sources.
+    Defines keywords and target websites for content discovery.
+    """
+    
+    class Status(models.TextChoices):
+        ACTIVE = 'active', 'Active'
+        PAUSED = 'paused', 'Paused'
+        DISABLED = 'disabled', 'Disabled'
+    
+    # Primary Fields
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, help_text="Configuration name")
+    
+    # Keywords to search for
+    keywords = models.JSONField(
+        default=list,
+        help_text="List of keywords/topics to search for"
+    )
+    
+    # Target websites
+    source_websites = models.JSONField(
+        default=list,
+        help_text="List of news website URLs to scrape from"
+    )
+    
+    # Category
+    CATEGORY_CHOICES = [
+        ('Politics', 'Politics'),
+        ('Business', 'Business'),
+        ('Technology', 'Technology'),
+        ('Health', 'Health'),
+        ('Education', 'Education'),
+        ('Entertainment', 'Entertainment'),
+        ('Sports', 'Sports'),
+        ('Science', 'Science'),
+        ('Environment', 'Environment'),
+        ('Culture', 'Culture'),
+    ]
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default='Politics'
+    )
+    
+    # Settings
+    max_articles_per_scrape = models.IntegerField(
+        default=20,
+        validators=[MinValueValidator(1), MaxValueValidator(100)]
+    )
+    scrape_frequency_hours = models.IntegerField(
+        default=24,
+        help_text="How often to scrape (in hours)"
+    )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE
+    )
+    
+    # Metadata
+    notes = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='news_source_configs'
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_scraped_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'News Source Configuration'
+        verbose_name_plural = 'News Source Configurations'
+    
+    def __str__(self):
+        return f"{self.name} - {self.category}"
+
+
+# ============================================================================
+# Scraped Article Model
+# ============================================================================
+
+class ScrapedArticle(models.Model):
+    """
+    Articles scraped from news websites.
+    Pending review before sending to AI generation pipeline.
+    """
+    
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending Review'
+        APPROVED = 'approved', 'Approved for Generation'
+        REJECTED = 'rejected', 'Rejected'
+        GENERATED = 'generated', 'Article Generated'
+    
+    # Primary Fields
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    source_config = models.ForeignKey(
+        NewsSourceConfig,
+        on_delete=models.CASCADE,
+        related_name='scraped_articles'
+    )
+    
+    # Article Data
+    title = models.CharField(max_length=500)
+    content = models.TextField(help_text="Scraped article content")
+    summary = models.TextField(blank=True)
+    
+    # Source Information
+    source_url = models.URLField(max_length=1000)
+    source_website = models.CharField(max_length=255)
+    author = models.CharField(max_length=255, blank=True)
+    published_date = models.DateTimeField(null=True, blank=True)
+    
+    # Extracted Data
+    matched_keywords = models.JSONField(
+        default=list,
+        help_text="Keywords that matched this article"
+    )
+    image_urls = models.JSONField(
+        default=list,
+        help_text="Image URLs found in article"
+    )
+    reference_urls = models.JSONField(
+        default=list,
+        help_text="Reference/citation URLs from article"
+    )
+    
+    # Categorization
+    category = models.CharField(max_length=50)
+    tags = models.JSONField(default=list, blank=True)
+    
+    # Review Status
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True
+    )
+    
+    # Approval/Rejection
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='reviewed_scraped_articles'
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True)
+    
+    # Link to generated AI article
+    ai_article = models.ForeignKey(
+        AIArticle,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='source_scraped_article'
+    )
+    
+    # Timestamps
+    scraped_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-scraped_at']
+        verbose_name = 'Scraped Article'
+        verbose_name_plural = 'Scraped Articles'
+        indexes = [
+            models.Index(fields=['status', '-scraped_at']),
+            models.Index(fields=['category', 'status']),
+            models.Index(fields=['source_config', '-scraped_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title[:50]}... ({self.get_status_display()})"
+    
+    def approve(self, user):
+        """Approve this article for AI generation."""
+        self.status = self.Status.APPROVED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.save(update_fields=['status', 'reviewed_by', 'reviewed_at', 'updated_at'])
+    
+    def reject(self, user, reason):
+        """Reject this article."""
+        self.status = self.Status.REJECTED
+        self.reviewed_by = user
+        self.reviewed_at = timezone.now()
+        self.rejection_reason = reason
+        self.save(update_fields=['status', 'reviewed_by', 'reviewed_at', 'rejection_reason', 'updated_at'])
+

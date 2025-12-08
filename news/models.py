@@ -291,5 +291,8 @@ class Advertisement(models.Model):
 from .legal_models import LegalPage
 
 # Import AI Content Generation models
-from .ai_models import KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog
+from .ai_models import (
+    KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog,
+    NewsSourceConfig, ScrapedArticle
+)
 

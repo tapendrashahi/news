@@ -24,3 +24,10 @@ tiktoken==0.8.0
 beautifulsoup4==4.12.3
 requests==2.32.3
 google-api-python-client==2.158.0
+
+# Phase 4: Celery & Async Processing
+celery==5.4.0
+redis==5.2.1
+django-celery-beat==2.7.0
+django-celery-results==2.5.1
+kombu==5.4.2

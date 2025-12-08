@@ -26,7 +26,10 @@ Includes full and lightweight versions for different use cases:
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .ai_models import KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog
+from .ai_models import (
+    KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog,
+    NewsSourceConfig, ScrapedArticle
+)
 
 User = get_user_model()
 
@@ -536,3 +539,61 @@ class GenerationProgressSerializer(serializers.Serializer):
     )
     stages_completed = serializers.ListField(child=serializers.CharField())
     current_stage_message = serializers.CharField(allow_blank=True)
+
+
+# ============================================================================
+# News Source & Scraped Article Serializers
+# ============================================================================
+
+class NewsSourceConfigSerializer(serializers.ModelSerializer):
+    """Serializer for news source configuration."""
+    created_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    
+    class Meta:
+        model = NewsSourceConfig
+        fields = [
+            'id', 'name', 'keywords', 'source_websites', 'category',
+            'max_articles_per_scrape', 'scrape_frequency_hours', 'status',
+            'notes', 'created_by', 'created_by_name', 'created_at', 
+            'updated_at', 'last_scraped_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'last_scraped_at', 'created_by_name']
+    
+    def create(self, validated_data):
+        # Set created_by from request user
+        validated_data['created_by'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class ScrapedArticleSerializer(serializers.ModelSerializer):
+    """Serializer for scraped articles."""
+    source_config_name = serializers.CharField(source='source_config.name', read_only=True)
+    reviewed_by_name = serializers.CharField(source='reviewed_by.username', read_only=True)
+    ai_article_id = serializers.UUIDField(source='ai_article.id', read_only=True)
+    
+    class Meta:
+        model = ScrapedArticle
+        fields = [
+            'id', 'source_config', 'source_config_name', 'title', 'content', 
+            'summary', 'source_url', 'source_website', 'author', 'published_date',
+            'matched_keywords', 'image_urls', 'reference_urls', 'category', 'tags',
+            'status', 'reviewed_by', 'reviewed_by_name', 'reviewed_at', 
+            'rejection_reason', 'ai_article', 'ai_article_id', 'scraped_at', 'updated_at'
+        ]
+        read_only_fields = [
+            'id', 'source_config_name', 'reviewed_by', 'reviewed_by_name', 
+            'reviewed_at', 'ai_article', 'ai_article_id', 'scraped_at', 'updated_at'
+        ]
+
+
+class ScrapedArticleListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for scraped article lists."""
+    source_config_name = serializers.CharField(source='source_config.name', read_only=True)
+    
+    class Meta:
+        model = ScrapedArticle
+        fields = [
+            'id', 'title', 'source_website', 'source_url', 'category',
+            'status', 'matched_keywords', 'source_config_name', 'scraped_at'
+        ]
+        read_only_fields = fields

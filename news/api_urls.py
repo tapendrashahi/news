@@ -32,7 +32,9 @@ from .ai_views import (
     KeywordSourceViewSet,
     AIArticleViewSet,
     AIGenerationConfigViewSet,
-    AIWorkflowLogViewSet
+    AIWorkflowLogViewSet,
+    NewsSourceConfigViewSet,
+    ScrapedArticleViewSet
 )
 
 # Public API router
@@ -61,6 +63,8 @@ admin_router.register(r'ai/keywords', KeywordSourceViewSet, basename='admin-ai-k
 admin_router.register(r'ai/articles', AIArticleViewSet, basename='admin-ai-articles')
 admin_router.register(r'ai/configs', AIGenerationConfigViewSet, basename='admin-ai-configs')
 admin_router.register(r'ai/logs', AIWorkflowLogViewSet, basename='admin-ai-logs')
+admin_router.register(r'ai/news-sources', NewsSourceConfigViewSet, basename='admin-ai-news-sources')
+admin_router.register(r'ai/scraped-articles', ScrapedArticleViewSet, basename='admin-ai-scraped')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [
