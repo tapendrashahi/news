@@ -34,6 +34,7 @@ from decimal import Decimal
 
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, SystemMessage
 
 # Django imports
@@ -125,9 +126,11 @@ class AINewsOrchestrator:
         return {
             'openai_api_key': os.getenv('OPENAI_API_KEY', ''),
             'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
-            'default_model': 'gpt-4-turbo-preview',
+            'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
+            'default_provider': 'google',  # Changed to Gemini
+            'default_model': 'gemini-2.0-flash-exp',  # Latest Gemini model
             'temperature': 0.7,
-            'max_tokens': 4000,
+            'max_tokens': 8000,  # Gemini supports larger context
             'max_retries': 3,
             'quality_thresholds': {
                 'max_ai_score': 50.0,
@@ -142,13 +145,27 @@ class AINewsOrchestrator:
     def _init_llms(self):
         """Initialize Language Model instances."""
         try:
-            # Primary model: GPT-4 for content generation
-            self.llm_primary = ChatOpenAI(
-                model=self.config['default_model'],
-                temperature=self.config['temperature'],
-                max_tokens=self.config['max_tokens'],
-                openai_api_key=self.config['openai_api_key']
-            )
+            # Primary model: Gemini for content generation
+            provider = self.config.get('default_provider', 'google')
+            
+            if provider == 'google' and self.config.get('gemini_api_key'):
+                self.llm_primary = ChatGoogleGenerativeAI(
+                    model=self.config['default_model'],
+                    temperature=self.config['temperature'],
+                    max_output_tokens=self.config['max_tokens'],
+                    google_api_key=self.config['gemini_api_key']
+                )
+                logger.info(f"Primary LLM: Gemini ({self.config['default_model']})")
+            elif provider == 'openai' and self.config.get('openai_api_key'):
+                self.llm_primary = ChatOpenAI(
+                    model=self.config.get('default_model', 'gpt-4-turbo-preview'),
+                    temperature=self.config['temperature'],
+                    max_tokens=self.config['max_tokens'],
+                    openai_api_key=self.config['openai_api_key']
+                )
+                logger.info(f"Primary LLM: OpenAI ({self.config['default_model']})")
+            else:
+                raise ValueError(f"Invalid provider '{provider}' or missing API key")
             
             # Secondary model: Claude for cross-validation and bias checking
             if self.config.get('anthropic_api_key'):
@@ -157,9 +174,10 @@ class AINewsOrchestrator:
                     temperature=0.3,  # Lower temp for quality checks
                     anthropic_api_key=self.config['anthropic_api_key']
                 )
+                logger.info("Secondary LLM: Claude (for cross-validation)")
             else:
                 self.llm_secondary = None
-                logger.warning("Claude API key not found. Bias cross-validation disabled.")
+                logger.warning("Claude API key not found. Cross-validation will use primary model.")
             
             logger.info("LLMs initialized successfully")
             

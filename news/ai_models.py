@@ -236,7 +236,7 @@ class AIArticle(models.Model):
     # AI Configuration
     ai_model_used = models.CharField(
         max_length=100,
-        default='gpt-4-turbo-preview',
+        default='gemini-2.0-flash-exp',
         help_text="AI model used for generation"
     )
     
@@ -510,12 +510,12 @@ class AIGenerationConfig(models.Model):
     ai_provider = models.CharField(
         max_length=50,
         choices=Provider.choices,
-        default=Provider.OPENAI
+        default=Provider.GOOGLE
     )
     model_name = models.CharField(
         max_length=100,
-        default='gpt-4-turbo-preview',
-        help_text="Model name (e.g., gpt-4, claude-3-opus)"
+        default='gemini-2.0-flash-exp',
+        help_text="Model name (e.g., gemini-2.0-flash-exp, gpt-4, claude-3-opus)"
     )
     
     # Prompts
@@ -535,7 +535,7 @@ class AIGenerationConfig(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(2)]
     )
     max_tokens = models.IntegerField(
-        default=4000,
+        default=8000,
         validators=[MinValueValidator(100), MaxValueValidator(128000)]
     )
     top_p = models.DecimalField(

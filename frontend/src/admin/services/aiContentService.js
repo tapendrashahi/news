@@ -13,7 +13,7 @@ export const getArticles = (params) => api.get('/admin/ai/articles/', { params }
 export const getArticle = (id) => api.get(`/admin/ai/articles/${id}/`)
 export const startGeneration = (id) => api.post(`/admin/ai/articles/${id}/start_generation/`)
 export const retryStage = (id, stage) => api.post(`/admin/ai/articles/${id}/retry_stage/`, { stage })
-export const cancelGeneration = (id) => api.post(`/admin/ai/articles/${id}/cancel_generation/`)
+export const cancelGeneration = (id) => api.post(`/admin/ai/articles/${id}/cancel/`)
 
 // Queue
 export const getGenerationQueue = (params) => api.get('/admin/ai/articles/', { params })

@@ -45,9 +45,10 @@ const GenerationQueue = () => {
     try {
       await cancelGeneration(id)
       fetchArticles()
+      console.log('✅ Generation cancelled successfully')
     } catch (error) {
       console.error('Failed to cancel generation:', error)
-      alert('Failed to cancel generation')
+      alert('Failed to cancel generation. Please try again.')
     }
   }
 

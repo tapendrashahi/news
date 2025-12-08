@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { getArticles, retryStage, cancelGeneration } from '../../../services/aiContentService'
+import ArticleProgress from './ArticleProgress'
 import './GenerationQueue.css'
 
 const GenerationQueue = () => {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [selectedArticle, setSelectedArticle] = useState(null)
   const [stats, setStats] = useState({
     total: 0,
     queued: 0,
@@ -117,8 +119,11 @@ const GenerationQueue = () => {
     try {
       await cancelGeneration(id)
       fetchArticles()
+      // Optional: Show success message
+      console.log('✅ Generation cancelled successfully')
     } catch (error) {
       console.error('Failed to cancel:', error)
+      alert('Failed to cancel generation. Please try again.')
     }
   }
 
@@ -288,7 +293,9 @@ const GenerationQueue = () => {
                   </button>
                 )}
                 {(article.status === 'reviewing' || article.status === 'approved') && (
-                  <button className="btn btn-sm btn-primary">👁️ View</button>
+                  <button className="btn btn-sm btn-primary" onClick={() => setSelectedArticle(article)}>
+                    👁️ View
+                  </button>
                 )}
               </div>
 
@@ -302,6 +309,13 @@ const GenerationQueue = () => {
         })}
       </div>
       {articles.length === 0 && <div className="empty-state">No articles in queue</div>}
+      
+      {selectedArticle && (
+        <ArticleProgress
+          article={selectedArticle}
+          onClose={() => setSelectedArticle(null)}
+        />
+      )}
     </div>
   )
 }
