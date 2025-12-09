@@ -1,0 +1,89 @@
+# Environment variables - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+*.env
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/static
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.backup
+*.bak
+db.sqlite3.backup*
+*_backup_*
+sqlite_backup.json
+sqlite_data_export_*.json
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.cache/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Temporary files
+temp_*.py
+*.tmp
