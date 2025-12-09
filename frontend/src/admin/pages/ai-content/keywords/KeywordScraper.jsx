@@ -767,7 +767,7 @@ export default function KeywordScraper({ onKeywordsAdded, showModal, setShowModa
                   <div className="article-main">
                     <h3 className="article-title">{article.title}</h3>
                     <p className="article-summary">{article.summary || article.content?.substring(0, 200) + '...'}</p>
-                    <div className="article-meta">
+                    <div className="scraped-article-meta">
                       <span className="meta-item">
                         <strong>Source:</strong> {article.source_website}
                       </span>
