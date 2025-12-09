@@ -224,46 +224,27 @@ const NewsDetail = () => {
             )}
             
             <h1 className="article-title">{news.title}</h1>
-            
-            {news.excerpt && (
-              <p className="article-excerpt">{news.excerpt}</p>
-            )}
 
-            <div className="article-meta">
-              <div className="meta-left">
-                {news.author && (
-                  <div className="article-author">
-                    <div className="author-avatar">
-                      {(news.author.name || news.author).toString().charAt(0).toUpperCase()}
-                    </div>
-                    <div className="author-info">
-                      <div className="author-name">{news.author.name || news.author}</div>
-                      <div className="author-title">{news.author.role_display || 'Staff Writer'}</div>
-                    </div>
-                  </div>
-                )}
+            <div className="article-meta-inline">
+              <div className="meta-item">
+                <i className="icon">📅</i>
+                <span>{formatDate(news.created_at)}</span>
               </div>
-              
-              <div className="meta-right">
-                <div className="meta-item">
-                  <i className="icon">📅</i>
-                  <span>{formatDate(news.created_at)}</span>
-                </div>
-                <div className="meta-item">
-                  <i className="icon">⏱️</i>
-                  <span>{calculateReadTime(news.content)}</span>
-                </div>
-                <div className="meta-item">
-                  <i className="icon">💬</i>
-                  <span>{comments.length} Comments</span>
-                </div>
+              <div className="meta-separator">•</div>
+              <div className="meta-item">
+                <i className="icon">⏱️</i>
+                <span>{calculateReadTime(news.content)}</span>
               </div>
-            </div>
-
-            {/* AI Analysis Badge */}
-            <div className="ai-analysis-badge">
-              <span className="ai-icon">🤖</span>
-              <span className="ai-text">Verified by AI • Confidence: {Math.floor(Math.random() * (98 - 85 + 1)) + 85}%</span>
+              <div className="meta-separator">•</div>
+              <div className="meta-item">
+                <i className="icon">💬</i>
+                <span>{comments.length} Comments</span>
+              </div>
+              <div className="meta-separator">•</div>
+              <div className="meta-item ai-verified">
+                <span className="ai-icon">🤖</span>
+                <span>Verified by AI • Confidence: {Math.floor(Math.random() * (98 - 85 + 1)) + 85}%</span>
+              </div>
             </div>
           </div>
         </header>

@@ -105,7 +105,8 @@
   z-index: 1;
 }
 
-.article-category {
+.article-header .article-category,
+.news-detail .article-category {
   display: inline-block;
   padding: 6px 16px;
   background: rgba(255, 255, 255, 0.15);
@@ -118,20 +119,23 @@
   margin-bottom: 20px;
 }
 
-.article-title {
+.article-header .article-title,
+.news-detail .article-title {
   font-size: 3.5rem !important;
-  font-weight: 900;
-  line-height: 1.2;
-  margin: 0 0 20px;
-  letter-spacing: -1px;
-  color: #f0f0f0;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  margin: 0 0 20px !important;
+  letter-spacing: -1px !important;
+  color: #f0f0f0 !important;
 }
 
-.article-excerpt {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  opacity: 0.9;
-  margin: 0 0 30px;
+.article-header .article-excerpt,
+.news-detail .article-excerpt {
+  font-size: 1.25rem !important;
+  line-height: 1.7 !important;
+  opacity: 0.9 !important;
+  margin: 0 0 30px !important;
+  color: #ffffff !important;
 }
 
 .article-meta {
@@ -191,6 +195,59 @@
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
+}
+
+/* Single-line meta information */
+.article-meta-inline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+  font-size: 1.05rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.article-meta-inline .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 1;
+  color: #374151;
+}
+
+.article-meta-inline .meta-item .icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.article-meta-inline .meta-separator {
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.article-meta-inline .meta-item.ai-verified {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid #059669;
+  padding: 8px 18px;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.article-meta-inline .ai-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .meta-item {

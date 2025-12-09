@@ -665,8 +665,7 @@
   flex: 1;
 }
 
-.article-row .article-main .article-title,
-.article-title {
+.article-row .article-main .article-title {
   margin: 0 0 4px 0 !important;
   font-size: 14px !important;
   font-weight: 600 !important;
