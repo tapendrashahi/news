@@ -128,9 +128,9 @@ class AINewsOrchestrator:
             'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
             'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
             'default_provider': 'google',  # Changed to Gemini
-            'default_model': 'gemini-2.0-flash-exp',  # Latest Gemini model
+            'default_model': 'gemini-exp-1206',  # Gemini 3 Pro (experimental release)
             'temperature': 0.7,
-            'max_tokens': 8000,  # Gemini supports larger context
+            'max_tokens': 32000,  # Gemini 3 supports very large context
             'max_retries': 3,
             'quality_thresholds': {
                 'max_ai_score': 50.0,

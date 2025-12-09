@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getConfigs, updateConfig } from '../../../services/aiContentService'
+import aiModelsConfig from '../../../config/ai-models-config.json'
 import './AISettings.css'
 
 const AISettings = () => {
@@ -8,9 +9,9 @@ const AISettings = () => {
   const [activeTab, setActiveTab] = useState('general')
   const [generalSettings, setGeneralSettings] = useState({
     ai_provider: 'google',
-    model_name: 'gemini-2.0-flash-exp',
-    temperature: 0.7,
-    max_tokens: 8000
+    model_name: 'gemini-exp-1206',
+    temperature: aiModelsConfig.defaultSettings.temperature.default,
+    max_tokens: aiModelsConfig.defaultSettings.maxTokens.default
   })
 
   useEffect(() => {
@@ -26,9 +27,9 @@ const AISettings = () => {
         const config = response.data[0]
         setGeneralSettings({
           ai_provider: config.ai_provider || 'google',
-          model_name: config.model_name || 'gemini-2.0-flash-exp',
-          temperature: config.temperature || 0.7,
-          max_tokens: config.max_tokens || 8000
+          model_name: config.model_name || 'gemini-exp-1206',
+          temperature: config.temperature || aiModelsConfig.defaultSettings.temperature.default,
+          max_tokens: config.max_tokens || aiModelsConfig.defaultSettings.maxTokens.default
         })
       }
     } catch (error) {
@@ -56,23 +57,15 @@ const AISettings = () => {
   }
 
   const getModelOptions = (provider) => {
-    const models = {
-      google: [
-        { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash (Experimental) - 1M tokens' },
-        { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro - 2M tokens' },
-        { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash - 1M tokens' }
-      ],
-      openai: [
-        { value: 'gpt-4-turbo-preview', label: 'GPT-4 Turbo' },
-        { value: 'gpt-4', label: 'GPT-4' },
-        { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
-      ],
-      anthropic: [
-        { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus' },
-        { value: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet' }
-      ]
-    }
-    return models[provider] || []
+    const providerData = aiModelsConfig.providers.find(p => p.id === provider)
+    return providerData ? providerData.models : []
+  }
+
+  const getProviderOptions = () => {
+    return aiModelsConfig.providers.map(provider => ({
+      value: provider.id,
+      label: provider.name
+    }))
   }
 
   if (loading) return <div className="loading">Loading...</div>
@@ -105,9 +98,9 @@ const AISettings = () => {
                 value={generalSettings.ai_provider}
                 onChange={(e) => setGeneralSettings({...generalSettings, ai_provider: e.target.value})}
               >
-                <option value="google">Google (Gemini)</option>
-                <option value="openai">OpenAI (GPT-4)</option>
-                <option value="anthropic">Anthropic (Claude)</option>
+                {getProviderOptions().map(provider => (
+                  <option key={provider.value} value={provider.value}>{provider.label}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
@@ -117,33 +110,41 @@ const AISettings = () => {
                 onChange={(e) => setGeneralSettings({...generalSettings, model_name: e.target.value})}
               >
                 {getModelOptions(generalSettings.ai_provider).map(model => (
-                  <option key={model.value} value={model.value}>{model.label}</option>
+                  <option key={model.value} value={model.value}>
+                    {model.label}
+                    {model.recommended && ' ⭐ Recommended'}
+                  </option>
                 ))}
               </select>
+              {getModelOptions(generalSettings.ai_provider).find(m => m.value === generalSettings.model_name)?.description && (
+                <small className="model-description">
+                  {getModelOptions(generalSettings.ai_provider).find(m => m.value === generalSettings.model_name).description}
+                </small>
+              )}
             </div>
             <div className="form-group">
               <label>Temperature</label>
               <input 
                 type="number" 
-                step="0.1" 
-                min="0" 
-                max="2" 
+                step={aiModelsConfig.defaultSettings.temperature.step}
+                min={aiModelsConfig.defaultSettings.temperature.min}
+                max={aiModelsConfig.defaultSettings.temperature.max}
                 value={generalSettings.temperature}
                 onChange={(e) => setGeneralSettings({...generalSettings, temperature: parseFloat(e.target.value)})}
               />
-              <small>Lower = more focused, Higher = more creative (0-2)</small>
+              <small>{aiModelsConfig.defaultSettings.temperature.description} ({aiModelsConfig.defaultSettings.temperature.min}-{aiModelsConfig.defaultSettings.temperature.max})</small>
             </div>
             <div className="form-group">
               <label>Max Tokens</label>
               <input 
                 type="number" 
-                step="100" 
-                min="1000" 
-                max="32000" 
+                step={aiModelsConfig.defaultSettings.maxTokens.step}
+                min={aiModelsConfig.defaultSettings.maxTokens.min}
+                max={aiModelsConfig.defaultSettings.maxTokens.max}
                 value={generalSettings.max_tokens}
                 onChange={(e) => setGeneralSettings({...generalSettings, max_tokens: parseInt(e.target.value)})}
               />
-              <small>Maximum length of generated content (1000-32000)</small>
+              <small>{aiModelsConfig.defaultSettings.maxTokens.description} ({aiModelsConfig.defaultSettings.maxTokens.min}-{aiModelsConfig.defaultSettings.maxTokens.max})</small>
             </div>
             <button className="btn btn-primary" onClick={handleSaveGeneral}>
               Save General Settings

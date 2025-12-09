@@ -41,6 +41,10 @@ module.exports = {
           filename: 'static/fonts/[name].[hash][ext]',
         },
       },
+      {
+        test: /\.json$/,
+        type: 'json',
+      },
     ],
   },
   resolve: {

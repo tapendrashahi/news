@@ -1,0 +1,193 @@
+{
+  "providers": [
+    {
+      "id": "google",
+      "name": "Google (Gemini)",
+      "models": [
+        {
+          "value": "gemini-exp-1206",
+          "label": "Gemini 3 Pro (Experimental) - 32K tokens",
+          "description": "Latest Gemini 3 model with advanced reasoning",
+          "maxTokens": 32000,
+          "contextWindow": 2000000,
+          "recommended": true
+        },
+        {
+          "value": "gemini-2.0-flash-thinking-exp",
+          "label": "Gemini 2.0 Flash Thinking - 16K tokens",
+          "description": "Advanced reasoning with extended thinking",
+          "maxTokens": 16000,
+          "contextWindow": 1000000,
+          "recommended": false
+        },
+        {
+          "value": "gemini-2.0-flash-exp",
+          "label": "Gemini 2.0 Flash (Experimental) - 8K tokens",
+          "description": "Fast and efficient for most tasks",
+          "maxTokens": 8000,
+          "contextWindow": 1000000,
+          "recommended": false
+        },
+        {
+          "value": "gemini-1.5-pro",
+          "label": "Gemini 1.5 Pro - 8K tokens",
+          "description": "Balanced performance and quality",
+          "maxTokens": 8000,
+          "contextWindow": 2000000,
+          "recommended": false
+        },
+        {
+          "value": "gemini-1.5-flash",
+          "label": "Gemini 1.5 Flash - 8K tokens",
+          "description": "Fast responses with good quality",
+          "maxTokens": 8000,
+          "contextWindow": 1000000,
+          "recommended": false
+        }
+      ],
+      "imageModels": [
+        {
+          "value": "imagen-3.0-generate-001",
+          "label": "Imagen 3 (Latest)",
+          "description": "High-quality image generation",
+          "recommended": true
+        },
+        {
+          "value": "imagen-2.0",
+          "label": "Imagen 2",
+          "description": "Stable image generation",
+          "recommended": false
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI (GPT)",
+      "models": [
+        {
+          "value": "gpt-4-turbo-preview",
+          "label": "GPT-4 Turbo - 4K tokens",
+          "description": "Most capable GPT-4 variant",
+          "maxTokens": 4096,
+          "contextWindow": 128000,
+          "recommended": true
+        },
+        {
+          "value": "gpt-4",
+          "label": "GPT-4 - 8K tokens",
+          "description": "Standard GPT-4",
+          "maxTokens": 8192,
+          "contextWindow": 8192,
+          "recommended": false
+        },
+        {
+          "value": "gpt-3.5-turbo",
+          "label": "GPT-3.5 Turbo - 4K tokens",
+          "description": "Fast and cost-effective",
+          "maxTokens": 4096,
+          "contextWindow": 16385,
+          "recommended": false
+        }
+      ],
+      "imageModels": [
+        {
+          "value": "dall-e-3",
+          "label": "DALL-E 3",
+          "description": "Latest image generation",
+          "recommended": true
+        },
+        {
+          "value": "dall-e-2",
+          "label": "DALL-E 2",
+          "description": "Previous generation",
+          "recommended": false
+        }
+      ]
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic (Claude)",
+      "models": [
+        {
+          "value": "claude-3-5-sonnet-20241022",
+          "label": "Claude 3.5 Sonnet - 8K tokens",
+          "description": "Best balance of speed and intelligence",
+          "maxTokens": 8192,
+          "contextWindow": 200000,
+          "recommended": true
+        },
+        {
+          "value": "claude-3-opus-20240229",
+          "label": "Claude 3 Opus - 4K tokens",
+          "description": "Most capable Claude model",
+          "maxTokens": 4096,
+          "contextWindow": 200000,
+          "recommended": false
+        },
+        {
+          "value": "claude-3-sonnet-20240229",
+          "label": "Claude 3 Sonnet - 4K tokens",
+          "description": "Balanced performance",
+          "maxTokens": 4096,
+          "contextWindow": 200000,
+          "recommended": false
+        }
+      ],
+      "imageModels": []
+    }
+  ],
+  "defaultSettings": {
+    "temperature": {
+      "min": 0,
+      "max": 2,
+      "default": 0.7,
+      "step": 0.1,
+      "description": "Lower = more focused, Higher = more creative"
+    },
+    "maxTokens": {
+      "min": 1000,
+      "max": 32000,
+      "default": 8000,
+      "step": 100,
+      "description": "Maximum length of generated content"
+    }
+  },
+  "qualityThresholds": {
+    "maxBiasScore": {
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "description": "Maximum acceptable bias percentage"
+    },
+    "minFactCheckScore": {
+      "default": 80,
+      "min": 0,
+      "max": 100,
+      "description": "Minimum fact-checking score required"
+    },
+    "minSeoScore": {
+      "default": 75,
+      "min": 0,
+      "max": 100,
+      "description": "Minimum SEO optimization score"
+    },
+    "maxAiScore": {
+      "default": 50,
+      "min": 0,
+      "max": 100,
+      "description": "Maximum AI detection score (lower is better)"
+    },
+    "maxPlagiarismScore": {
+      "default": 5,
+      "min": 0,
+      "max": 100,
+      "description": "Maximum plagiarism percentage allowed"
+    },
+    "minPerspectives": {
+      "default": 2,
+      "min": 1,
+      "max": 10,
+      "description": "Minimum number of perspectives to cover"
+    }
+  }
+}
