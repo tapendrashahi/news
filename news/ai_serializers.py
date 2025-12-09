@@ -30,6 +30,7 @@ from .ai_models import (
     KeywordSource, AIArticle, AIGenerationConfig, AIWorkflowLog,
     NewsSourceConfig, ScrapedArticle
 )
+from .models import News
 
 User = get_user_model()
 
@@ -37,6 +38,24 @@ User = get_user_model()
 # ============================================================================
 # User Serializers (for nested relationships)
 # ============================================================================
+
+class UserMinimalSerializer(serializers.ModelSerializer):
+    """Minimal user data for nested relationships."""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
+
+# ============================================================================
+# Published Article Serializer (for nested relationships)
+# ============================================================================
+
+class PublishedArticleSerializer(serializers.ModelSerializer):
+    """Minimal serializer for published News articles."""
+    class Meta:
+        model = News
+        fields = ['id', 'title', 'slug', 'publish_date']
+        read_only_fields = ['id', 'title', 'slug', 'publish_date']
 
 class UserMinimalSerializer(serializers.ModelSerializer):
     """Minimal user data for nested relationships."""
@@ -170,6 +189,7 @@ class AIArticleSerializer(serializers.ModelSerializer):
     
     keyword_data = KeywordSourceListSerializer(source='keyword', read_only=True)
     reviewed_by = UserMinimalSerializer(read_only=True)
+    published_article = PublishedArticleSerializer(read_only=True)
     category_display = serializers.CharField(source='keyword.get_category_display', read_only=True)
     workflow_progress = serializers.SerializerMethodField()
     quality_summary = serializers.SerializerMethodField()
@@ -268,19 +288,20 @@ class AIArticleListSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source='keyword.get_category_display', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     workflow_stage_display = serializers.CharField(source='get_workflow_stage_display', read_only=True)
+    published_article = PublishedArticleSerializer(read_only=True)
     progress_percentage = serializers.SerializerMethodField()
     has_errors = serializers.SerializerMethodField()
     
     class Meta:
         model = AIArticle
         fields = [
-            'id', 'title', 'keyword_text', 'category_display',
+            'id', 'title', 'slug', 'keyword_text', 'category_display',
             'template_type', 'status', 'status_display',
             'workflow_stage', 'workflow_stage_display',
             'ai_model_used', 'actual_word_count',
             'overall_quality_score', 'cost_estimate',
             'created_at', 'updated_at', 'progress_percentage',
-            'has_errors', 'retry_count',
+            'has_errors', 'retry_count', 'published_article',
             # Content fields for Review Queue
             'raw_content', 'content_json', 'meta_title', 
             'meta_description', 'focus_keywords',

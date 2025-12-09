@@ -97,6 +97,7 @@ const GenerationQueue = () => {
       generating: articles.filter(a => a.status === 'generating').length,
       reviewing: articles.filter(a => a.status === 'reviewing').length,
       approved: articles.filter(a => a.status === 'approved').length,
+      published: articles.filter(a => a.status === 'published').length,
       failed: articles.filter(a => a.status === 'failed').length,
       byStage,
       byTemplate
@@ -223,16 +224,16 @@ const GenerationQueue = () => {
             <div className="stat-label">Reviewing</div>
           </div>
         </div>
-        <div className="stat-card reviewing">
-          <div className="stat-content">
-            <div className="stat-value">{stats.reviewing}</div>
-            <div className="stat-label">Reviewing</div>
-          </div>
-        </div>
         <div className="stat-card approved">
           <div className="stat-content">
             <div className="stat-value">{stats.approved}</div>
             <div className="stat-label">Approved</div>
+          </div>
+        </div>
+        <div className="stat-card published">
+          <div className="stat-content">
+            <div className="stat-value">{stats.published}</div>
+            <div className="stat-label">Published</div>
           </div>
         </div>
         <div className="stat-card failed">
@@ -284,7 +285,7 @@ const GenerationQueue = () => {
 
       <div className="filters-bar">
         <div className="filter-group">
-          {['all', 'queued', 'generating', 'reviewing', 'approved', 'failed'].map(f => (
+          {['all', 'queued', 'generating', 'reviewing', 'approved', 'published', 'failed'].map(f => (
             <button key={f} className={filter === f ? 'active' : ''} onClick={() => setFilter(f)}>
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
@@ -376,6 +377,16 @@ const GenerationQueue = () => {
                   <button className="btn btn-sm btn-primary" onClick={() => setSelectedArticle(article)}>
                     👁️ View
                   </button>
+                )}
+                {article.status === 'published' && article.published_article && (
+                  <a 
+                    href={`/news/${article.published_article.slug || article.slug}/`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn btn-sm btn-success"
+                  >
+                    🌐 View Live Article
+                  </a>
                 )}
               </div>
 

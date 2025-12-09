@@ -18,8 +18,10 @@ sqlparse==0.5.4
 langchain==0.3.13
 langchain-openai==0.2.14
 langchain-anthropic==0.3.3
+langchain-google-genai==2.0.8
 openai==1.58.1
 anthropic==0.42.0
+google-generativeai==0.8.3
 tiktoken==0.8.0
 beautifulsoup4==4.12.3
 requests==2.32.3

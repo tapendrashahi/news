@@ -89,6 +89,11 @@
   background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
 }
 
+.stat-card.published {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #ffffff 0%, #dcfce7 100%);
+}
+
 .stat-card.completed {
   border-color: #a7f3d0;
   background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
@@ -390,6 +395,12 @@
 .status-badge.approved {
   background: #d1fae5;
   color: #065f46;
+}
+
+.status-badge.published {
+  background: #bbf7d0;
+  color: #14532d;
+  font-weight: 600;
 }
 
 .status-badge.completed {

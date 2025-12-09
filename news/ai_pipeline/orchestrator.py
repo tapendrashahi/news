@@ -469,11 +469,11 @@ Please generate a well-structured, objective news article following AI Analitica
         
         response = await self._invoke_llm(
             self.llm_primary,
-            system=SYSTEM_PROMPT,
+            system=SYSTEM_PROMPT + " Return ONLY the article content in Markdown format without any preamble or code block markers.",
             prompt=prompt
         )
         
-        # Parse content
+        # Parse content (which includes cleaning)
         content_data = self._parse_article_content(response)
         
         return {
@@ -517,12 +517,15 @@ Return the improved article maintaining the same structure and all citations."""
         
         response = await self._invoke_llm(
             self.llm_primary,
-            system="You are an editor improving readability while maintaining journalistic objectivity.",
+            system="You are an editor improving readability while maintaining journalistic objectivity. Return ONLY the improved article content without any preamble, explanations, or code block markers.",
             prompt=prompt
         )
         
+        # Clean unwanted preamble and code blocks
+        cleaned_response = self._clean_llm_response(response)
+        
         return {
-            'content': response,
+            'content': cleaned_response,
             'humanized': True
         }
     
@@ -744,20 +747,125 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
     
     async def _generate_image(self, article, context: Dict) -> Dict[str, Any]:
         """
-        Stage 13: Generate featured image with DALL-E.
+        Stage 13: Generate featured image with Google Imagen 3.
         
-        Creates professional, news-appropriate imagery.
+        Creates professional, news-appropriate imagery using Gemini's image generation.
         """
         title = context.get('content_generation', {}).get('title', '')
+        keyword = article.keyword.keyword
+        outline = context.get('outline', {}).get('outline', {})
         
-        # TODO: Implement image generation
-        # Placeholder implementation
+        if not title:
+            title = keyword
         
-        return {
-            'image_url': '',
-            'image_prompt': f"Professional news image for: {title}",
-            'alt_text': title
-        }
+        # Create a detailed image prompt optimized for news articles
+        prompt_template = f"""Create a professional, high-quality featured image for a news article about: {keyword}
+
+Article Title: {title}
+
+Style Requirements:
+- Professional news/journalism aesthetic
+- Modern, clean design
+- Suitable for news website header
+- No text or watermarks
+- Photorealistic or clean illustration style
+- Neutral and objective visual tone
+- High resolution, landscape orientation (16:9)
+
+The image should visually represent the main topic while maintaining a professional, credible news publication appearance."""
+
+        try:
+            # Use Google Generative AI for image generation
+            if not self.config.get('gemini_api_key'):
+                logger.warning("Gemini API key not configured, skipping image generation")
+                return {
+                    'image_generated': False,
+                    'image_url': '',
+                    'image_prompt': prompt_template,
+                    'alt_text': title,
+                    'error': 'No API key configured'
+                }
+            
+            # Import Gemini image generation
+            import google.generativeai as genai
+            import requests
+            import base64
+            from io import BytesIO
+            from PIL import Image as PILImage
+            from django.core.files.base import ContentFile
+            
+            # Configure Gemini
+            genai.configure(api_key=self.config['gemini_api_key'])
+            
+            # Use Imagen 3 model for image generation
+            model = genai.GenerativeModel('imagen-3.0-generate-001')
+            
+            # Generate image
+            logger.info(f"Generating image with prompt: {prompt_template[:100]}...")
+            
+            response = model.generate_images(
+                prompt=prompt_template,
+                number_of_images=1,
+                safety_filter_level="block_some",
+                person_generation="allow_adult",
+                aspect_ratio="16:9",
+            )
+            
+            # Get the first generated image
+            if response.images:
+                generated_image = response.images[0]
+                
+                # Save image to media directory
+                image_filename = f"ai_article_{article.id}.png"
+                image_path = f"ai_generated/{image_filename}"
+                
+                # Convert PIL Image to Django file
+                img_buffer = BytesIO()
+                generated_image._pil_image.save(img_buffer, format='PNG', quality=95)
+                img_buffer.seek(0)
+                
+                # Save to article
+                from asgiref.sync import sync_to_async
+                
+                @sync_to_async
+                def save_image():
+                    from news.ai_models import AIArticle
+                    art = AIArticle.objects.get(id=article.id)
+                    art.image.save(image_filename, ContentFile(img_buffer.read()), save=True)
+                    return art.image.url
+                
+                image_url = await save_image()
+                
+                logger.info(f"✅ Image generated successfully: {image_url}")
+                
+                return {
+                    'image_generated': True,
+                    'image_url': image_url,
+                    'image_local_path': image_path,
+                    'image_prompt': prompt_template,
+                    'alt_text': title,
+                    'model': 'imagen-3.0'
+                }
+            else:
+                logger.warning("No images generated from Imagen")
+                return {
+                    'image_generated': False,
+                    'image_url': '',
+                    'image_prompt': prompt_template,
+                    'alt_text': title,
+                    'error': 'No images returned from API'
+                }
+                
+        except Exception as e:
+            logger.error(f"Image generation failed: {e}")
+            # Continue pipeline even if image generation fails
+            return {
+                'image_generated': False,
+                'image_url': '',
+                'image_prompt': prompt_template,
+                'alt_text': title,
+                'error': str(e)
+            }
     
     async def _finalize(self, article, context: Dict) -> Dict[str, Any]:
         """
@@ -819,13 +927,41 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
             logger.error(f"Failed to parse JSON response: {response[:200]}")
             return {}
     
+    def _clean_llm_response(self, response: str) -> str:
+        """Clean unwanted preamble and code blocks from LLM responses."""
+        import re
+        
+        # Remove common LLM preamble patterns
+        preamble_patterns = [
+            r"^(?:Okay|Sure|Here's|Here is)[^:]*:?\s*",
+            r"^I've\s+(?:revised|created|generated)[^:]*:?\s*",
+            r"^This\s+(?:is|will be)[^:]*:?\s*",
+            r"^Let me[^:]*:?\s*",
+        ]
+        
+        cleaned = response
+        for pattern in preamble_patterns:
+            cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE | re.MULTILINE)
+        
+        # Remove markdown code blocks (```html, ```markdown, etc.)
+        cleaned = re.sub(r'^\s*```(?:html|markdown|md)?\s*\n', '', cleaned, flags=re.MULTILINE)
+        cleaned = re.sub(r'\n\s*```\s*$', '', cleaned, flags=re.MULTILINE)
+        
+        # Remove any remaining code block markers
+        cleaned = re.sub(r'```\s*', '', cleaned)
+        
+        return cleaned.strip()
+    
     def _parse_article_content(self, response: str) -> Dict[str, Any]:
         """Parse article content from LLM response and convert Markdown to HTML."""
         import markdown
         
+        # Clean unwanted preamble first
+        cleaned_response = self._clean_llm_response(response)
+        
         # Convert Markdown to HTML with extensions for better formatting
         html_content = markdown.markdown(
-            response,
+            cleaned_response,
             extensions=[
                 'markdown.extensions.extra',      # Tables, footnotes, etc.
                 'markdown.extensions.nl2br',      # Convert newlines to <br>
@@ -959,6 +1095,15 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
             
             # Save quality scores
             article.quality_metrics = quality_scores
+            
+            # Save image data if generated
+            if 'image_generation' in context:
+                img_data = context['image_generation']
+                if img_data.get('image_generated') and img_data.get('image_url'):
+                    article.image_url = img_data.get('image_url', '')
+                    if img_data.get('image_local_path'):
+                        article.image_local_path = img_data.get('image_local_path', '')
+                    logger.info(f"Image saved: {article.image_url}")
             
             # Calculate word count from raw_content
             if article.raw_content:
