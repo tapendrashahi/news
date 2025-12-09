@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'gis.urls'
+ROOT_URLCONF = 'ai_analitica.urls'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -84,7 +84,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gis.wsgi.application'
+WSGI_APPLICATION = 'ai_analitica.wsgi.application'
 
 
 # Database

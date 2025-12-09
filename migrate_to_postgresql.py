@@ -10,7 +10,7 @@ import json
 from django.core.management import call_command
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gis.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ai_analitica.settings')
 django.setup()
 
 def backup_sqlite_data():

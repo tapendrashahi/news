@@ -169,7 +169,7 @@ npm start
 ```
 news/
 ├── backend/
-│   ├── gis/                    # Django project settings
+│   ├── ai_analitica/           # Django project settings
 │   │   ├── settings.py        # Main settings
 │   │   ├── urls.py            # Root URL configuration
 │   │   └── wsgi.py            # WSGI configuration
@@ -372,7 +372,7 @@ This creates an optimized production build in `frontend/build/`.
 
 ### Django Production Settings
 
-1. Update `gis/settings.py`:
+1. Update `ai_analitica/settings.py`:
 ```python
 DEBUG = False
 ALLOWED_HOSTS = ['yourdomain.com']
@@ -393,7 +393,7 @@ python manage.py collectstatic
 3. Use production server (Gunicorn):
 ```bash
 pip install gunicorn
-gunicorn gis.wsgi:application
+gunicorn ai_analitica.wsgi:application
 ```
 
 ### Environment Variables
