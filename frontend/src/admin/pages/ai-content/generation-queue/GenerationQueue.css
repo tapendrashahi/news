@@ -283,13 +283,84 @@
   gap: 12px;
 }
 
+.card-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.card-header .header-right {
+  position: relative;
+}
+
 .card-header h3 {
   font-size: 16px;
   font-weight: 600;
   color: #111827;
   margin: 0;
-  flex: 1;
   line-height: 1.4;
+}
+
+.menu-button {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.menu-button:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.dropdown-menu button:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.dropdown-menu button.danger {
+  color: #dc2626;
+}
+
+.dropdown-menu button.danger:hover {
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 .status-badge {
@@ -448,17 +519,46 @@
 }
 
 .progress-bar {
-  height: 8px;
+  height: 24px;
   background: #f3f4f6;
-  border-radius: 4px;
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 100%;
   background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-  transition: width 0.3s ease;
+  transition: width 0.5s ease;
+  animation: shimmer 2s infinite;
+}
+
+.progress-text {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  color: #374151;
+  text-shadow: 0 0 2px white;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .card-actions {

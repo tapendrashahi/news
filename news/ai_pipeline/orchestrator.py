@@ -438,17 +438,24 @@ Format as JSON with: headline, lead, sections (array of {{title, subsections, co
         research = context.get('research', {}).get('research_data', {})
         
         # Import prompts
-        from .prompts.article_templates import SYSTEM_PROMPT, ARTICLE_TEMPLATE
+        from .prompts.article_templates import SYSTEM_PROMPT, ARTICLE_GENERATION_PROMPT
         
-        prompt = ARTICLE_TEMPLATE.format(
-            keyword=keyword,
-            research_data=research,
-            outline=outline,
-            word_count=article.target_word_count,
-            num_headings=len(outline.get('sections', [])),
-            focus_keywords=article.focus_keywords or [keyword],
-            template_type=article.template_type
-        )
+        prompt = f"""Generate a comprehensive news article based on the following:
+
+KEYWORD: {keyword}
+WORD COUNT TARGET: {article.target_word_count}
+TEMPLATE TYPE: {article.template_type}
+
+OUTLINE:
+{outline}
+
+RESEARCH DATA:
+{research}
+
+FOCUS KEYWORDS: {article.focus_keywords or [keyword]}
+
+Please generate a well-structured, objective news article following AI Analitica standards.
+"""
         
         response = await self._invoke_llm(
             self.llm_primary,

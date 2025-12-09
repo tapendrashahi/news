@@ -439,6 +439,57 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         })
     
     @action(detail=True, methods=['post'])
+    def start_generation(self, request, pk=None):
+        """
+        Manually start article generation for queued articles.
+        
+        POST /api/ai-articles/{id}/start_generation/
+        """
+        article = self.get_object()
+        
+        if article.status not in [AIArticle.Status.QUEUED, AIArticle.Status.FAILED]:
+            return Response(
+                {'detail': f'Cannot start generation. Article status is {article.status}.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Start generation synchronously (since Celery is not running)
+            from news.ai_pipeline.orchestrator import AINewsOrchestrator
+            import asyncio
+            
+            article.status = AIArticle.Status.GENERATING
+            article.workflow_stage = AIArticle.WorkflowStage.KEYWORD_ANALYSIS
+            article.save()
+            
+            logger.info(f"Starting manual generation for article {article.id}")
+            
+            # Run pipeline in background thread to not block the response
+            import threading
+            def run_pipeline():
+                try:
+                    orchestrator = AINewsOrchestrator()
+                    asyncio.run(orchestrator.process_article(str(article.id)))
+                except Exception as e:
+                    logger.error(f"Pipeline error for {article.id}: {e}", exc_info=True)
+            
+            thread = threading.Thread(target=run_pipeline, daemon=True)
+            thread.start()
+            
+            return Response({
+                'detail': 'Article generation started.',
+                'article_id': str(article.id),
+                'status': 'generating'
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to start generation: {e}", exc_info=True)
+            return Response(
+                {'detail': f'Failed to start generation: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         """
         Cancel ongoing article generation.

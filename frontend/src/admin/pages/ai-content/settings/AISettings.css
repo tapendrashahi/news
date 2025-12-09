@@ -71,6 +71,13 @@
   font-size: 1rem;
 }
 
+.form-group small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {

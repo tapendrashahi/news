@@ -14,6 +14,7 @@ export const getArticle = (id) => api.get(`/admin/ai/articles/${id}/`)
 export const startGeneration = (id) => api.post(`/admin/ai/articles/${id}/start_generation/`)
 export const retryStage = (id, stage) => api.post(`/admin/ai/articles/${id}/retry_stage/`, { stage })
 export const cancelGeneration = (id) => api.post(`/admin/ai/articles/${id}/cancel/`)
+export const deleteArticle = (id) => api.delete(`/admin/ai/articles/${id}/`)
 export const approveArticle = (id, notes) => api.post(`/admin/ai/articles/${id}/approve/`, { notes })
 export const rejectArticle = (id, notes, regenerate = false) => api.post(`/admin/ai/articles/${id}/reject/`, { notes, regenerate })
 export const publishArticle = (id, visibility = 'public') => api.post(`/admin/ai/articles/${id}/publish/`, { visibility })
@@ -56,6 +57,7 @@ export default {
 	startGeneration,
 	retryStage,
 	cancelGeneration,
+	deleteArticle,
 	approveArticle,
 	rejectArticle,
 	publishArticle,

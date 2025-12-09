@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getArticles, retryStage, cancelGeneration } from '../../../services/aiContentService'
+import { getArticles, retryStage, cancelGeneration, startGeneration, deleteArticle } from '../../../services/aiContentService'
 import ArticleProgress from './ArticleProgress'
 import './GenerationQueue.css'
 
@@ -8,6 +8,7 @@ const GenerationQueue = () => {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [selectedArticle, setSelectedArticle] = useState(null)
+  const [openMenuId, setOpenMenuId] = useState(null)
   const [stats, setStats] = useState({
     total: 0,
     queued: 0,
@@ -65,6 +66,17 @@ const GenerationQueue = () => {
     calculateStats()
   }, [articles])
 
+  // Close dropdown menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openMenuId && !event.target.closest('.header-right')) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [openMenuId])
+
   const calculateStats = () => {
     const byStage = {}
     const byTemplate = {}
@@ -114,6 +126,17 @@ const GenerationQueue = () => {
     }
   }
 
+  const handleStart = async (id) => {
+    try {
+      await startGeneration(id)
+      fetchArticles()
+      alert('✅ Article generation started! Check progress in a few moments.')
+    } catch (error) {
+      console.error('Failed to start generation:', error)
+      alert('❌ Failed to start generation: ' + (error.response?.data?.detail || error.message))
+    }
+  }
+
   const handleCancel = async (id) => {
     if (!window.confirm('Cancel generation?')) return
     try {
@@ -125,6 +148,36 @@ const GenerationQueue = () => {
       console.error('Failed to cancel:', error)
       alert('Failed to cancel generation. Please try again.')
     }
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this article? This action cannot be undone.')) return
+    try {
+      await deleteArticle(id)
+      fetchArticles()
+      setOpenMenuId(null)
+      alert('✅ Article deleted successfully')
+    } catch (error) {
+      console.error('Failed to delete article:', error)
+      alert('❌ Failed to delete article: ' + (error.response?.data?.detail || error.message))
+    }
+  }
+
+  const handleRemoveFromPipeline = async (id) => {
+    if (!window.confirm('Remove this article from the pipeline? The article will be cancelled and marked as failed.')) return
+    try {
+      await cancelGeneration(id)
+      fetchArticles()
+      setOpenMenuId(null)
+      alert('✅ Article removed from pipeline')
+    } catch (error) {
+      console.error('Failed to remove from pipeline:', error)
+      alert('❌ Failed to remove from pipeline: ' + (error.response?.data?.detail || error.message))
+    }
+  }
+
+  const toggleMenu = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id)
   }
 
   if (loading) return <div className="loading">⏳ Loading generation queue...</div>
@@ -242,10 +295,27 @@ const GenerationQueue = () => {
           return (
             <div key={article.id} className={`queue-card ${article.status}`}>
               <div className="card-header">
-                <h3>{article.title || article.keyword?.keyword || 'Untitled'}</h3>
-                <span className={`status-badge ${article.status}`}>
-                  {article.status}
-                </span>
+                <div className="header-left">
+                  <h3>{article.title || article.keyword?.keyword || 'Untitled'}</h3>
+                  <span className={`status-badge ${article.status}`}>
+                    {article.status}
+                  </span>
+                </div>
+                <div className="header-right">
+                  <button className="menu-button" onClick={() => toggleMenu(article.id)}>
+                    ⋮
+                  </button>
+                  {openMenuId === article.id && (
+                    <div className="dropdown-menu">
+                      <button onClick={() => handleRemoveFromPipeline(article.id)}>
+                        🚫 Remove from Pipeline
+                      </button>
+                      <button className="danger" onClick={() => handleDelete(article.id)}>
+                        🗑️ Delete Article
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Stage Progress Indicators */}
@@ -277,11 +347,17 @@ const GenerationQueue = () => {
 
               {article.status === 'generating' && (
                 <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${article.progress || 0}%` }} />
+                  <div className="progress-fill" style={{ width: `${article.progress_percentage || 0}%` }} />
+                  <span className="progress-text">{article.progress_percentage || 0}%</span>
                 </div>
               )}
 
               <div className="card-actions">
+                {article.status === 'queued' && (
+                  <button className="btn btn-sm btn-success" onClick={() => handleStart(article.id)}>
+                    🚀 Start Generation
+                  </button>
+                )}
                 {article.status === 'failed' && (
                   <button className="btn btn-sm btn-warning" onClick={() => handleRetry(article.id, article.workflow_stage)}>
                     🔄 Retry
