@@ -402,6 +402,7 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         })
     
     @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'])
     def retry_stage(self, request, pk=None):
         """
         Retry a specific failed stage.
@@ -412,11 +413,9 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         article = self.get_object()
         stage = request.data.get('stage')
         
+        # If no stage specified, default to research (skip keyword_analysis)
         if not stage:
-            return Response(
-                {'detail': 'Stage is required.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            stage = 'research'
         
         if stage not in AIArticle.WorkflowStage.values:
             return Response(
@@ -430,11 +429,25 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         article.retry_count += 1
         article.save()
         
-        # TODO: Trigger async stage retry
-        # retry_failed_stage.delay(str(article.id), stage)
+        logger.info(f"Retrying article {article.id} from stage: {stage}")
+        
+        # Start pipeline from the specified stage
+        from news.ai_pipeline.orchestrator import AINewsOrchestrator
+        import asyncio
+        import threading
+        
+        def run_pipeline():
+            try:
+                orchestrator = AINewsOrchestrator()
+                asyncio.run(orchestrator.process_article(str(article.id), start_stage=stage))
+            except Exception as e:
+                logger.error(f"Pipeline error for {article.id}: {e}", exc_info=True)
+        
+        thread = threading.Thread(target=run_pipeline, daemon=True)
+        thread.start()
         
         return Response({
-            'detail': f'Retrying stage: {stage}',
+            'detail': f'Retrying from stage: {stage}',
             'current_stage': article.workflow_stage
         })
     
@@ -459,17 +472,19 @@ class AIArticleViewSet(viewsets.ModelViewSet):
             import asyncio
             
             article.status = AIArticle.Status.GENERATING
-            article.workflow_stage = AIArticle.WorkflowStage.KEYWORD_ANALYSIS
+            # Skip keyword_analysis since keyword is already selected
+            article.workflow_stage = AIArticle.WorkflowStage.RESEARCH
             article.save()
             
-            logger.info(f"Starting manual generation for article {article.id}")
+            logger.info(f"Starting manual generation for article {article.id} from research stage")
             
             # Run pipeline in background thread to not block the response
             import threading
             def run_pipeline():
                 try:
                     orchestrator = AINewsOrchestrator()
-                    asyncio.run(orchestrator.process_article(str(article.id)))
+                    # Start from research stage instead of keyword_analysis
+                    asyncio.run(orchestrator.process_article(str(article.id), start_stage='research'))
                 except Exception as e:
                     logger.error(f"Pipeline error for {article.id}: {e}", exc_info=True)
             
@@ -492,25 +507,37 @@ class AIArticleViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         """
-        Cancel ongoing article generation.
+        Cancel/remove article from pipeline.
         
         POST /api/ai-articles/{id}/cancel/
+        
+        Can cancel articles in any status except published.
         """
         article = self.get_object()
         
-        if article.status not in [AIArticle.Status.QUEUED, AIArticle.Status.GENERATING]:
+        # Don't allow canceling published articles
+        if article.status == AIArticle.Status.PUBLISHED:
             return Response(
-                {'detail': 'Can only cancel queued or generating articles.'},
+                {'detail': 'Cannot cancel published articles.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        article.status = AIArticle.Status.FAILED
-        article.last_error = 'Cancelled by user'
+        # Mark as failed with appropriate message
+        if article.status in [AIArticle.Status.QUEUED, AIArticle.Status.GENERATING]:
+            article.status = AIArticle.Status.FAILED
+            article.last_error = 'Cancelled by user'
+        elif article.status == AIArticle.Status.REVIEWING:
+            article.status = AIArticle.Status.FAILED
+            article.last_error = 'Removed from review queue by user'
+        elif article.status == AIArticle.Status.APPROVED:
+            article.status = AIArticle.Status.FAILED
+            article.last_error = 'Removed from approved queue by user'
+        
         article.save()
         
-        # TODO: Cancel Celery task if possible
+        logger.info(f"Article {article.id} cancelled by user (was {article.workflow_stage})")
         
-        return Response({'detail': 'Article generation cancelled.'})
+        return Response({'detail': 'Article cancelled successfully.'})
     
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
@@ -588,9 +615,10 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         """
         article = self.get_object()
         
-        if article.status != AIArticle.Status.APPROVED:
+        # Allow publishing from both REVIEWING and APPROVED status
+        if article.status not in [AIArticle.Status.REVIEWING, AIArticle.Status.APPROVED]:
             return Response(
-                {'detail': 'Article must be approved before publishing.'},
+                {'detail': 'Article must be in review or approved status before publishing.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -600,43 +628,73 @@ class AIArticleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Validate required content
+        if not article.raw_content:
+            return Response(
+                {'detail': 'Article must have content to be published.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         # Import News model
         from .models import News
         
         # Create published article
         visibility = request.data.get('visibility', 'public')
         
+        # Prepare excerpt from meta_description or content
+        excerpt = ''
+        if article.meta_description:
+            excerpt = article.meta_description[:300]
+        elif article.raw_content:
+            # Strip HTML tags and take first 300 chars
+            import re
+            clean_content = re.sub(r'<[^>]+>', '', article.raw_content)
+            excerpt = clean_content[:300]
+        
+        # Prepare tags from focus_keywords
+        tags = ''
+        if article.focus_keywords and isinstance(article.focus_keywords, list):
+            tags = ', '.join(article.focus_keywords[:5])  # Limit to 5 tags
+        
+        # Handle image - News model expects ImageField, not URL string
+        image = None
+        if article.image_local_path:
+            image = article.image_local_path
+        
         news = News.objects.create(
             title=article.title,
-            slug=article.slug,
+            slug=article.slug if article.slug else None,  # Let News model auto-generate if empty
             content=article.raw_content,
-            excerpt=article.meta_description[:200] if article.meta_description else '',
+            excerpt=excerpt,
             category=article.keyword.category,
-            author=request.user,
-            meta_description=article.meta_description,
-            meta_title=article.meta_title,
+            author=None,  # Set to None since request.user might not be TeamMember
+            meta_description=article.meta_description[:160] if article.meta_description else '',
             visibility=visibility,
-            image=article.image_local_path or article.image_url
+            tags=tags,
+            publish_date=timezone.now()
         )
         
-        # Add tags
-        if article.focus_keywords:
-            # Assuming Tag model exists
-            # for keyword in article.focus_keywords:
-            #     tag, _ = Tag.objects.get_or_create(name=keyword)
-            #     news.tags.add(tag)
-            pass
+        # Handle image separately if it's a local file path
+        if image:
+            try:
+                news.image = image
+                news.save()
+            except Exception as e:
+                # Log error but don't fail the publish
+                print(f"Warning: Could not set image: {e}")
         
         # Link to AI article
         article.published_article = news
         article.status = AIArticle.Status.PUBLISHED
         article.published_at = timezone.now()
+        article.reviewed_by = request.user
         article.save()
         
         return Response({
             'detail': 'Article published successfully.',
             'article_id': news.id,
-            'article_url': f'/news/{news.slug}/'
+            'article_url': f'/news/{news.slug}/',
+            'published_at': article.published_at.isoformat()
         })
     
     @action(detail=False, methods=['get'])

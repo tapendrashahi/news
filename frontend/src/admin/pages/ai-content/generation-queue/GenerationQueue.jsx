@@ -6,7 +6,7 @@ import './GenerationQueue.css'
 const GenerationQueue = () => {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState('all') // Show all by default so filters work
   const [selectedArticle, setSelectedArticle] = useState(null)
   const [openMenuId, setOpenMenuId] = useState(null)
   const [stats, setStats] = useState({
@@ -106,7 +106,11 @@ const GenerationQueue = () => {
   const fetchArticles = async () => {
     try {
       const params = {}
-      if (filter !== 'all') params.status = filter
+      // Apply filter if not 'all'
+      if (filter !== 'all') {
+        params.status = filter
+      }
+      
       const response = await getArticles(params)
       setArticles(response.data.results || response.data)
     } catch (error) {

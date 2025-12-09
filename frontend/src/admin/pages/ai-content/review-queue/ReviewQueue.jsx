@@ -143,119 +143,100 @@ const ReviewQueue = () => {
         <p>{articles.length} article(s) ready for review</p>
       </div>
 
-      <div className="review-grid">
-        <div className="articles-list">
-          {articles.map(article => (
-            <div
-              key={article.id}
-              className={`review-card ${selectedArticle?.id === article.id ? 'selected' : ''}`}
-              onClick={() => setSelectedArticle(article)}
-            >
-              <div className="card-header">
-                <h3>{article.title}</h3>
-                {getStatusBadge(article.status)}
-              </div>
-              
-              <div className="article-meta">
-                <div className="meta-item">
-                  <strong>Keyword:</strong> {article.keyword?.keyword || 'N/A'}
-                </div>
-                <div className="meta-item">
-                  <strong>Created:</strong> {formatDate(article.created_at)}
-                </div>
-                <div className="meta-item">
-                  <strong>Word Count:</strong> {article.word_count || 0}
-                </div>
-              </div>
-
-              {article.overall_quality_score !== null && (
-                <div className="quality-preview">
-                  <div 
-                    className="quality-badge" 
-                    style={{ background: getQualityColor(article.overall_quality_score) }}
-                  >
-                    Quality: {Math.round(article.overall_quality_score)}%
-                  </div>
-                  {article.seo_score !== null && (
-                    <div 
-                      className="quality-badge" 
-                      style={{ background: getQualityColor(article.seo_score) }}
-                    >
-                      SEO: {Math.round(article.seo_score)}%
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+      <div className="review-layout">
+        {/* Left Sidebar - Topics List */}
+        <div className="topics-sidebar">
+          <div className="sidebar-header">
+            <h3>Review Topics ({articles.length})</h3>
+          </div>
           
-          {articles.length === 0 && (
-            <div className="empty-state">
-              <p>🎉 No articles in review queue</p>
-              <small>Articles will appear here when generation is completed</small>
-            </div>
-          )}
+          <div className="topics-list">
+            {articles.map(article => (
+              <div
+                key={article.id}
+                className={`topic-item ${selectedArticle?.id === article.id ? 'active' : ''}`}
+                onClick={() => setSelectedArticle(article)}
+              >
+                <div className="topic-header">
+                  <h4>{article.title}</h4>
+                </div>
+              </div>
+            ))}
+            
+            {articles.length === 0 && (
+              <div className="empty-state">
+                <p>🎉 No articles ready</p>
+                <small>Articles will appear here when generation completes</small>
+              </div>
+            )}
+          </div>
         </div>
 
-        {selectedArticle && (
-          <div className="review-panel">
-            <div className="panel-header">
-              <h2>{selectedArticle.title}</h2>
-              <div className="header-actions">
+        {/* Main Content Area */}
+        {selectedArticle ? (
+          <div className="article-detail-view">
+            <div className="detail-header">
+              <div className="detail-title">
+                <h1>{selectedArticle.title}</h1>
                 {getStatusBadge(selectedArticle.status)}
-                <button 
-                  className="btn-close" 
-                  onClick={() => setSelectedArticle(null)}
-                  title="Close"
-                >
-                  ✕
-                </button>
               </div>
+              <button 
+                className="btn-close-detail" 
+                onClick={() => setSelectedArticle(null)}
+                title="Close Detail View"
+              >
+                ✕ Close
+              </button>
             </div>
 
-            <div className="panel-content">
-              {/* Article Details */}
-              <div className="article-details">
-                <div className="detail-row">
-                  <span className="label">Keyword:</span>
-                  <span className="value">{selectedArticle.keyword?.keyword}</span>
+            <div className="detail-content">
+              {/* Article Metadata */}
+              <div className="metadata-grid">
+                <div className="metadata-card">
+                  <span className="metadata-label">Keyword</span>
+                  <span className="metadata-value">{selectedArticle.keyword_text || 'N/A'}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="label">Category:</span>
-                  <span className="value">{selectedArticle.keyword?.category?.name || 'N/A'}</span>
+                <div className="metadata-card">
+                  <span className="metadata-label">Category</span>
+                  <span className="metadata-value">{selectedArticle.category_display || 'N/A'}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="label">Word Count:</span>
-                  <span className="value">{selectedArticle.word_count || 0}</span>
+                <div className="metadata-card">
+                  <span className="metadata-label">Word Count</span>
+                  <span className="metadata-value">{selectedArticle.actual_word_count || 0}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="label">AI Model:</span>
-                  <span className="value">{selectedArticle.ai_model_used || 'N/A'}</span>
+                <div className="metadata-card">
+                  <span className="metadata-label">AI Model</span>
+                  <span className="metadata-value">{selectedArticle.ai_model_used || 'N/A'}</span>
+                </div>
+                <div className="metadata-card">
+                  <span className="metadata-label">Created</span>
+                  <span className="metadata-value">{formatDate(selectedArticle.created_at)}</span>
+                </div>
+                <div className="metadata-card">
+                  <span className="metadata-label">Updated</span>
+                  <span className="metadata-value">{formatDate(selectedArticle.updated_at)}</span>
                 </div>
               </div>
 
               {/* Quality Metrics */}
-              <QualityMetrics article={selectedArticle} />
+              <div className="section-card">
+                <h3 className="section-title">Quality Metrics</h3>
+                <QualityMetrics article={selectedArticle} />
+              </div>
 
-              {/* Meta Information */}
-              {(selectedArticle.meta_title || selectedArticle.meta_description) && (
-                <div className="meta-section">
-                  <h3>SEO Metadata</h3>
-                  {selectedArticle.meta_title && (
-                    <div className="meta-field">
-                      <strong>Meta Title:</strong>
-                      <p>{selectedArticle.meta_title}</p>
-                    </div>
-                  )}
+              {/* SEO Metadata */}
+              {(selectedArticle.meta_description || (selectedArticle.focus_keywords && selectedArticle.focus_keywords.length > 0)) && (
+                <div className="section-card">
+                  <h3 className="section-title">SEO Metadata</h3>
                   {selectedArticle.meta_description && (
-                    <div className="meta-field">
-                      <strong>Meta Description:</strong>
+                    <div className="seo-field">
+                      <label>Meta Description</label>
                       <p>{selectedArticle.meta_description}</p>
                     </div>
                   )}
                   {selectedArticle.focus_keywords && selectedArticle.focus_keywords.length > 0 && (
-                    <div className="meta-field">
-                      <strong>Focus Keywords:</strong>
+                    <div className="seo-field">
+                      <label>Focus Keywords</label>
                       <div className="keywords-list">
                         {selectedArticle.focus_keywords.map((kw, idx) => (
                           <span key={idx} className="keyword-tag">{kw}</span>
@@ -266,15 +247,15 @@ const ReviewQueue = () => {
                 </div>
               )}
 
-              {/* Content Preview/Full */}
-              <div className="article-content">
-                <div className="content-header">
-                  <h3>Article Content</h3>
+              {/* Generated Content */}
+              <div className="section-card content-card">
+                <div className="content-card-header">
+                  <h3 className="section-title">Generated Content</h3>
                   <button 
                     className="btn-toggle-content"
                     onClick={() => setShowFullContent(!showFullContent)}
                   >
-                    {showFullContent ? 'Show Preview' : 'Show Full Content'}
+                    {showFullContent ? '📖 Show Preview' : '📄 Show Full Content'}
                   </button>
                 </div>
                 
@@ -293,38 +274,44 @@ const ReviewQueue = () => {
                   <div className="content-fade"></div>
                 )}
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="review-actions">
-              {selectedArticle.status === 'reviewing' && (
+              {/* Action Buttons */}
+              <div className="detail-actions">
+                {selectedArticle.status === 'reviewing' && (
+                  <button 
+                    className="btn btn-success btn-large"
+                    onClick={handleApprove}
+                    disabled={actionLoading}
+                  >
+                    ✓ Approve for Publishing
+                  </button>
+                )}
+                
+                {selectedArticle.status === 'approved' && (
+                  <button 
+                    className="btn btn-primary btn-large"
+                    onClick={handlePublish}
+                    disabled={actionLoading}
+                  >
+                    🚀 Publish to Live Site
+                  </button>
+                )}
+                
                 <button 
-                  className="btn btn-success"
-                  onClick={handleApprove}
+                  className="btn btn-danger btn-large"
+                  onClick={() => setShowRejectModal(true)}
                   disabled={actionLoading}
                 >
-                  ✓ Approve for Publishing
+                  ✕ Reject Article
                 </button>
-              )}
-              
-              {selectedArticle.status === 'approved' && (
-                <button 
-                  className="btn btn-primary"
-                  onClick={handlePublish}
-                  disabled={actionLoading}
-                >
-                  🚀 Publish to Live Site
-                </button>
-              )}
-              
-              <button 
-                className="btn btn-danger"
-                onClick={() => setShowRejectModal(true)}
-                disabled={actionLoading}
-              >
-                ✕ Reject Article
-              </button>
+              </div>
             </div>
+          </div>
+        ) : (
+          <div className="no-selection">
+            <div className="no-selection-icon">📋</div>
+            <h2>Select an Article to Review</h2>
+            <p>Choose an article from the topics list on the left to view details and take action</p>
           </div>
         )}
       </div>

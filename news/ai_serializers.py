@@ -280,7 +280,13 @@ class AIArticleListSerializer(serializers.ModelSerializer):
             'ai_model_used', 'actual_word_count',
             'overall_quality_score', 'cost_estimate',
             'created_at', 'updated_at', 'progress_percentage',
-            'has_errors', 'retry_count'
+            'has_errors', 'retry_count',
+            # Content fields for Review Queue
+            'raw_content', 'content_json', 'meta_title', 
+            'meta_description', 'focus_keywords',
+            'ai_score', 'plagiarism_score', 'seo_score', 
+            'readability_score', 'bias_score', 'fact_check_score',
+            'research_data', 'outline'
         ]
         read_only_fields = fields
     

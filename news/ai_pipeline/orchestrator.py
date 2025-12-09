@@ -56,7 +56,7 @@ except ImportError:
 # from .chains.humanizer import HumanizationChain
 # from .chains.seo_optimizer import SEOOptimizationChain
 # from .chains.meta_generator import MetaGenerationChain
-# from .agents.research_agent import ResearchAgent
+from .agents.research_agent import ResearchAgent
 # from .tools.keyword_scraper import KeywordResearchTool
 # from .tools.ai_detector import AIDetectionTool
 # from .tools.plagiarism_checker import PlagiarismChecker
@@ -189,12 +189,13 @@ class AINewsOrchestrator:
     # Main Pipeline Execution
     # ========================================================================
     
-    async def process_article(self, article_id: str) -> Dict[str, Any]:
+    async def process_article(self, article_id: str, start_stage: str = 'keyword_analysis') -> Dict[str, Any]:
         """
         Process an article through the complete pipeline.
         
         Args:
             article_id: UUID of the AIArticle to process
+            start_stage: Stage to start from (default: 'keyword_analysis')
             
         Returns:
             Dictionary containing final article data and metadata
@@ -202,7 +203,7 @@ class AINewsOrchestrator:
         self.current_article_id = article_id
         self.pipeline_start_time = datetime.now()
         
-        logger.info(f"Starting pipeline for article {article_id}")
+        logger.info(f"Starting pipeline for article {article_id} from stage: {start_stage}")
         
         try:
             # Load article from database
@@ -212,13 +213,22 @@ class AINewsOrchestrator:
             await self._update_article_status(
                 article_id,
                 status='generating',
-                workflow_stage='keyword_analysis'
+                workflow_stage=start_stage
             )
             
             # Execute pipeline stages sequentially
             context = {'article_id': article_id}
             
-            for stage_name, stage_func in self.stages.items():
+            # Skip stages before start_stage
+            stage_names = list(self.stages.keys())
+            start_index = stage_names.index(start_stage) if start_stage in stage_names else 0
+            
+            for i, (stage_name, stage_func) in enumerate(self.stages.items()):
+                # Skip stages before the start_stage
+                if i < start_index:
+                    logger.info(f"Skipping stage: {stage_name}")
+                    continue
+                    
                 logger.info(f"Executing stage: {stage_name}")
                 
                 # Create workflow log entry
@@ -354,23 +364,23 @@ Format as JSON with these keys: angle, audience, questions, data_needed, perspec
         keyword = article.keyword.keyword
         analysis = context.get('keyword_analysis', {}).get('keyword_analysis', {})
         
-        # TODO: Implement actual web search using ResearchAgent
-        # For now, placeholder implementation
-        
         logger.info(f"Researching: {keyword}")
         
-        # Simulate research results
-        research_data = {
-            'sources': [],
-            'statistics': [],
-            'quotes': [],
-            'perspectives': [],
-            'last_updated': datetime.now().isoformat()
-        }
+        # Initialize research agent
+        research_agent = ResearchAgent()
+        
+        # Collect references from multiple sources
+        research_data = research_agent.collect_references(keyword, max_sources=20)
+        
+        logger.info(f"Research complete: {research_data['source_count']} sources, "
+                   f"avg credibility: {research_data['credibility_avg']:.1f}")
         
         return {
             'research_data': research_data,
-            'source_count': len(research_data['sources'])
+            'source_count': research_data['source_count'],
+            'statistics': research_data['statistics'],
+            'quotes': research_data['quotes'],
+            'perspectives': research_data['perspectives']
         }
     
     async def _create_outline(self, article, context: Dict) -> Dict[str, Any]:
@@ -810,11 +820,23 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
             return {}
     
     def _parse_article_content(self, response: str) -> Dict[str, Any]:
-        """Parse article content from LLM response."""
-        # TODO: Implement proper content parsing
+        """Parse article content from LLM response and convert Markdown to HTML."""
+        import markdown
+        
+        # Convert Markdown to HTML with extensions for better formatting
+        html_content = markdown.markdown(
+            response,
+            extensions=[
+                'markdown.extensions.extra',      # Tables, footnotes, etc.
+                'markdown.extensions.nl2br',      # Convert newlines to <br>
+                'markdown.extensions.sane_lists', # Better list handling
+                'markdown.extensions.toc',        # Table of contents
+            ]
+        )
+        
         return {
             'title': 'Generated Article Title',
-            'content': response,
+            'content': html_content,
             'references': []
         }
     
@@ -856,33 +878,98 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
     
     async def _update_article_status(self, article_id: str, **kwargs):
         """Update article status in database."""
+        from news.ai_models import AIArticle
+        from asgiref.sync import sync_to_async
+        
         logger.info(f"Updating article {article_id}: {kwargs}")
-        # TODO: Implement actual database update
-        pass
+        
+        @sync_to_async
+        def update_db():
+            article = AIArticle.objects.get(id=article_id)
+            for key, value in kwargs.items():
+                setattr(article, key, value)
+            article.save()
+        
+        await update_db()
     
     async def _create_workflow_log(self, article_id: str, stage: str, status: str) -> str:
         """Create workflow log entry."""
         logger.info(f"Creating log for {article_id}, stage: {stage}, status: {status}")
-        # TODO: Implement actual log creation
-        return "log-id-123"
+        # Workflow logging simplified - just return a dummy ID
+        return f"log-{article_id}-{stage}"
     
     async def _complete_workflow_log(self, log_id: str, output_data: Dict, duration: float):
         """Mark workflow log as completed."""
         logger.info(f"Completing log {log_id}, duration: {duration}s")
-        # TODO: Implement actual log update
+        # Simplified logging - just log to console
         pass
     
     async def _fail_workflow_log(self, log_id: str, error: str):
         """Mark workflow log as failed."""
         logger.error(f"Failing log {log_id}: {error}")
-        # TODO: Implement actual log update
+        # Simplified logging - just log to console
         pass
     
     async def _save_article_data(self, article_id: str, context: Dict, quality_scores: Dict):
         """Save final article data to database."""
+        from news.ai_models import AIArticle
+        from asgiref.sync import sync_to_async
+        
         logger.info(f"Saving article data for {article_id}")
-        # TODO: Implement actual database save
-        pass
+        
+        @sync_to_async
+        def save_data():
+            article = AIArticle.objects.get(id=article_id)
+            
+            # Save content from final stages (use humanized content if available, otherwise raw)
+            final_content = ''
+            content_source = None
+            
+            if 'humanization' in context and context['humanization'].get('content'):
+                final_content = context['humanization'].get('content', '')
+                article.content_json = context['humanization']
+                content_source = 'humanization'
+            elif 'content_generation' in context:
+                final_content = context['content_generation'].get('content', '')
+                article.content_json = context['content_generation']
+                content_source = 'content_generation'
+            
+            article.raw_content = final_content
+            
+            # Debug logging
+            logger.info(f"Content saved from: {content_source}")
+            logger.info(f"Content length: {len(final_content)} chars")
+            logger.info(f"Content preview: {final_content[:200]}..." if final_content else "Content is EMPTY!")
+            
+            # Save outline
+            if 'outline' in context:
+                article.outline = context['outline'].get('outline', {})
+            
+            # Save SEO data
+            if 'seo_optimization' in context:
+                seo = context['seo_optimization']
+                article.meta_title = seo.get('title', '')
+                article.meta_description = seo.get('description', '')
+                # Handle focus_keyword as single string or list
+                focus_kw = seo.get('focus_keyword', '')
+                if isinstance(focus_kw, str):
+                    article.focus_keywords = [focus_kw] if focus_kw else []
+                else:
+                    article.focus_keywords = focus_kw
+            
+            # Save quality scores
+            article.quality_metrics = quality_scores
+            
+            # Calculate word count from raw_content
+            if article.raw_content:
+                # Simple word count (remove HTML tags and count)
+                import re
+                text = re.sub(r'<[^>]+>', '', article.raw_content)
+                article.actual_word_count = len(text.split())
+            
+            article.save()
+        
+        await save_data()
     
     # ========================================================================
     # Public Methods
