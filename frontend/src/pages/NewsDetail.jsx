@@ -225,25 +225,28 @@ const NewsDetail = () => {
             
             <h1 className="article-title">{news.title}</h1>
 
-            <div className="article-meta-inline">
-              <div className="meta-item">
-                <i className="icon">📅</i>
-                <span>{formatDate(news.created_at)}</span>
+            <div className="article-meta-bar">
+              <div className="meta-info-group">
+                <div className="meta-info-item">
+                  <span className="meta-icon">📅</span>
+                  <span className="meta-text">{formatDate(news.created_at)}</span>
+                </div>
+                <span className="meta-divider">•</span>
+                <div className="meta-info-item">
+                  <span className="meta-icon">⏱️</span>
+                  <span className="meta-text">{calculateReadTime(news.content)}</span>
+                </div>
+                <span className="meta-divider">•</span>
+                <div className="meta-info-item">
+                  <span className="meta-icon">💬</span>
+                  <span className="meta-text">{comments.length} Comments</span>
+                </div>
               </div>
-              <div className="meta-separator">•</div>
-              <div className="meta-item">
-                <i className="icon">⏱️</i>
-                <span>{calculateReadTime(news.content)}</span>
-              </div>
-              <div className="meta-separator">•</div>
-              <div className="meta-item">
-                <i className="icon">💬</i>
-                <span>{comments.length} Comments</span>
-              </div>
-              <div className="meta-separator">•</div>
-              <div className="meta-item ai-verified">
-                <span className="ai-icon">🤖</span>
-                <span>Verified by AI • Confidence: {Math.floor(Math.random() * (98 - 85 + 1)) + 85}%</span>
+              <div className="ai-verification-badge">
+                <span className="badge-icon">🤖</span>
+                <span className="badge-text">Verified by AI</span>
+                <span className="badge-divider">•</span>
+                <span className="badge-confidence">Confidence: {Math.floor(Math.random() * (98 - 85 + 1)) + 85}%</span>
               </div>
             </div>
           </div>
