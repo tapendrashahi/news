@@ -13,7 +13,7 @@ CRITICAL: All prompts must emphasize:
 - Cultural sensitivity and local context
 """
 
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 # ============================================================================
 # SYSTEM PROMPT - Educational Content Mission
@@ -332,49 +332,49 @@ TARGET LENGTH: {word_count} words
 
 **MARKDOWN FORMAT**:
 ```markdown
-# {SEO-Optimized Title with Keyword}
+# {{SEO-Optimized Title with Keyword}}
 
-{Opening paragraph with keyword in first 100 words, engaging hook, and value promise}
+{{Opening paragraph with keyword in first 100 words, engaging hook, and value promise}}
 
-## {Main Section 1 - Keyword-Rich Heading}
+## {{Main Section 1 - Keyword-Rich Heading}}
 
-{Content paragraph 1 with Nepal context}
+{{Content paragraph 1 with Nepal context}}
 
-{Content paragraph 2 with examples}
+{{Content paragraph 2 with examples}}
 
-### {Subsection Heading - Question Format}
+### {{Subsection Heading - Question Format}}
 
-{Detailed explanation with bullet points}
+{{Detailed explanation with bullet points}}
 
 **Key Points:**
-- {Point 1 with practical tip}
-- {Point 2 with Nepal example}
-- {Point 3 with actionable advice}
+- {{Point 1 with practical tip}}
+- {{Point 2 with Nepal example}}
+- {{Point 3 with actionable advice}}
 
-## {Main Section 2 with Keyword Variation}
+## {{Main Section 2 with Keyword Variation}}
 
-{Continue similar structure...}
+{{Continue similar structure...}}
 
 ### Step-by-Step Guide
 
-1. **{Step 1}**: {Explanation with Nepal context}
-2. **{Step 2}**: {Explanation with example}
-3. **{Step 3}**: {Practical tip}
+1. **{{Step 1}}**: {{Explanation with Nepal context}}
+2. **{{Step 2}}**: {{Explanation with example}}
+3. **{{Step 3}}**: {{Practical tip}}
 
 ## Frequently Asked Questions
 
-**Q: {Common student question}?**
-A: {Clear, concise answer}
+**Q: {{Common student question}}?**
+A: {{Clear, concise answer}}
 
 ## Conclusion
 
-{Summary of main points}
+{{Summary of main points}}
 
-{Final keyword mention naturally}
+{{Final keyword mention naturally}}
 
-{Call-to-action encouraging engagement}
+{{Call-to-action encouraging engagement}}
 
-{Motivational closing statement}
+{{Motivational closing statement}}
 ```
 
 **WRITING TONE**:

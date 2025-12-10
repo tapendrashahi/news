@@ -480,16 +480,85 @@ class AIArticleViewSet(viewsets.ModelViewSet):
             
             # Run pipeline in background thread to not block the response
             import threading
-            def run_pipeline():
-                try:
-                    orchestrator = AINewsOrchestrator()
-                    # Start from research stage instead of keyword_analysis
-                    asyncio.run(orchestrator.process_article(str(article.id), start_stage='research'))
-                except Exception as e:
-                    logger.error(f"Pipeline error for {article.id}: {e}", exc_info=True)
+            import sys
+            import traceback
             
-            thread = threading.Thread(target=run_pipeline, daemon=True)
+            def run_pipeline():
+                article_id_str = str(article.id)
+                logger.info(f"🚀 [DEBUG] Thread started for article {article_id_str}")
+                logger.info(f"🚀 [DEBUG] Keyword: {article.keyword.keyword}")
+                
+                try:
+                    # Set up exception handling for the async event loop
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    logger.info(f"✓ [DEBUG] Event loop created")
+                    
+                    orchestrator = AINewsOrchestrator()
+                    logger.info(f"✓ [DEBUG] Orchestrator created, starting pipeline from research stage")
+                    logger.info(f"✓ [DEBUG] Using LLM: {type(orchestrator.llm_primary).__name__}")
+                    
+                    # Run with exception handling
+                    result = loop.run_until_complete(
+                        orchestrator.process_article(article_id_str, start_stage='research')
+                    )
+                    loop.close()
+                    
+                    logger.info(f"✅ [DEBUG] Pipeline completed successfully for {article_id_str}")
+                    logger.info(f"✅ [DEBUG] Final status: {result}")
+                    
+                except asyncio.CancelledError:
+                    error_msg = f"Pipeline was cancelled for {article_id_str}"
+                    logger.error(f"❌ [DEBUG] {error_msg}")
+                    raise
+                except Exception as e:
+                    # Capture full error details
+                    error_type = type(e).__name__
+                    error_msg = str(e)
+                    tb = traceback.format_exc()
+                    
+                    # Log detailed error
+                    logger.error(f"❌ [DEBUG] ==================== PIPELINE ERROR ====================")
+                    logger.error(f"❌ [DEBUG] Article ID: {article_id_str}")
+                    logger.error(f"❌ [DEBUG] Error Type: {error_type}")
+                    logger.error(f"❌ [DEBUG] Error Message: {error_msg}")
+                    logger.error(f"❌ [DEBUG] Full Traceback:\n{tb}")
+                    logger.error(f"❌ [DEBUG] =========================================================")
+                    
+                    # Update article status to failed with detailed error
+                    try:
+                        from news.ai_models import AIArticle
+                        failed_article = AIArticle.objects.get(id=article_id_str)
+                        
+                        if failed_article.status == AIArticle.Status.GENERATING:
+                            # Store detailed error info
+                            error_detail = f"{error_type}: {error_msg}\n\nTraceback:\n{tb}"
+                            
+                            failed_article.status = AIArticle.Status.FAILED
+                            failed_article.last_error = error_detail[:5000]  # Limit to 5000 chars
+                            failed_article.failed_stage = failed_article.workflow_stage
+                            
+                            # Add to error log
+                            if not failed_article.error_log:
+                                failed_article.error_log = []
+                            failed_article.error_log.append({
+                                'timestamp': timezone.now().isoformat(),
+                                'stage': failed_article.workflow_stage,
+                                'error_type': error_type,
+                                'error_message': error_msg,
+                                'traceback': tb[:2000]  # Limit traceback
+                            })
+                            
+                            failed_article.save()
+                            logger.info(f"✓ [DEBUG] Updated article {article_id_str} to FAILED status with error details")
+                    except Exception as update_error:
+                        logger.error(f"❌ [DEBUG] Failed to update article status: {update_error}", exc_info=True)
+                finally:
+                    logger.info(f"🏁 [DEBUG] Thread ending for article {article_id_str}")
+            
+            thread = threading.Thread(target=run_pipeline, daemon=True, name=f"ArticleGen-{article.id}")
             thread.start()
+            logger.info(f"✓ [DEBUG] Generation thread started: {thread.name}")
             
             return Response({
                 'detail': 'Article generation started.',
@@ -538,6 +607,121 @@ class AIArticleViewSet(viewsets.ModelViewSet):
         logger.info(f"Article {article.id} cancelled by user (was {article.workflow_stage})")
         
         return Response({'detail': 'Article cancelled successfully.'})
+    
+    @action(detail=True, methods=['get'])
+    def debug_info(self, request, pk=None):
+        """
+        Get detailed debug information for an article.
+        
+        GET /api/ai-articles/{id}/debug_info/
+        
+        Returns comprehensive error details, logs, and pipeline status.
+        """
+        article = self.get_object()
+        
+        # Build debug info
+        debug_data = {
+            'article_id': str(article.id),
+            'keyword': article.keyword.keyword,
+            'status': article.status,
+            'workflow_stage': article.workflow_stage,
+            'failed_stage': article.failed_stage or None,
+            'last_updated': article.updated_at.isoformat() if article.updated_at else None,
+            'created_at': article.created_at.isoformat() if article.created_at else None,
+            
+            # Error information
+            'has_error': bool(article.last_error),
+            'last_error': article.last_error or None,
+            'error_log': article.error_log or [],
+            
+            # Progress information
+            'progress': {
+                'has_title': bool(article.title),
+                'has_research': bool(article.research_data),
+                'has_outline': bool(article.outline),
+                'has_content': bool(article.raw_content),
+                'word_count': article.actual_word_count,
+            },
+            
+            # Quality scores
+            'quality_metrics': article.quality_metrics if hasattr(article, 'quality_metrics') else None,
+            
+            # Timestamps
+            'generation_started': article.generation_started_at.isoformat() if article.generation_started_at else None,
+            'generation_completed': article.generation_completed_at.isoformat() if article.generation_completed_at else None,
+        }
+        
+        # Calculate time info
+        if article.generation_started_at:
+            if article.generation_completed_at:
+                duration = (article.generation_completed_at - article.generation_started_at).total_seconds()
+                debug_data['generation_duration_seconds'] = duration
+            else:
+                # Still running or stuck
+                from django.utils import timezone
+                elapsed = (timezone.now() - article.generation_started_at).total_seconds()
+                debug_data['elapsed_seconds'] = elapsed
+        
+        return Response(debug_data)
+    
+    @action(detail=False, methods=['post'])
+    def check_stuck(self, request):
+        """
+        Check for stuck articles and reset them.
+        
+        POST /api/ai-articles/check_stuck/
+        Body: {"hours": 1, "to_queued": false}
+        
+        Response: {
+            "stuck_count": 2,
+            "reset_articles": [{"id": "...", "keyword": "...", "was_stuck_at": "..."}]
+        }
+        """
+        from datetime import timedelta
+        
+        hours = request.data.get('hours', 1)
+        to_queued = request.data.get('to_queued', False)
+        
+        # Find articles stuck in "generating" for more than specified hours
+        time_threshold = timezone.now() - timedelta(hours=hours)
+        stuck_articles = AIArticle.objects.filter(
+            status=AIArticle.Status.GENERATING,
+            updated_at__lt=time_threshold
+        ).select_related('keyword')
+        
+        reset_list = []
+        
+        for article in stuck_articles:
+            article_data = {
+                'id': str(article.id),
+                'keyword': article.keyword.keyword,
+                'was_stuck_at': article.workflow_stage,
+                'last_updated': article.updated_at.isoformat()
+            }
+            
+            if to_queued:
+                article.status = AIArticle.Status.QUEUED
+                article.workflow_stage = AIArticle.WorkflowStage.KEYWORD_ANALYSIS
+                article.last_error = ""
+                article.failed_stage = ""
+            else:
+                article.status = AIArticle.Status.FAILED
+                article.last_error = (
+                    f"Generation stuck at {article.workflow_stage} stage. "
+                    f"Process timed out or crashed after {hours} hour(s)."
+                )
+                article.failed_stage = article.workflow_stage
+            
+            article.save()
+            reset_list.append(article_data)
+            
+            logger.info(f"Reset stuck article {article.id} to {'QUEUED' if to_queued else 'FAILED'}")
+        
+        return Response({
+            'stuck_count': len(reset_list),
+            'reset_articles': reset_list,
+            'reset_to': 'queued' if to_queued else 'failed'
+        })
     
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):

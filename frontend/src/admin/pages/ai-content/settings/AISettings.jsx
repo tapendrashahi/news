@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { getConfigs, updateConfig } from '../../../services/aiContentService'
 import aiModelsConfig from '../../../config/ai-models-config.json'
 import SEOSettings from './SEOSettings'
+import PlagiarismSettings from './PlagiarismSettings'
 import './AISettings.css'
 
 const AISettings = () => {
@@ -205,7 +206,7 @@ const AISettings = () => {
       </div>
 
       <div className="settings-tabs">
-        {['general', 'stages', 'seo', 'api_keys', 'prompts', 'quality'].map(tab => (
+        {['general', 'stages', 'seo', 'plagiarism', 'api_keys', 'prompts', 'quality'].map(tab => (
           <button
             key={tab}
             className={activeTab === tab ? 'active' : ''}
@@ -472,6 +473,14 @@ const AISettings = () => {
                 <span className="status configured">Configured</span>
               </div>
               <div className="api-key-item">
+                <strong>CODEQUIRY_API_KEY</strong>
+                <span className="status configured">Configured</span>
+              </div>
+              <div className="api-key-item">
+                <strong>YOAST_SEO_URL</strong>
+                <span className="status configured">Configured</span>
+              </div>
+              <div className="api-key-item">
                 <strong>OPENAI_API_KEY</strong>
                 <span className="status not-configured">Not Configured</span>
               </div>
@@ -491,6 +500,10 @@ const AISettings = () => {
 
         {activeTab === 'seo' && (
           <SEOSettings />
+        )}
+
+        {activeTab === 'plagiarism' && (
+          <PlagiarismSettings />
         )}
 
         {/* Other tabs remain the same */}
