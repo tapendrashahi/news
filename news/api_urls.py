@@ -20,6 +20,8 @@ from .api_admin import (
     dashboard_stats,
     # Analytics
     analytics,
+    # SEO Refinement
+    seo_refinement_config,
     # ViewSets
     NewsAdminViewSet,
     TeamAdminViewSet,
@@ -78,5 +80,6 @@ urlpatterns = [
     path('admin/auth/user/', admin_user, name='admin-user'),
     path('admin/dashboard/stats/', dashboard_stats, name='admin-dashboard-stats'),
     path('admin/reports/analytics/', analytics, name='admin-analytics'),
+    path('admin/seo-refinement-config/', seo_refinement_config, name='admin-seo-refinement-config'),
     path('admin/', include(admin_router.urls)),
 ]

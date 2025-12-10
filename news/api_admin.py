@@ -601,3 +601,190 @@ class AdvertisementsAdminViewSet(viewsets.ModelViewSet):
         }
         
         return Response(data)
+
+
+# ============================================================================
+# SEO REFINEMENT CONFIGURATION ENDPOINT
+# ============================================================================
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAdmin])
+def seo_refinement_config(request):
+    """Get or update SEO refinement configuration"""
+    import json
+    import os
+    from django.conf import settings
+    
+    config_path = os.path.join(settings.BASE_DIR, 'seo_refinement_config.json')
+    
+    if request.method == 'GET':
+        # Load existing config or return default
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+        else:
+            # Default configuration
+            config = {
+                "seo_refinement": {
+                    "enabled": True,
+                    "targetScore": 80,
+                    "maxRetries": 3,
+                    "refinementOptions": {
+                        "keywordDensity": {
+                            "enabled": True,
+                            "targetRange": {"min": 0.5, "max": 2.5},
+                            "priority": "high"
+                        },
+                        "internalLinking": {
+                            "enabled": True,
+                            "minLinks": 2,
+                            "maxLinks": 5,
+                            "priority": "medium"
+                        },
+                        "metaDescription": {
+                            "enabled": True,
+                            "minLength": 120,
+                            "maxLength": 160,
+                            "includeKeyword": True,
+                            "priority": "high"
+                        },
+                        "readability": {
+                            "enabled": True,
+                            "targetScore": 60,
+                            "maxSentenceLength": 25,
+                            "maxParagraphLength": 150,
+                            "priority": "medium"
+                        },
+                        "titleOptimization": {
+                            "enabled": True,
+                            "minLength": 30,
+                            "maxLength": 60,
+                            "includeKeyword": True,
+                            "priority": "high"
+                        },
+                        "contentStructure": {
+                            "enabled": True,
+                            "minWordCount": 600,
+                            "maxWordCount": 2500,
+                            "headingDistribution": True,
+                            "priority": "low"
+                        }
+                    },
+                    "rewriteStages": {
+                        "contentGeneration": {
+                            "rewrite": True,
+                            "includeSuggestions": True
+                        },
+                        "humanization": {
+                            "rewrite": True,
+                            "includeSuggestions": True
+                        },
+                        "seoOptimization": {
+                            "rewrite": False,
+                            "includeSuggestions": True
+                        }
+                    }
+                }
+            }
+        return Response(config)
+    
+    elif request.method == 'POST':
+        # Save configuration
+        config = request.data
+        
+        try:
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=2)
+            return Response({'success': True, 'message': 'SEO refinement configuration saved successfully'})
+        except Exception as e:
+            return Response(
+                {'success': False, 'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+# ============================================================================
+# PLAGIARISM CHECK CONFIGURATION ENDPOINT
+# ============================================================================
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAdmin])
+def plagiarism_config(request):
+    """Get or update plagiarism check configuration"""
+    import json
+    import os
+    from django.conf import settings
+    
+    config_path = os.path.join(settings.BASE_DIR, 'plagiarism_config.json')
+    
+    if request.method == 'GET':
+        # Load existing config or return default
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+        else:
+            # Default configuration
+            config = {
+                "plagiarism_check": {
+                    "enabled": True,
+                    "threshold": 5.0,
+                    "maxRetries": 3,
+                    "checkOptions": {
+                        "checkWeb": {
+                            "enabled": True,
+                            "description": "Check against web sources"
+                        },
+                        "checkDatabase": {
+                            "enabled": True,
+                            "description": "Check against Codequiry database"
+                        },
+                        "autoRewrite": {
+                            "enabled": True,
+                            "description": "Automatically rewrite plagiarized sections"
+                        }
+                    },
+                    "rewriteStrategy": {
+                        "rewriteSections": {
+                            "enabled": True,
+                            "description": "Rewrite only plagiarized sections"
+                        },
+                        "rewriteEntireArticle": {
+                            "enabled": False,
+                            "description": "Rewrite entire article if plagiarism detected"
+                        },
+                        "maintainSEO": {
+                            "enabled": True,
+                            "description": "Maintain SEO optimization during rewrite"
+                        },
+                        "maintainNepalContext": {
+                            "enabled": True,
+                            "description": "Maintain Nepal-specific context during rewrite"
+                        }
+                    },
+                    "reportOptions": {
+                        "saveReports": {
+                            "enabled": True,
+                            "description": "Save plagiarism reports for review"
+                        },
+                        "detailedMatches": {
+                            "enabled": True,
+                            "description": "Include detailed match information"
+                        }
+                    }
+                }
+            }
+        return Response(config)
+    
+    elif request.method == 'POST':
+        # Save configuration
+        config = request.data
+        
+        try:
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=2)
+            return Response({'success': True, 'message': 'Plagiarism check configuration saved successfully'})
+        except Exception as e:
+            return Response(
+                {'success': False, 'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

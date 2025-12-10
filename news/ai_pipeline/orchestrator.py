@@ -297,6 +297,263 @@ class AINewsOrchestrator:
             return self.llm_primary
     
     # ========================================================================
+    # SEO Refinement Methods
+    # ========================================================================
+    
+    def _load_seo_refinement_config(self) -> Dict[str, Any]:
+        """Load SEO refinement configuration from JSON file."""
+        import json
+        from django.conf import settings
+        
+        config_path = os.path.join(settings.BASE_DIR, 'seo_refinement_config.json')
+        
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                    return config.get('seo_refinement', {})
+            except Exception as e:
+                logger.error(f"Failed to load SEO refinement config: {e}")
+        
+        # Return default configuration
+        return {
+            'enabled': True,
+            'targetScore': 80,
+            'maxRetries': 3,
+            'refinementOptions': {
+                'keywordDensity': {'enabled': True, 'targetRange': {'min': 0.5, 'max': 2.5}, 'priority': 'high'},
+                'internalLinking': {'enabled': True, 'minLinks': 2, 'maxLinks': 5, 'priority': 'medium'},
+                'metaDescription': {'enabled': True, 'minLength': 120, 'maxLength': 160, 'includeKeyword': True, 'priority': 'high'},
+                'readability': {'enabled': True, 'targetScore': 60, 'maxSentenceLength': 25, 'maxParagraphLength': 150, 'priority': 'medium'},
+                'titleOptimization': {'enabled': True, 'minLength': 30, 'maxLength': 60, 'includeKeyword': True, 'priority': 'high'},
+                'contentStructure': {'enabled': True, 'minWordCount': 600, 'maxWordCount': 2500, 'headingDistribution': True, 'priority': 'low'}
+            },
+            'rewriteStages': {
+                'contentGeneration': {'rewrite': True, 'includeSuggestions': True},
+                'humanization': {'rewrite': True, 'includeSuggestions': True},
+                'seoOptimization': {'rewrite': False, 'includeSuggestions': True}
+            }
+        }
+    
+    def _build_seo_refinement_prompt(self, seo_config: Dict, yoast_analysis: Dict, suggestions: Dict) -> str:
+        """Build a detailed prompt with SEO refinement suggestions."""
+        prompt_parts = [
+            "IMPORTANT SEO REFINEMENT REQUIREMENTS:",
+            "",
+            "The article needs to be rewritten to meet these SEO standards:"
+        ]
+        
+        # Add target score
+        prompt_parts.append(f"\n✓ Target SEO Score: {seo_config.get('targetScore', 80)}/100")
+        prompt_parts.append(f"  Current Score: {yoast_analysis.get('seo_score', 0)}/100")
+        
+        # Keyword density
+        if seo_config.get('refinementOptions', {}).get('keywordDensity', {}).get('enabled'):
+            kd_config = seo_config['refinementOptions']['keywordDensity']
+            current_density = yoast_analysis.get('keyword_density', 0)
+            target_range = kd_config.get('targetRange', {})
+            
+            prompt_parts.append(f"\n✓ Keyword Density [{kd_config.get('priority', 'medium').upper()} PRIORITY]:")
+            prompt_parts.append(f"  Current: {current_density:.2f}%")
+            prompt_parts.append(f"  Target: {target_range.get('min', 0.5)}% - {target_range.get('max', 2.5)}%")
+            
+            if current_density < target_range.get('min', 0.5):
+                prompt_parts.append("  → Increase focus keyword usage naturally throughout the content")
+            elif current_density > target_range.get('max', 2.5):
+                prompt_parts.append("  → Reduce keyword usage to avoid keyword stuffing")
+        
+        # Readability
+        if seo_config.get('refinementOptions', {}).get('readability', {}).get('enabled'):
+            read_config = seo_config['refinementOptions']['readability']
+            current_read = yoast_analysis.get('readability_score', 0)
+            target_read = read_config.get('targetScore', 60)
+            
+            prompt_parts.append(f"\n✓ Readability [{read_config.get('priority', 'medium').upper()} PRIORITY]:")
+            prompt_parts.append(f"  Current Score: {current_read}/100")
+            prompt_parts.append(f"  Target Score: {target_read}/100")
+            prompt_parts.append(f"  → Keep sentences under {read_config.get('maxSentenceLength', 25)} words")
+            prompt_parts.append(f"  → Keep paragraphs under {read_config.get('maxParagraphLength', 150)} words")
+        
+        # Title optimization
+        if seo_config.get('refinementOptions', {}).get('titleOptimization', {}).get('enabled'):
+            title_config = seo_config['refinementOptions']['titleOptimization']
+            prompt_parts.append(f"\n✓ Title Optimization [{title_config.get('priority', 'high').upper()} PRIORITY]:")
+            prompt_parts.append(f"  → Length: {title_config.get('minLength', 30)}-{title_config.get('maxLength', 60)} characters")
+            if title_config.get('includeKeyword'):
+                prompt_parts.append("  → MUST include focus keyword in title")
+        
+        # Meta description
+        if seo_config.get('refinementOptions', {}).get('metaDescription', {}).get('enabled'):
+            meta_config = seo_config['refinementOptions']['metaDescription']
+            prompt_parts.append(f"\n✓ Meta Description [{meta_config.get('priority', 'high').upper()} PRIORITY]:")
+            prompt_parts.append(f"  → Length: {meta_config.get('minLength', 120)}-{meta_config.get('maxLength', 160)} characters")
+            if meta_config.get('includeKeyword'):
+                prompt_parts.append("  → MUST include focus keyword")
+        
+        # Content structure
+        if seo_config.get('refinementOptions', {}).get('contentStructure', {}).get('enabled'):
+            struct_config = seo_config['refinementOptions']['contentStructure']
+            prompt_parts.append(f"\n✓ Content Structure [{struct_config.get('priority', 'low').upper()} PRIORITY]:")
+            prompt_parts.append(f"  → Word count: {struct_config.get('minWordCount', 600)}-{struct_config.get('maxWordCount', 2500)} words")
+            if struct_config.get('headingDistribution'):
+                prompt_parts.append("  → Use proper heading distribution (H2, H3)")
+        
+        # Add YoastSEO issues
+        if yoast_analysis.get('issues'):
+            prompt_parts.append("\n✗ CRITICAL ISSUES TO FIX:")
+            for issue in yoast_analysis['issues'][:5]:
+                prompt_parts.append(f"  - {issue}")
+        
+        # Add improvements
+        if yoast_analysis.get('improvements'):
+            prompt_parts.append("\n⚠ IMPROVEMENTS NEEDED:")
+            for improvement in yoast_analysis['improvements'][:5]:
+                prompt_parts.append(f"  - {improvement}")
+        
+        # Add priority suggestions
+        if suggestions.get('overall_priority'):
+            prompt_parts.append("\n🔥 HIGH PRIORITY FIXES:")
+            for priority in suggestions['overall_priority'][:5]:
+                prompt_parts.append(f"  - {priority}")
+        
+        prompt_parts.append("\nRewrite the content to address ALL the above requirements while maintaining factual accuracy and objectivity.")
+        
+        return "\n".join(prompt_parts)
+    
+    async def _check_seo_refinement_needed(self, context: Dict) -> tuple[bool, str]:
+        """
+        Check if SEO refinement is needed based on current scores.
+        
+        Returns:
+            Tuple of (needs_refinement: bool, reason: str)
+        """
+        seo_config = self._load_seo_refinement_config()
+        
+        if not seo_config.get('enabled', False):
+            return False, "SEO refinement disabled"
+        
+        seo_data = context.get('seo_optimization', {})
+        seo_score = seo_data.get('seo_score', 0)
+        target_score = seo_config.get('targetScore', 80)
+        
+        if seo_score >= target_score:
+            return False, f"SEO score ({seo_score}) meets target ({target_score})"
+        
+        return True, f"SEO score ({seo_score}) below target ({target_score})"
+    
+    async def _refine_article_for_seo(self, article, context: Dict, retry_attempt: int = 0) -> Dict[str, Any]:
+        """
+        Refine article to meet SEO standards by rewriting specified stages.
+        
+        Args:
+            article: AIArticle instance
+            context: Current pipeline context
+            retry_attempt: Current retry attempt number
+            
+        Returns:
+            Updated context with refined content
+        """
+        seo_config = self._load_seo_refinement_config()
+        max_retries = seo_config.get('maxRetries', 3)
+        
+        if retry_attempt >= max_retries:
+            logger.warning(f"Max SEO refinement retries ({max_retries}) reached")
+            return context
+        
+        logger.info(f"Starting SEO refinement attempt {retry_attempt + 1}/{max_retries}")
+        
+        # Get YoastSEO analysis and suggestions
+        seo_data = context.get('seo_optimization', {})
+        yoast_analysis = seo_data.get('yoast_analysis', {})
+        
+        # Get optimization suggestions
+        from .yoast_seo import get_yoast_service
+        yoast = get_yoast_service()
+        
+        content = context.get('humanization', {}).get('content', '')
+        title = context.get('content_generation', {}).get('title', '')
+        keyword = article.keyword.keyword
+        
+        suggestions = yoast.optimize_content(
+            content=content,
+            title=title,
+            focus_keyword=keyword,
+            analysis=yoast_analysis
+        )
+        
+        # Build refinement prompt
+        refinement_prompt = self._build_seo_refinement_prompt(seo_config, yoast_analysis, suggestions)
+        
+        # Determine which stages to rewrite
+        rewrite_stages = seo_config.get('rewriteStages', {})
+        
+        # Rewrite content generation if configured
+        if rewrite_stages.get('contentGeneration', {}).get('rewrite'):
+            logger.info("Rewriting content generation stage with SEO refinement")
+            
+            # Create workflow log
+            log_id = await self._create_workflow_log(
+                str(article.id), 'content_generation_seo_refinement', 'started'
+            )
+            
+            try:
+                # Store original prompt enhancement if configured
+                original_context = context.copy()
+                
+                if rewrite_stages['contentGeneration'].get('includeSuggestions'):
+                    # Add SEO refinement prompt to the content generation
+                    context['seo_refinement_prompt'] = refinement_prompt
+                
+                # Re-execute content generation
+                result = await self._generate_content(article, context)
+                context['content_generation'] = result
+                
+                await self._complete_workflow_log(log_id, result, 0)
+                
+            except Exception as e:
+                logger.error(f"Content generation refinement failed: {e}")
+                await self._fail_workflow_log(log_id, str(e))
+                context = original_context
+        
+        # Rewrite humanization if configured
+        if rewrite_stages.get('humanization', {}).get('rewrite'):
+            logger.info("Rewriting humanization stage with SEO refinement")
+            
+            log_id = await self._create_workflow_log(
+                str(article.id), 'humanization_seo_refinement', 'started'
+            )
+            
+            try:
+                if rewrite_stages['humanization'].get('includeSuggestions'):
+                    context['seo_refinement_prompt'] = refinement_prompt
+                
+                result = await self._humanize_content(article, context)
+                context['humanization'] = result
+                
+                await self._complete_workflow_log(log_id, result, 0)
+                
+            except Exception as e:
+                logger.error(f"Humanization refinement failed: {e}")
+                await self._fail_workflow_log(log_id, str(e))
+        
+        # Re-run SEO optimization to check if score improved
+        logger.info("Re-analyzing SEO after refinement")
+        seo_result = await self._optimize_seo(article, context)
+        context['seo_optimization'] = seo_result
+        
+        new_score = seo_result.get('seo_score', 0)
+        target_score = seo_config.get('targetScore', 80)
+        
+        logger.info(f"SEO score after refinement: {new_score}/100 (target: {target_score})")
+        
+        # Check if we need another iteration
+        if new_score < target_score and retry_attempt + 1 < max_retries:
+            logger.info(f"SEO score still below target, retrying refinement")
+            return await self._refine_article_for_seo(article, context, retry_attempt + 1)
+        
+        return context
+    
+    # ========================================================================
     # Main Pipeline Execution
     # ========================================================================
     
@@ -368,6 +625,39 @@ class AINewsOrchestrator:
                     )
                     
                     logger.info(f"Stage {stage_name} completed in {stage_duration:.2f}s")
+                    
+                    # Check for SEO refinement after SEO optimization stage
+                    if stage_name == 'seo_optimization':
+                        needs_refinement, reason = await self._check_seo_refinement_needed(context)
+                        
+                        if needs_refinement:
+                            logger.info(f"SEO refinement needed: {reason}")
+                            
+                            # Create workflow log for refinement
+                            refinement_log_id = await self._create_workflow_log(
+                                article_id, 'seo_refinement', 'started'
+                            )
+                            
+                            try:
+                                # Perform SEO refinement
+                                refinement_start = datetime.now()
+                                context = await self._refine_article_for_seo(article, context)
+                                refinement_duration = (datetime.now() - refinement_start).total_seconds()
+                                
+                                await self._complete_workflow_log(
+                                    refinement_log_id, 
+                                    {'refined': True, 'final_seo_score': context.get('seo_optimization', {}).get('seo_score', 0)},
+                                    refinement_duration
+                                )
+                                
+                                logger.info(f"SEO refinement completed in {refinement_duration:.2f}s")
+                                
+                            except Exception as e:
+                                logger.error(f"SEO refinement failed: {e}")
+                                await self._fail_workflow_log(refinement_log_id, str(e))
+                                # Continue with pipeline even if refinement fails
+                        else:
+                            logger.info(f"SEO refinement skipped: {reason}")
                     
                 except Exception as e:
                     logger.error(f"Stage {stage_name} failed: {e}")
@@ -565,6 +855,7 @@ Format as JSON with: headline, lead, sections (array of {{title, subsections, co
         # Import prompts
         from .prompts.article_templates import SYSTEM_PROMPT, ARTICLE_GENERATION_PROMPT
         
+        # Build base prompt
         prompt = f"""Generate a comprehensive news article based on the following:
 
 KEYWORD: {keyword}
@@ -581,6 +872,11 @@ FOCUS KEYWORDS: {article.focus_keywords or [keyword]}
 
 Please generate a well-structured, objective news article following AI Analitica standards.
 """
+        
+        # Add SEO refinement requirements if available
+        if context.get('seo_refinement_prompt'):
+            prompt += f"\n\n{context['seo_refinement_prompt']}"
+            logger.info("Including SEO refinement requirements in content generation")
         
         llm = self._get_llm_for_stage('content_generation')
         
@@ -663,6 +959,7 @@ Please generate a well-structured, objective news article following AI Analitica
         # Fallback to LLM-based humanization
         logger.info("Using LLM for humanization")
         
+        # Build base prompt
         prompt = f"""Refine this news analysis to be more readable and natural while MAINTAINING complete objectivity:
 
 {content}
@@ -678,6 +975,11 @@ Improvements to make:
 - Keep the analytical, objective style
 
 Return the improved article maintaining the same structure and all citations."""
+        
+        # Add SEO refinement requirements if available
+        if context.get('seo_refinement_prompt'):
+            prompt += f"\n\n{context['seo_refinement_prompt']}"
+            logger.info("Including SEO refinement requirements in humanization")
         
         llm = self._get_llm_for_stage('humanization')
         
@@ -922,23 +1224,62 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
     
     async def _optimize_seo(self, article, context: Dict) -> Dict[str, Any]:
         """
-        Stage 11: Optimize for search engines.
+        Stage 11: Optimize for search engines using YoastSEO.
         
-        Improves discoverability while maintaining quality.
+        Analyzes content with self-hosted YoastSEO for:
+        - SEO Score
+        - Keyword Density
+        - Readability
+        - Meta tags optimization
         """
+        from .yoast_seo import get_yoast_service
+        
         content = context.get('humanization', {}).get('content', '')
+        title = context.get('content_generation', {}).get('title', '')
         keyword = article.keyword.keyword
+        meta_description = context.get('meta_generation', {}).get('meta_description', '')
         
-        # TODO: Implement SEO optimization chain
-        # Placeholder implementation
+        # Get YoastSEO service
+        yoast = get_yoast_service()
         
-        seo_score = 82.0  # Simulated score
+        # Analyze content with YoastSEO
+        analysis = yoast.analyze_content(
+            content=content,
+            title=title,
+            focus_keyword=keyword,
+            meta_description=meta_description
+        )
+        
+        # Get optimization suggestions
+        suggestions = yoast.optimize_content(
+            content=content,
+            title=title,
+            focus_keyword=keyword,
+            analysis=analysis
+        )
+        
+        # Calculate final SEO score
+        seo_score = analysis.get('seo_score', 70)
+        readability_score = analysis.get('readability_score', 70)
+        
+        # Combine recommendations
+        recommendations = []
+        recommendations.extend(suggestions.get('title_suggestions', []))
+        recommendations.extend(suggestions.get('content_suggestions', []))
+        recommendations.extend(suggestions.get('meta_suggestions', []))
         
         return {
             'seo_score': seo_score,
+            'readability_score': readability_score,
+            'keyword_density': analysis.get('keyword_density', 0),
+            'keyword_in_title': analysis.get('keyword_in_title', False),
+            'keyword_in_description': analysis.get('keyword_in_description', False),
             'passed': seo_score >= self.config['quality_thresholds']['min_seo_score'],
             'optimized_content': content,
-            'recommendations': []
+            'recommendations': recommendations,
+            'priority_issues': suggestions.get('overall_priority', []),
+            'yoast_analysis': analysis,
+            'using_fallback': analysis.get('fallback_mode', False)
         }
     
     async def _generate_meta(self, article, context: Dict) -> Dict[str, Any]:

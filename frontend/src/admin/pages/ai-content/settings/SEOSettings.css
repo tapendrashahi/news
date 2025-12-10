@@ -1,0 +1,284 @@
+.seo-settings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-header {
+  margin-bottom: 30px;
+}
+
+.settings-header h2 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.settings-description {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.settings-section {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section h3 {
+  font-size: 20px;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-description {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+}
+
+.setting-row {
+  margin-bottom: 24px;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.setting-label input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.setting-label span {
+  font-size: 15px;
+}
+
+.setting-help {
+  color: #666;
+  font-size: 13px;
+  margin: 4px 0 0 28px;
+  font-style: italic;
+}
+
+.input-with-help {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-suffix {
+  color: #666;
+  font-size: 14px;
+}
+
+input[type="number"],
+input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 120px;
+  transition: border-color 0.2s;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+input[type="number"]:disabled,
+input[type="text"]:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Refinement Options */
+.option-group {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border-left: 3px solid #e0e0e0;
+  transition: border-color 0.2s;
+}
+
+.option-group:hover {
+  border-left-color: #4a90e2;
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.priority-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-badge.high {
+  background-color: #fee;
+  color: #c00;
+}
+
+.priority-badge.medium {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.priority-badge.low {
+  background-color: #e8f4f8;
+  color: #0c5460;
+}
+
+.option-details {
+  margin-left: 28px;
+}
+
+.inline-inputs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.input-group input {
+  width: 100px;
+}
+
+/* Rewrite Stages */
+.rewrite-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stage-option {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border-left: 3px solid #4a90e2;
+}
+
+.sub-option {
+  margin-left: 28px;
+  margin-top: 8px;
+  font-weight: 400;
+  color: #666;
+}
+
+.sub-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* Footer */
+.settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px 0;
+}
+
+.save-button {
+  padding: 12px 32px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #357abd;
+  transform: translateY(-1px);
+}
+
+.save-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.save-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .seo-settings-container {
+    padding: 12px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .inline-inputs {
+    flex-direction: column;
+  }
+
+  .input-group input {
+    width: 100%;
+  }
+
+  .option-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

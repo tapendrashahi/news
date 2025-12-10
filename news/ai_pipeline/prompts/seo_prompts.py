@@ -1,9 +1,8 @@
 """
 SEO Optimization Prompt Templates
 
-Task 2.4: SEO Prompts Implementation
-- SEO_ANALYSIS_PROMPT
-- SEO_IMPROVEMENT_PROMPT
+Educational Content SEO Focused on Nepal
+Optimized for Google ranking and student discoverability
 """
 
 from langchain.prompts import ChatPromptTemplate
@@ -13,9 +12,9 @@ from langchain.prompts import ChatPromptTemplate
 # ============================================================================
 
 SEO_ANALYSIS_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an expert SEO analyst specializing in news content optimization.
-Your analysis must be thorough, actionable, and focused on improving search visibility while maintaining journalistic integrity."""),
-    ("human", """Perform a comprehensive SEO analysis of this article:
+    ("system", """You are an expert SEO analyst specializing in educational content optimization for the Nepali market.
+Your analysis must be thorough, actionable, and focused on improving search visibility for students in Nepal."""),
+    ("human", """Perform a comprehensive SEO analysis of this educational blog article:
 
 ARTICLE DATA:
 - Title: {title}
@@ -23,6 +22,7 @@ ARTICLE DATA:
 - URL Slug: {slug}
 - Word Count: {word_count}
 - Primary Keyword: {primary_keyword}
+- Target Audience: Students in Nepal
 - Category: {category}
 
 CONTENT:
@@ -31,72 +31,87 @@ CONTENT:
 Analyze the following aspects and provide scores (0-100):
 
 1. **KEYWORD OPTIMIZATION** (0-100)
-   - Is primary keyword in title? (Yes +20)
-   - Is keyword in first 100 words? (Yes +15)
+   - Primary keyword in title (first 60 chars)? (Yes +20)
+   - Keyword in first 100 words? (Yes +20)
    - Keyword density (1-2% is ideal) (+20)
-   - LSI keywords present (+15)
-   - Keywords in headings (+15)
-   - Natural integration (not stuffing) (+15)
+   - Keyword in at least one H2 heading? (Yes +15)
+   - LSI/related keywords present (+15)
+   - Natural integration (not keyword stuffing) (+10)
 
 2. **ON-PAGE SEO** (0-100)
    - Title tag length (50-60 chars ideal) (+15)
-   - Meta description length (150-160 chars ideal) (+15)
-   - URL structure (short, descriptive, keyword) (+10)
-   - Heading hierarchy (H1 → H2 → H3) (+15)
-   - Image alt text (if applicable) (+10)
-   - Internal linking opportunities (+10)
-   - External authoritative links (+15)
-   - Content uniqueness (+10)
+   - Title compelling for students? (+10)
+   - Meta description length (120-155 chars ideal) (+15)
+   - Meta description includes keyword + CTA? (+10)
+   - URL structure (short, keyword-rich) (+10)
+   - Heading hierarchy (H1 → H2 → H3) proper (+15)
+   - Internal linking opportunities identified (+15)
+   - Content uniqueness and value (+10)
 
-3. **CONTENT QUALITY** (0-100)
-   - Word count (1000-2000 words ideal for news) (+20)
-   - Paragraph structure (3-5 sentences) (+15)
-   - Sentence variety (+10)
-   - Topic coverage depth (+20)
-   - Use of data/statistics (+15)
-   - Expert quotes/sources (+10)
-   - Multimedia elements (+10)
+3. **CONTENT QUALITY FOR STUDENTS** (0-100)
+   - Word count (600-2500 words, sweet spot 1200-1800) (+20)
+   - Nepal-specific examples included? (+15)
+   - Practical, actionable advice for students? (+15)
+   - Addresses common student questions? (+10)
+   - Clear explanations (not too technical)? (+15)
+   - Step-by-step guides where appropriate? (+15)
+   - Engaging and motivational tone? (+10)
 
-4. **READABILITY** (0-100)
-   - Flesch Reading Ease (60-70 ideal) (+30)
-   - Average sentence length (15-20 words) (+20)
-   - Use of subheadings (+20)
-   - Bullet points/lists for scannability (+15)
-   - Active voice usage (+15)
+4. **READABILITY FOR STUDENTS** (0-100)
+   - Reading level: Grade 8-10 (appropriate for students) (+25)
+   - Average sentence length (12-20 words) (+20)
+   - Short paragraphs (2-4 sentences) (+15)
+   - Use of bullet points and lists (+15)
+   - Clear subheadings for scannability (+15)
+   - Conversational "you" language (+10)
 
 5. **USER ENGAGEMENT SIGNALS** (0-100)
-   - Compelling introduction (first 3 sentences) (+25)
-   - Clear value proposition (+20)
-   - Logical flow and structure (+20)
-   - Conclusion/key takeaways (+15)
-   - Call-to-action or next steps (+10)
+   - Engaging introduction (relatable hook) (+20)
+   - Clear value proposition for students (+20)
+   - Logical flow and structure (+15)
+   - FAQ section included? (+10)
+   - Strong conclusion with CTA (+15)
+   - Encouraging/motivational elements (+10)
    - Estimated time-on-page potential (+10)
 
-6. **TECHNICAL SEO INDICATORS** (0-100)
-   - URL length (<75 characters) (+20)
-   - Use of HTTPS (assumed) (+10)
+6. **NEPAL-SPECIFIC SEO** (0-100)
+   - Nepal context included? (+25)
+   - Local examples (colleges, exams, opportunities)? (+20)
+   - Addresses challenges of Nepali students? (+15)
+   - Mentions relevant Nepali institutions? (+15)
+   - Local keywords and phrases used? (+15)
+   - Available resources in Nepal mentioned? (+10)
+
+7. **TECHNICAL SEO INDICATORS** (0-100)
+   - URL length (<75 characters) (+15)
+   - URL includes keyword (+15)
    - Mobile-friendly formatting (+20)
-   - Page speed considerations (minimize images) (+15)
-   - Schema markup potential (+15)
-   - Canonical URL clarity (+10)
-   - Social sharing optimization (+10)
+   - Schema markup potential (Article, FAQ) (+15)
+   - Social sharing optimization (+15)
+   - Featured snippet opportunities (+10)
+   - Image optimization (if images present) (+10)
 
 OUTPUT FORMAT (JSON):
 {{
     "overall_seo_score": 85,
+    "seo_grade": "A",
     "scores": {{
         "keyword_optimization": 90,
         "on_page_seo": 85,
         "content_quality": 88,
-        "readability": 80,
-        "user_engagement": 82,
-        "technical_seo": 87
+        "readability": 92,
+        "user_engagement": 87,
+        "nepal_specific": 80,
+        "technical_seo": 85
     }},
     "keyword_analysis": {{
         "primary_keyword_in_title": true,
+        "keyword_position_in_title": 0,
         "primary_keyword_in_first_100_words": true,
         "keyword_density": "1.5%",
         "keyword_count": 12,
+        "target_keyword_count": "10-14",
+        "keyword_in_h2": true,
         "lsi_keywords_found": ["...", "..."],
         "keyword_placement_score": 90
     }},
@@ -149,16 +164,19 @@ OUTPUT FORMAT (JSON):
 # ============================================================================
 
 SEO_IMPROVEMENT_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an SEO content optimizer. Your goal is to improve articles for better search visibility while maintaining quality, accuracy, and readability.
+    ("system", """You are an SEO content optimizer specializing in educational blog content for students in Nepal.
+Your goal is to improve articles for better Google ranking and student discoverability while maintaining educational value and accuracy.
 
-CRITICAL RULES:
-- Never sacrifice factual accuracy for SEO
-- Never add keywords unnaturally (no keyword stuffing)
-- Maintain the article's journalistic integrity
-- Preserve all sources and citations
-- Keep the original meaning and tone
-- Only suggest changes that improve both SEO AND readability"""),
-    ("human", """Optimize this article based on the SEO analysis:
+CRITICAL RULES FOR EDUCATIONAL CONTENT:
+- Never sacrifice factual accuracy for SEO (students trust this information)
+- Never add keywords unnaturally (maintain conversational, student-friendly tone)
+- Maintain educational integrity and helpfulness
+- Preserve all facts, data, and accurate information
+- Keep encouraging and motivational tone for students
+- Only suggest changes that improve BOTH SEO AND student learning experience
+- Nepal context must feel natural, not forced
+- Focus on practical, actionable advice students can use"""),
+    ("human", """Optimize this educational blog article based on the SEO analysis:
 
 ORIGINAL ARTICLE:
 {content}
@@ -168,17 +186,29 @@ SEO ANALYSIS RESULTS:
 
 PRIMARY KEYWORD: {primary_keyword}
 SECONDARY KEYWORDS: {secondary_keywords}
+TARGET AUDIENCE: Students in Nepal (high school, college, aspiring professionals)
 
 IMPROVEMENTS NEEDED:
 {improvement_areas}
 
-Your task:
-1. Rewrite sections that need keyword optimization (naturally!)
-2. Improve heading structure if needed
-3. Enhance readability where flagged
-4. Suggest meta tag improvements
-5. Add internal/external linking opportunities
-6. Optimize for featured snippets (if applicable)
+Your optimization tasks:
+1. **Keyword Optimization**: Naturally integrate primary keyword in:
+   - Title (first 60 characters)
+   - First 100 words of content
+   - At least one H2 heading
+   - Maintain 1-2% keyword density throughout
+
+2. **Content Structure**: Improve heading hierarchy and scannability for students
+
+3. **Readability**: Enhance clarity for student comprehension (Grade 8-10 level)
+
+4. **Student Engagement**: Add motivational elements, relatable examples, practical tips
+
+5. **Nepal Context**: Weave in relevant Nepal-specific examples (colleges, exams, opportunities)
+
+6. **Meta Tags**: Optimize title and description for student search intent
+
+7. **Featured Snippets**: Structure content to win snippet positions (FAQ, How-to, Lists)
 
 SPECIFIC FOCUS AREAS:
 - **Title Optimization**: {title_feedback}
@@ -188,50 +218,86 @@ SPECIFIC FOCUS AREAS:
 
 OUTPUT FORMAT (JSON):
 {{
-    "optimized_title": "...",
-    "optimized_meta_description": "...",
-    "optimized_content": "... [full article text with improvements] ...",
-    "suggested_url_slug": "...",
+    "optimized_title": "Primary Keyword in First 60 Chars | Student-Friendly",
+    "optimized_meta_description": "120-155 char description with keyword + value prop + CTA for students",
+    "optimized_content": "... [full article text with SEO improvements, Nepal context, student engagement] ...",
+    "suggested_url_slug": "primary-keyword-short-descriptive",
     "changes_made": [
         {{
             "section": "Title",
-            "original": "...",
-            "improved": "...",
-            "reason": "Added primary keyword at beginning for better SEO"
+            "original": "Old title without keyword",
+            "improved": "Primary Keyword: Comprehensive Guide for Nepali Students",
+            "reason": "Added primary keyword at beginning + student audience specification"
         }},
         {{
             "section": "First paragraph",
-            "original": "...",
-            "improved": "...",
-            "reason": "Integrated primary keyword naturally in second sentence"
+            "original": "Generic opening without keyword",
+            "improved": "Para with keyword in first 2 sentences + Nepal context + student hook",
+            "reason": "Integrated primary keyword naturally + relatable Nepal example + engaged students"
+        }},
+        {{
+            "section": "H2 Heading 1",
+            "original": "Generic heading",
+            "improved": "Heading with primary/LSI keyword + student value",
+            "reason": "Better SEO + clearer student benefit"
         }}
     ],
     "keyword_placements": {{
-        "primary_keyword_count": 8,
-        "primary_keyword_locations": ["title", "first_paragraph", "H2_heading", "conclusion"],
-        "secondary_keywords_integrated": ["...", "..."],
-        "lsi_keywords_added": ["...", "..."]
+        "primary_keyword_count": 10,
+        "primary_keyword_density": "1.5%",
+        "primary_keyword_locations": ["title_position_0", "first_100_words", "h2_heading_1", "h2_heading_3", "conclusion"],
+        "secondary_keywords_integrated": ["related term 1", "related term 2"],
+        "lsi_keywords_added": ["LSI keyword 1", "LSI keyword 2", "LSI keyword 3"],
+        "nepal_keywords_added": ["SEE exam", "TU colleges", "IOE entrance"]
     }},
     "structural_improvements": [
-        "Added H2 heading: '...'",
-        "Split long paragraph (8 sentences) into two (3 and 5 sentences)",
-        "Created bullet point list for key findings"
+        "Added H2 heading: 'How to [Primary Keyword] in Nepal: Step-by-Step Guide'",
+        "Split long explanation (10 sentences) into scannable sections with H3 subheadings",
+        "Created numbered list for actionable steps (better readability + snippet potential)",
+        "Added FAQ section at end (6 common student questions with concise answers)",
+        "Inserted motivational callout box after challenging section"
+    ],
+    "nepal_context_additions": [
+        "Example: How Tribhuvan University students approach [topic]",
+        "Reference to Nepal education system: SEE, +2, Bachelor's pathway",
+        "Mention of challenges specific to Nepali students (limited resources, exam pressure)",
+        "Link to available opportunities in Nepal (scholarships, programs, institutions)"
+    ],
+    "student_engagement_elements": [
+        "Relatable hook: 'If you're a student in Nepal feeling overwhelmed by...'",
+        "Encouraging language: 'You've got this!' 'It's easier than you think'",
+        "Practical tips: 'Here's exactly what you need to do...'",
+        "Real success story: Brief example of Nepali student who succeeded",
+        "Clear next steps: What to do after reading this article"
     ],
     "linking_suggestions": [
         {{
-            "anchor_text": "...",
-            "target_url": "internal/external",
+            "anchor_text": "preparing for IOE entrance exam",
+            "target_url": "internal",
             "placement": "After paragraph 3",
-            "purpose": "Provide context on related topic"
+            "purpose": "Link to related IOE exam guide for deeper learning"
+        }},
+        {{
+            "anchor_text": "top engineering colleges in Nepal",
+            "target_url": "internal",
+            "placement": "In college selection section",
+            "purpose": "Provide resource list for students"
         }}
     ],
     "featured_snippet_optimization": {{
-        "target_query": "...",
-        "snippet_type": "paragraph/list/table",
-        "optimized_section": "..."
+        "target_query": "[Primary Keyword] in Nepal",
+        "snippet_type": "numbered_list",
+        "optimized_section": "Created '5 Steps to [Primary Keyword]' section with clear, concise steps (40-60 words each)"
     }},
-    "estimated_seo_improvement": "+12 points",
-    "new_seo_score": 92
+    "readability_improvements": [
+        "Reduced average sentence length from 22 to 16 words",
+        "Used simpler vocabulary (replaced 'utilize' with 'use', 'endeavor' with 'try')",
+        "Added transition words for better flow (However, Additionally, For example)",
+        "Broke up dense paragraphs into 2-3 sentence chunks"
+    ],
+    "estimated_seo_improvement": "+15 points",
+    "new_seo_score": 88,
+    "student_value_score": "9/10"
 }}
 
 Optimize NOW:""")
@@ -242,50 +308,64 @@ Optimize NOW:""")
 # ============================================================================
 
 READABILITY_IMPROVEMENT_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are a readability expert specializing in news content.
-Your goal is to make content more accessible while preserving accuracy and depth."""),
-    ("human", """Improve the readability of this content:
+    ("system", """You are a readability expert specializing in educational content for students.
+Your goal is to make content more accessible and engaging for students (Grade 8-10 reading level) while preserving educational value and accuracy."""),
+    ("human", """Improve the readability of this educational content for students in Nepal:
 
 CURRENT TEXT:
 {content}
 
 READABILITY ISSUES DETECTED:
-- Flesch Reading Ease: {flesch_score} (target: 60-70)
-- Average Sentence Length: {avg_sentence_length} words (target: 15-20)
-- Complex Words: {complex_word_percentage}% (target: <15%)
-- Passive Voice: {passive_voice_percentage}% (target: <10%)
+- Flesch Reading Ease: {flesch_score} (target: 60-70 for students)
+- Average Sentence Length: {avg_sentence_length} words (target: 12-20)
+- Complex Words: {complex_word_percentage}% (target: <12% for students)
+- Passive Voice: {passive_voice_percentage}% (target: <8%)
 
-IMPROVEMENT STRATEGIES:
-1. **Break Long Sentences**: Split sentences >25 words into shorter ones
-2. **Simplify Vocabulary**: Replace complex words with simpler alternatives (without dumbing down)
-3. **Active Voice**: Convert passive constructions to active
-4. **Add Transitions**: Improve flow between paragraphs
-5. **Vary Sentence Length**: Mix short (5-10), medium (11-20), and longer (21-25) sentences
-6. **Use Subheadings**: Break content into scannable sections
-7. **Add Lists**: Convert dense paragraphs into bullet/numbered lists where appropriate
+IMPROVEMENT STRATEGIES FOR STUDENTS:
+1. **Break Long Sentences**: Split sentences >20 words into shorter, digestible chunks
+2. **Simplify Vocabulary**: Use student-friendly language (replace jargon, explain technical terms)
+3. **Active Voice**: Students engage better with active constructions ("You can do X" vs "X can be done")
+4. **Add Transitions**: Improve flow with words students know (However, Next, For example, Additionally)
+5. **Vary Sentence Length**: Mix short (5-10), medium (11-18), occasional longer (19-22) sentences
+6. **Use Subheadings**: Break content into clear, scannable sections with "you" language
+7. **Add Lists**: Convert dense explanations into numbered steps or bullet points
+8. **Use "You" Language**: Direct address makes content more engaging for students
 
-CONSTRAINTS:
-- Maintain all facts and data accurately
-- Preserve all source citations
-- Keep technical terms if necessary (but explain them)
-- Don't oversimplify complex topics
+STUDENT-SPECIFIC CONSTRAINTS:
+- Maintain all facts and educational accuracy (students trust this information)
+- Preserve all data, examples, and practical tips
+- Keep technical terms if necessary BUT explain them simply
+- Don't oversimplify complex topics, but make them understandable
+- Add relatable examples for Nepali students where possible
+- Maintain encouraging, motivational tone
 
 OUTPUT FORMAT (JSON):
 {{
-    "improved_content": "... [rewritten content] ...",
+    "improved_content": "... [rewritten content with student-friendly readability] ...",
     "readability_improvements": {{
         "new_flesch_score": 68,
-        "new_avg_sentence_length": 18,
-        "sentences_split": 5,
-        "passive_to_active_conversions": 8,
-        "complex_words_simplified": 12
+        "new_avg_sentence_length": 16,
+        "sentences_split": 7,
+        "passive_to_active_conversions": 10,
+        "complex_words_simplified": 15,
+        "technical_terms_explained": 5
     }},
     "specific_changes": [
         {{
-            "original": "The implementation of AI-driven diagnostic systems has facilitated...",
-            "improved": "AI diagnostic systems have made it easier to...",
-            "improvement": "Simplified vocabulary + active voice"
+            "original": "The utilization of mnemonic devices facilitates enhanced retention...",
+            "improved": "Using memory tricks helps you remember things better. For example, you can...",
+            "improvement": "Simplified vocabulary + active voice + student-friendly explanation + practical example"
+        }},
+        {{
+            "original": "It is recommended that students allocate sufficient time...",
+            "improved": "You should set aside enough time to...",
+            "explanation": "Passive to active voice + direct 'you' address for better student engagement"
         }}
+    ],
+    "student_engagement_additions": [
+        "Added relatable example: 'Just like preparing for your SEE exam...'",
+        "Inserted encouraging phrase: 'Don't worry, this is easier than it seems!'",
+        "Included practical tip: 'Here's exactly how you can do this...'"
     ]
 }}""")
 ])

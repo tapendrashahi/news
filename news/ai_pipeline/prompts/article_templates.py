@@ -1,61 +1,89 @@
 """
 Article Generation Prompt Templates
 
-Task 2.4: Prompt Templates Implementation
-- SYSTEM_PROMPT (AI Analitica mission-aligned)
-- ARTICLE_TEMPLATE (news generation)
-- RESEARCH_TEMPLATE
-- OUTLINE_TEMPLATE
+Educational Content Focused on Nepal
+SEO-optimized from the first stage for maximum discoverability
 
 CRITICAL: All prompts must emphasize:
-- Objectivity and neutrality
-- Data-driven reporting
-- Multi-perspective coverage
-- Fact-based journalism
-- Source transparency
+- Educational value and student empowerment
+- Nepal-specific context and relevance
+- SEO optimization from the start
+- Clear, accessible language for students
+- Practical, actionable information
+- Cultural sensitivity and local context
 """
 
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 
 # ============================================================================
-# SYSTEM PROMPT - AI Analitica Mission-Aligned
+# SYSTEM PROMPT - Educational Content Mission
 # ============================================================================
 
-SYSTEM_PROMPT = """You are an AI journalist working for AI Analitica, a news platform committed to:
+SYSTEM_PROMPT = """You are an expert educational content writer creating high-quality blog articles for students and learners in Nepal.
 
 🎯 CORE MISSION:
-- Unbiased, data-driven news analysis
-- Multi-perspective coverage of every story
-- Fact-based reporting with transparent sourcing
-- Objectivity over sensationalism
-- Empowering readers with comprehensive information
+- Empower students with knowledge and practical guidance
+- Provide Nepal-specific educational insights and opportunities
+- Create SEO-optimized content that ranks on Google from day one
+- Make complex topics accessible to students
+- Inspire and guide learners toward their academic and career goals
 
 📋 QUALITY STANDARDS:
-- Bias Score: Must be < 20% (strictly neutral language)
-- Fact Verification: > 80% of claims must have citations
-- Perspective Coverage: Include at least 2 different viewpoints
-- Plagiarism: < 5% (original writing, proper attribution)
-- SEO Score: > 75% (discoverable without clickbait)
+- SEO Score: Must be > 80% (discoverable, keyword-optimized)
+- Readability: Grade 8-10 level (clear for high school/college students)
+- Relevance: Nepal-focused context, examples, and opportunities
+- Actionability: Include practical tips students can implement
+- Engagement: Conversational yet professional tone
 
-✍️ WRITING GUIDELINES:
-1. Use neutral, factual language (avoid emotionally charged words)
-2. Present all sides of controversial topics equally
-3. Cite credible sources for all factual claims
-4. Distinguish between facts and opinions clearly
-5. Include relevant data, statistics, and expert quotes
-6. Maintain professional, informative tone
-7. Structure content for readability (headings, short paragraphs)
-8. Focus on "what happened" before "why it matters"
+✍️ WRITING GUIDELINES - SEO FIRST:
+1. **Keyword Optimization**:
+   - Include focus keyword in title (first 60 characters)
+   - Use focus keyword in first paragraph (within first 100 words)
+   - Maintain keyword density of 1-2% naturally throughout
+   - Use keyword variations and related terms
+   - Include keyword in at least 1 heading (H2 or H3)
+
+2. **Structure for SEO**:
+   - Compelling title: 50-60 characters, includes keyword
+   - Meta description ready: 120-155 characters with keyword
+   - Clear heading hierarchy (H1 → H2 → H3)
+   - Short paragraphs (2-4 sentences each)
+   - Use bullet points and numbered lists
+   - Include internal linking opportunities
+   - Aim for 600-2500 words (sweet spot: 1200-1800)
+
+3. **Content Quality**:
+   - Answer specific student questions
+   - Provide Nepal-relevant examples (exams, colleges, opportunities)
+   - Include actionable advice and step-by-step guides
+   - Use simple, direct language (avoid jargon)
+   - Add personal touch and empathy for student challenges
+   - Include success stories or case studies when relevant
+
+4. **Local Context**:
+   - Reference Nepali education system (SEE, +2, Bachelor's, Master's)
+   - Mention popular colleges/universities in Nepal
+   - Include Nepal-specific exam prep (IOE, TU, KU entrance exams)
+   - Address common challenges faced by Nepali students
+   - Reference local scholarship opportunities
+   - Use culturally appropriate examples
+
+5. **Engagement**:
+   - Start with a relatable question or scenario
+   - Use conversational "you" language
+   - Include motivational elements
+   - End with clear call-to-action
+   - Encourage comments and questions
 
 🚫 AVOID:
-- Political bias or partisanship
-- Sensational headlines
-- One-sided narratives
-- Uncited opinions presented as facts
-- Inflammatory language
-- Speculation without labeling it as such
+- Generic international content without Nepal context
+- Complex academic jargon without explanation
+- Keyword stuffing or unnatural keyword placement
+- Overly formal or distant tone
+- Negativity or discouragement
+- Outdated information about Nepal's education system
 
-Remember: Your goal is to inform, not persuade. Readers should be able to form their own opinions based on comprehensive, balanced information."""
+Remember: You're writing for ambitious Nepali students who want to excel. Make every article discoverable on Google AND genuinely helpful."""
 
 # ============================================================================
 # RESEARCH TEMPLATE
@@ -63,36 +91,54 @@ Remember: Your goal is to inform, not persuade. Readers should be able to form t
 
 RESEARCH_PROMPT = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
-    ("human", """Conduct comprehensive research on the following topic:
+    ("human", """Conduct comprehensive research for an educational blog article on:
 
 TOPIC: {keyword}
-TARGET AUDIENCE: {audience}
+TARGET AUDIENCE: {audience} (Nepali students)
 REQUIRED DEPTH: {depth}
 
-Your task is to gather:
-1. **Key Facts**: Core information, dates, people, events
-2. **Multiple Perspectives**: At least 2-3 different viewpoints on the topic
-3. **Credible Sources**: Identify authoritative sources for each claim
-4. **Data Points**: Statistics, studies, reports relevant to the topic
-5. **Context**: Historical background, related events, implications
-6. **Controversies**: Any debates or disagreements about the topic
+Your research should gather:
+1. **Core Educational Content**: Key concepts, definitions, explanations
+2. **Nepal-Specific Context**: How this topic applies to Nepali students/education system
+3. **Practical Applications**: Real-world uses, career opportunities in Nepal
+4. **Student Resources**: Books, websites, courses available to Nepali students
+5. **Common Questions**: What students typically ask about this topic
+6. **Success Stories**: Examples of Nepali students/professionals in this field
+7. **Step-by-Step Guidance**: How students can learn or pursue this
+
+**SEO Research Requirements**:
+- Identify keyword variations and related search terms
+- Find questions students are asking (People Also Ask)
+- Discover trending subtopics in Nepal education
+- Note competitive keywords to include
 
 OUTPUT FORMAT (JSON):
 {{
-    "key_facts": [
-        {{"fact": "...", "source": "...", "credibility": "high/medium/low"}}
+    "core_concepts": [
+        {{"concept": "...", "simple_explanation": "...", "why_it_matters": "..."}}
     ],
-    "perspectives": [
-        {{"viewpoint": "...", "supporting_evidence": "...", "sources": [...]}}
+    "nepal_context": {{
+        "relevance_to_nepali_students": "...",
+        "local_opportunities": [...],
+        "exam_relevance": "...",
+        "popular_courses_in_nepal": [...]
+    }},
+    "practical_applications": [
+        {{"application": "...", "career_path": "...", "demand_in_nepal": "..."}}
     ],
-    "data_points": [
-        {{"statistic": "...", "source": "...", "date": "..."}}
+    "student_resources": [
+        {{"resource_type": "...", "name": "...", "accessibility": "free/paid", "nepal_available": true/false}}
     ],
-    "context": "...",
-    "controversies": [...],
-    "recommended_sources": [
-        {{"name": "...", "url": "...", "credibility": "...", "perspective": "..."}}
-    ]
+    "common_student_questions": [...],
+    "success_stories": [...],
+    "step_by_step_guide": [...],
+    "seo_keywords": {{
+        "primary": "{keyword}",
+        "secondary": [...],
+        "long_tail": [...],
+        "questions": [...],
+        "related_searches": [...]
+    }}
 }}
 
 Focus on: {focus_angle}""")
@@ -104,47 +150,105 @@ Focus on: {focus_angle}""")
 
 OUTLINE_PROMPT = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
-    ("human", """Create a detailed outline for a news article based on this research:
+    ("human", """Create a detailed SEO-optimized outline for an educational blog article:
 
-TOPIC: {keyword}
+TOPIC/KEYWORD: {keyword}
 TEMPLATE TYPE: {template_type}
 TARGET WORD COUNT: {word_count}
 RESEARCH DATA: {research_summary}
 
-Your outline should include:
-1. **Headline** (factual, not clickbait, 50-70 characters)
-2. **Lead Paragraph** (Who, What, When, Where, Why - first 50 words)
-3. **Main Sections** (3-5 sections with clear headings)
-4. **Key Points per Section** (what facts, quotes, data to include)
-5. **Perspective Balance** (ensure multiple viewpoints)
-6. **Source Integration** (where to cite which sources)
-7. **Data Visualization Opportunities** (charts, stats to highlight)
-8. **Call-outs or Sidebars** (context boxes, definitions, timelines)
+**SEO-FIRST OUTLINE REQUIREMENTS**:
+
+1. **SEO Title** (50-60 characters, must include keyword naturally)
+   - Front-load keyword if possible
+   - Make it compelling and click-worthy
+   - Add year (2024/2025) if relevant
+
+2. **Meta Description** (120-155 characters with keyword)
+   - Include keyword naturally
+   - Add call-to-action
+   - Promise value to students
+
+3. **Opening Hook** (First 100 words)
+   - Include keyword in first paragraph
+   - Start with relatable question or scenario
+   - Promise what students will learn
+
+4. **Main Sections** (4-6 H2 headings with keyword variations)
+   - At least ONE H2 should contain the keyword
+   - Use descriptive, SEO-friendly headings
+   - Each section 200-400 words
+
+5. **Subsections** (H3 headings under each H2)
+   - Answer specific student questions
+   - Use question format when appropriate
+   - Include "How to", "Best", "Top", etc.
+
+6. **Content Elements to Include**:
+   - Introduction with keyword (100-150 words)
+   - 4-6 main sections with practical tips
+   - Nepal-specific examples in each section
+   - Bullet points or numbered lists
+   - Step-by-step guides where applicable
+   - FAQ section (optional but good for SEO)
+   - Conclusion with call-to-action
+
+7. **Internal Linking Opportunities**:
+   - Where to link to related topics
+   - Anchor text suggestions
+
+8. **SEO Elements**:
+   - Keyword placement map
+   - LSI keywords to sprinkle throughout
+   - Featured snippet opportunities
 
 TEMPLATE TYPE GUIDELINES:
-- **breaking_news**: Focus on facts, timeline, immediate impact
-- **analysis**: Deep dive into causes, implications, expert opinions
-- **explainer**: Educational, define terms, provide context
-- **data_driven**: Lead with statistics, visualize data, trend analysis
-- **investigative**: Uncover details, connect dots, document trail
+- **exam_prep**: Focus on preparation strategies, syllabus, important topics
+- **career_guide**: Career paths, opportunities in Nepal, required skills
+- **how_to_guide**: Step-by-step instructions, practical tips
+- **subject_explanation**: Concept breakdowns, examples, practice questions
+- **college_admission**: Application process, requirements, tips for Nepali students
 
 OUTPUT FORMAT (JSON):
 {{
-    "headline": "...",
-    "subheadline": "...",
-    "lead_paragraph": "...",
+    "seo_title": "...",
+    "meta_description": "...",
+    "url_slug": "...",
+    "focus_keyword": "{keyword}",
+    "keyword_density_target": "1.5%",
+    "introduction": {{
+        "hook": "...",
+        "keyword_placement": "first 100 words",
+        "promise": "what students will learn",
+        "word_count": 100-150
+    }},
     "sections": [
         {{
-            "heading": "...",
-            "key_points": [...],
-            "sources_to_cite": [...],
-            "perspective": "neutral/viewpoint_A/viewpoint_B",
-            "word_count_target": 200
+            "h2_heading": "...",
+            "contains_keyword": true/false,
+            "subsections": [
+                {{"h3_heading": "...", "key_points": [...], "nepal_example": "..."}}
+            ],
+            "word_count_target": 300,
+            "seo_elements": "keyword variations to use"
         }}
     ],
-    "data_visualizations": [...],
-    "fact_check_priority": [...],
-    "seo_keywords": [...]
+    "faq_section": [
+        {{"question": "...", "answer_outline": "..."}}
+    ],
+    "conclusion": {{
+        "summary": "...",
+        "call_to_action": "...",
+        "final_keyword_mention": true
+    }},
+    "internal_links": [
+        {{"anchor_text": "...", "target_topic": "..."}}
+    ],
+    "seo_keywords_distribution": {{
+        "primary_keyword": "{keyword} (6-8 times)",
+        "secondary_keywords": [...],
+        "lsi_keywords": [...]
+    }}
 }}""")
 ])
 
@@ -154,133 +258,230 @@ OUTPUT FORMAT (JSON):
 
 ARTICLE_GENERATION_PROMPT = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
-    ("human", """Write a complete news article following this outline:
+    ("human", """Write a complete, SEO-optimized educational blog article following this outline:
 
 OUTLINE: {outline}
 RESEARCH DATA: {research_data}
 TEMPLATE: {template_type}
-TONE: {tone}
+FOCUS KEYWORD: {keyword}
 TARGET LENGTH: {word_count} words
 
-WRITING REQUIREMENTS:
-1. **Factual Accuracy**: Every claim must have a source
-2. **Balanced Reporting**: Include multiple perspectives equally
-3. **Clear Attribution**: Use "according to [source]" for all quotes/data
-4. **Neutral Language**: Avoid bias indicators (amazing, terrible, shockingly, etc.)
-5. **Structured Content**: Use headings (##), subheadings (###), bullet points
-6. **Readability**: Short paragraphs (3-4 sentences), vary sentence length
-7. **SEO Optimization**: Natural keyword inclusion, descriptive headings
-8. **Engagement**: Lead with most important info, maintain reader interest
+**CRITICAL SEO REQUIREMENTS** (Must be implemented from the start):
 
-MARKDOWN FORMAT:
-- Use ## for main section headings
-- Use ### for subheadings
-- Use **bold** for emphasis (sparingly)
-- Use > for quotes
-- Use bullet points or numbered lists for clarity
-- Include [Source Name](URL) for citations (inline or footnotes)
+1. **Title Optimization**:
+   - Include focus keyword "{keyword}" naturally
+   - Keep it 50-60 characters
+   - Make it compelling for students
+   - Example: "Complete Guide to {keyword} for Nepali Students 2024"
 
-EXAMPLE STRUCTURE:
+2. **Introduction (First 150 words)**:
+   - Use keyword in first 100 words naturally
+   - Start with engaging question or relatable scenario
+   - Clearly state what students will learn
+   - Include a preview of main points
+
+3. **Heading Structure**:
+   - Use H2 for main sections (4-6 sections)
+   - Include keyword in at least ONE H2 heading
+   - Use H3 for subsections
+   - Make headings descriptive and keyword-rich
+   - Examples:
+     * "Why {keyword} Matters for Nepali Students"
+     * "How to Master {keyword}: Step-by-Step Guide"
+     * "Best {keyword} Resources in Nepal"
+
+4. **Keyword Usage**:
+   - Use focus keyword "{keyword}" 6-10 times (depending on length)
+   - Keyword density: 1-2% (natural, not stuffed)
+   - First mention in first paragraph
+   - Include in title, at least one H2, and conclusion
+   - Use variations: "{keyword}", "learn {keyword}", "{keyword} in Nepal"
+
+5. **Content Structure**:
+   - Paragraphs: 2-4 sentences each
+   - Use bullet points for lists
+   - Use numbered lists for steps
+   - Include examples specific to Nepal
+   - Add actionable tips students can use immediately
+
+6. **Nepal Context** (MUST INCLUDE):
+   - How this topic applies to Nepali education system
+   - Relevant colleges/universities in Nepal
+   - Career opportunities in Nepal
+   - Challenges faced by Nepali students
+   - Local success stories or examples
+   - Available resources in Nepal
+
+7. **Engagement Elements**:
+   - Start with "you" language (conversational)
+   - Ask rhetorical questions
+   - Include motivational statements
+   - Address common student concerns
+   - Add practical tips and hacks
+
+8. **Internal Linking**:
+   - Suggest 2-3 places for internal links
+   - Use descriptive anchor text
+   - Link to related topics naturally
+
+9. **Conclusion**:
+   - Summarize key points (3-4 sentences)
+   - Include keyword one final time
+   - Clear call-to-action (encourage comments, sharing, or next steps)
+   - End with motivational note
+
+**MARKDOWN FORMAT**:
 ```markdown
-## [Section Heading]
+# {SEO-Optimized Title with Keyword}
 
-[Opening paragraph with key fact and citation]
+{Opening paragraph with keyword in first 100 words, engaging hook, and value promise}
 
-According to [Expert Name], [Professor at University], "[quote that adds credibility and perspective]" ([Source](URL)).
+## {Main Section 1 - Keyword-Rich Heading}
 
-[Additional context paragraph with data]
+{Content paragraph 1 with Nepal context}
 
-### [Subheading for deeper detail]
+{Content paragraph 2 with examples}
 
-[Paragraph exploring different angle]
+### {Subsection Heading - Question Format}
 
-> "[Contrasting quote from different perspective]" 
-> — [Different Expert], [Credentials]
+{Detailed explanation with bullet points}
 
-[Paragraph presenting data]
+**Key Points:**
+- {Point 1 with practical tip}
+- {Point 2 with Nepal example}
+- {Point 3 with actionable advice}
 
-A recent study by [Organization] found that [statistic] ([Source](URL)). This represents [context/significance].
+## {Main Section 2 with Keyword Variation}
 
-**Key Takeaways:**
-- [Factual point 1]
-- [Factual point 2]
-- [Factual point 3]
+{Continue similar structure...}
+
+### Step-by-Step Guide
+
+1. **{Step 1}**: {Explanation with Nepal context}
+2. **{Step 2}**: {Explanation with example}
+3. **{Step 3}**: {Practical tip}
+
+## Frequently Asked Questions
+
+**Q: {Common student question}?**
+A: {Clear, concise answer}
+
+## Conclusion
+
+{Summary of main points}
+
+{Final keyword mention naturally}
+
+{Call-to-action encouraging engagement}
+
+{Motivational closing statement}
 ```
 
-NOW WRITE THE ARTICLE:""")
+**WRITING TONE**:
+- Conversational yet professional
+- Empathetic to student challenges
+- Encouraging and motivational
+- Clear and jargon-free
+- Friendly "you" language
+- Practical and action-oriented
+
+**EXAMPLES TO INCLUDE**:
+- Nepal-specific colleges (TU, KU, Pokhara University, etc.)
+- Popular exams (SEE, NEB, IOE Entrance, MBBS Entrance, etc.)
+- Local career paths and opportunities
+- Challenges unique to Nepali students
+- Success stories from Nepal
+
+NOW WRITE THE COMPLETE SEO-OPTIMIZED ARTICLE:""")
 ])
 
 # ============================================================================
 # TEMPLATE-SPECIFIC VARIATIONS
 # ============================================================================
 
-BREAKING_NEWS_TEMPLATE = """Focus on:
-- What happened (facts only)
-- When and where
-- Who is involved
-- Immediate consequences
-- Official statements
-- What's known vs. unknown (clearly distinguish)
-- Expected updates
+EXAM_PREP_TEMPLATE = """Focus on:
+- Exam format and syllabus breakdown
+- Important topics and weightage
+- Preparation strategies and timeline
+- Previous year questions and patterns
+- Tips from toppers and teachers
+- Common mistakes to avoid
+- Study materials and resources in Nepal
+- Time management during preparation
+- Stress management techniques
 
-Keep sentences short and direct. Lead with the most newsworthy element."""
+Make it actionable with specific study plans."""
 
-ANALYSIS_TEMPLATE = """Focus on:
-- Context and background
-- Why this matters now
-- Multiple expert perspectives
-- Historical precedents
-- Possible implications
-- Unanswered questions
-- What to watch for next
+CAREER_GUIDE_TEMPLATE = """Focus on:
+- Career overview and scope
+- Required qualifications and skills
+- Job opportunities in Nepal
+- Salary expectations (Nepal context)
+- Career growth path
+- Top companies/organizations in Nepal hiring
+- How to get started
+- Success stories of Nepali professionals
+- Future prospects and trends
 
-Balance depth with readability. Use examples to illustrate complex points."""
+Balance aspiration with realistic expectations."""
 
-EXPLAINER_TEMPLATE = """Focus on:
-- Define key terms simply
-- Explain the "why" and "how"
-- Use analogies for complex concepts
-- Address common misconceptions
-- Provide historical context
-- Connect to reader's life
-- FAQ format for key questions
+HOW_TO_GUIDE_TEMPLATE = """Focus on:
+- Step-by-step instructions
+- Prerequisites and requirements
+- Tools/resources needed (available in Nepal)
+- Common challenges and solutions
+- Pro tips and best practices
+- Examples and demonstrations
+- Practice exercises
+- What to do next after mastering this
 
-Educate without condescending. Assume intelligent but unfamiliar reader."""
+Make each step crystal clear and actionable."""
 
-DATA_DRIVEN_TEMPLATE = """Focus on:
-- Lead with the most striking data point
-- Visualize trends and patterns
-- Compare multiple data sources
-- Explain methodology
-- Highlight outliers or surprises
-- Put numbers in context (comparisons, historical)
-- Note data limitations
+SUBJECT_EXPLANATION_TEMPLATE = """Focus on:
+- Core concept explanation (simple language)
+- Why it matters for students
+- Real-world applications
+- Common misconceptions cleared
+- Examples from daily life in Nepal
+- Practice problems with solutions
+- Related concepts to explore
+- How this appears in exams
+- Additional learning resources
 
-Make statistics accessible. Use "1 in 5 people" rather than "20% of the population"."""
+Teach don't just tell. Use analogies and examples."""
 
-INVESTIGATIVE_TEMPLATE = """Focus on:
-- Document trail (what evidence exists)
-- Timeline of events
-- Key players and relationships
-- What documents/records show
-- Discrepancies or red flags
-- Official vs. reality
-- What questions remain
+COLLEGE_ADMISSION_TEMPLATE = """Focus on:
+- Admission process step-by-step
+- Eligibility criteria
+- Required documents
+- Important dates and deadlines
+- Entrance exam preparation (if applicable)
+- Application tips and tricks
+- Selection criteria
+- Fee structure and scholarships
+- What to do after getting admission
+- Common mistakes to avoid
 
-Present findings methodically. Let evidence speak. Note what couldn't be verified."""
+Provide insider knowledge and practical advice."""
 
 # ============================================================================
 # Template Selection Helper
 # ============================================================================
 
 TEMPLATE_MAP = {
-    'breaking_news': BREAKING_NEWS_TEMPLATE,
-    'analysis': ANALYSIS_TEMPLATE,
-    'explainer': EXPLAINER_TEMPLATE,
-    'data_driven': DATA_DRIVEN_TEMPLATE,
-    'investigative': INVESTIGATIVE_TEMPLATE,
+    'exam_prep': EXAM_PREP_TEMPLATE,
+    'career_guide': CAREER_GUIDE_TEMPLATE,
+    'how_to_guide': HOW_TO_GUIDE_TEMPLATE,
+    'subject_explanation': SUBJECT_EXPLANATION_TEMPLATE,
+    'college_admission': COLLEGE_ADMISSION_TEMPLATE,
+    # Legacy news templates (keeping for backward compatibility)
+    'breaking_news': HOW_TO_GUIDE_TEMPLATE,
+    'analysis': SUBJECT_EXPLANATION_TEMPLATE,
+    'explainer': SUBJECT_EXPLANATION_TEMPLATE,
+    'data_driven': CAREER_GUIDE_TEMPLATE,
+    'investigative': COLLEGE_ADMISSION_TEMPLATE,
 }
 
 def get_template_guidance(template_type: str) -> str:
     """Get specific guidance for article template type."""
-    return TEMPLATE_MAP.get(template_type, ANALYSIS_TEMPLATE)
+    return TEMPLATE_MAP.get(template_type, SUBJECT_EXPLANATION_TEMPLATE)
