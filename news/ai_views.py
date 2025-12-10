@@ -881,6 +881,74 @@ class AIArticleViewSet(viewsets.ModelViewSet):
             'published_at': article.published_at.isoformat()
         })
     
+    @action(detail=True, methods=['post'])
+    def upload_image(self, request, pk=None):
+        """
+        Upload image for article and save to media folder.
+        
+        POST /api/ai-articles/{id}/upload_image/
+        Body: multipart/form-data with 'image' file
+        """
+        import os
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
+        from django.conf import settings
+        
+        article = self.get_object()
+        
+        if 'image' not in request.FILES:
+            return Response(
+                {'detail': 'No image file provided.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        image_file = request.FILES['image']
+        
+        # Validate file type
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if image_file.content_type not in allowed_types:
+            return Response(
+                {'detail': f'Invalid file type. Allowed: {", ".join(allowed_types)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate file size (max 5MB)
+        if image_file.size > 5 * 1024 * 1024:
+            return Response(
+                {'detail': 'File size too large. Maximum 5MB allowed.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Generate unique filename
+            ext = os.path.splitext(image_file.name)[1]
+            filename = f'ai_articles/{article.id}_{timezone.now().timestamp()}{ext}'
+            
+            # Save file
+            path = default_storage.save(filename, ContentFile(image_file.read()))
+            
+            # Get the URL (works with both local and S3 storage)
+            if hasattr(default_storage, 'url'):
+                file_url = default_storage.url(path)
+            else:
+                file_url = os.path.join(settings.MEDIA_URL, path)
+            
+            # Update article
+            article.image_url = file_url
+            article.save()
+            
+            return Response({
+                'detail': 'Image uploaded successfully.',
+                'image_url': file_url,
+                'image_path': path
+            })
+            
+        except Exception as e:
+            return Response(
+                {'detail': f'Failed to upload image: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
     @action(detail=False, methods=['get'])
     def queue(self, request):
         """

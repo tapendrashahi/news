@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getArticles, retryStage, cancelGeneration, startGeneration, deleteArticle } from '../../../services/aiContentService'
 import ArticleProgress from './ArticleProgress'
 import DebugModal from './DebugModal'
 import './GenerationQueue.css'
 
 const GenerationQueue = () => {
+  const navigate = useNavigate()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // Show all by default so filters work
@@ -385,7 +387,15 @@ const GenerationQueue = () => {
                     ✕ Cancel
                   </button>
                 )}
-                {(article.status === 'reviewing' || article.status === 'approved') && (
+                {(article.status === 'reviewing' || article.workflow_stage === 'completed') && (
+                  <button 
+                    className="btn btn-sm btn-success" 
+                    onClick={() => navigate('/admin/ai-content/review-queue')}
+                  >
+                    📝 Review Article
+                  </button>
+                )}
+                {article.status === 'approved' && (
                   <button className="btn btn-sm btn-primary" onClick={() => setSelectedArticle(article)}>
                     👁️ View
                   </button>

@@ -298,7 +298,7 @@ class AIArticleListSerializer(serializers.ModelSerializer):
             'id', 'title', 'slug', 'keyword_text', 'category_display',
             'template_type', 'status', 'status_display',
             'workflow_stage', 'workflow_stage_display',
-            'ai_model_used', 'actual_word_count',
+            'ai_model_used', 'actual_word_count', 'target_word_count',
             'overall_quality_score', 'cost_estimate',
             'created_at', 'updated_at', 'progress_percentage',
             'has_errors', 'retry_count', 'published_article',
@@ -307,7 +307,11 @@ class AIArticleListSerializer(serializers.ModelSerializer):
             'meta_description', 'focus_keywords',
             'ai_score', 'plagiarism_score', 'seo_score', 
             'readability_score', 'bias_score', 'fact_check_score',
-            'research_data', 'outline'
+            'research_data', 'outline',
+            # Image fields
+            'image_url', 'image_alt_text', 'image_prompt',
+            # Additional metrics
+            'generation_time', 'last_error', 'failed_stage'
         ]
         read_only_fields = fields
     

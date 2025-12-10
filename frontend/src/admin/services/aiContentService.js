@@ -15,6 +15,14 @@ export const startGeneration = (id) => api.post(`/admin/ai/articles/${id}/start_
 export const retryStage = (id, stage) => api.post(`/admin/ai/articles/${id}/retry_stage/`, { stage })
 export const cancelGeneration = (id) => api.post(`/admin/ai/articles/${id}/cancel/`)
 export const deleteArticle = (id) => api.delete(`/admin/ai/articles/${id}/`)
+export const updateArticle = (id, data) => api.patch(`/admin/ai/articles/${id}/`, data)
+export const uploadArticleImage = (id, file) => {
+  const formData = new FormData()
+  formData.append('image', file)
+  return api.post(`/admin/ai/articles/${id}/upload_image/`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
 export const approveArticle = (id, notes) => api.post(`/admin/ai/articles/${id}/approve/`, { notes })
 export const rejectArticle = (id, notes, regenerate = false) => api.post(`/admin/ai/articles/${id}/reject/`, { notes, regenerate })
 export const publishArticle = (id, visibility = 'public') => api.post(`/admin/ai/articles/${id}/publish/`, { visibility })
