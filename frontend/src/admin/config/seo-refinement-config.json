@@ -1,0 +1,65 @@
+{
+  "seoRefinement": {
+    "enabled": true,
+    "targetScore": 80,
+    "maxRetries": 3,
+    "refinementOptions": {
+      "keywordDensity": {
+        "enabled": true,
+        "targetRange": {
+          "min": 0.5,
+          "max": 2.5
+        },
+        "priority": "high"
+      },
+      "internalLinking": {
+        "enabled": true,
+        "minLinks": 2,
+        "maxLinks": 5,
+        "priority": "medium"
+      },
+      "metaDescription": {
+        "enabled": true,
+        "minLength": 120,
+        "maxLength": 160,
+        "includeKeyword": true,
+        "priority": "high"
+      },
+      "readability": {
+        "enabled": true,
+        "targetScore": 60,
+        "maxSentenceLength": 25,
+        "maxParagraphLength": 150,
+        "priority": "medium"
+      },
+      "titleOptimization": {
+        "enabled": true,
+        "minLength": 30,
+        "maxLength": 60,
+        "includeKeyword": true,
+        "priority": "high"
+      },
+      "contentStructure": {
+        "enabled": true,
+        "minWordCount": 600,
+        "maxWordCount": 2500,
+        "headingDistribution": true,
+        "priority": "low"
+      }
+    },
+    "rewriteStages": {
+      "contentGeneration": {
+        "rewrite": true,
+        "includeSuggestions": true
+      },
+      "humanization": {
+        "rewrite": true,
+        "includeSuggestions": true
+      },
+      "seoOptimization": {
+        "rewrite": false,
+        "includeSuggestions": true
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getConfigs, updateConfig } from '../../../services/aiContentService'
 import aiModelsConfig from '../../../config/ai-models-config.json'
+import SEOSettings from './SEOSettings'
 import './AISettings.css'
 
 const AISettings = () => {
@@ -204,7 +205,7 @@ const AISettings = () => {
       </div>
 
       <div className="settings-tabs">
-        {['general', 'stages', 'api_keys', 'prompts', 'quality'].map(tab => (
+        {['general', 'stages', 'seo', 'api_keys', 'prompts', 'quality'].map(tab => (
           <button
             key={tab}
             className={activeTab === tab ? 'active' : ''}
@@ -486,6 +487,10 @@ const AISettings = () => {
               <p>Update keys in: <code>/home/tapendra/Downloads/projects/news/.env</code></p>
             </div>
           </div>
+        )}
+
+        {activeTab === 'seo' && (
+          <SEOSettings />
         )}
 
         {/* Other tabs remain the same */}

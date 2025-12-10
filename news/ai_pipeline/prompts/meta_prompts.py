@@ -1,10 +1,8 @@
 """
 Meta Tags Generation Prompt Templates
 
-Task 2.4: Meta Prompts Implementation
-- META_TITLE_PROMPT
-- META_DESCRIPTION_PROMPT
-- KEYWORDS_EXTRACTION_PROMPT
+Educational Content SEO Focused on Nepal
+Optimized for student search intent and Google ranking
 """
 
 from langchain.prompts import ChatPromptTemplate
@@ -14,37 +12,40 @@ from langchain.prompts import ChatPromptTemplate
 # ============================================================================
 
 META_TITLE_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an SEO expert specializing in news article optimization. 
-Your task is to create compelling, accurate meta titles that:
-- Are 50-60 characters (strict limit)
-- Include the main keyword naturally
-- Are factual and informative (no clickbait)
-- Make users want to click
-- Follow journalistic standards"""),
-    ("human", """Create an optimized meta title for this article:
+    ("system", """You are an SEO expert specializing in educational blog optimization for students in Nepal.
+Your task is to create compelling, student-friendly meta titles that:
+- Are 50-60 characters (strict limit for Google search results)
+- Include the main keyword naturally (preferably at the beginning)
+- Are clear, informative, and helpful for students
+- Make students want to click and learn
+- Address student search intent (how-to, guides, exam prep, career advice)"""),
+    ("human", """Create an optimized meta title for this educational blog article:
 
 HEADLINE: {headline}
 MAIN KEYWORD: {keyword}
 ARTICLE SUMMARY: {summary}
+TARGET AUDIENCE: Students in Nepal (high school, college, aspiring professionals)
 
 REQUIREMENTS:
-- Character count: 50-60 (STRICT - longer titles get cut off in search results)
-- Include "{keyword}" naturally if possible
-- Be specific and descriptive
-- Avoid clickbait phrases like "You Won't Believe" or "Shocking"
-- Use active voice
-- Include numbers or data if relevant
-- Front-load important words
+- Character count: 50-60 (STRICT - longer titles get cut off in Google search results)
+- Include "{keyword}" naturally at the beginning if possible
+- Be specific and helpful for students
+- Use student-friendly language (clear, encouraging, practical)
+- Include numbers or actionable words if relevant ("How to", "Guide", "Tips", "Steps")
+- Front-load important keywords
+- Mention "Nepal" if relevant to the topic
 
-GOOD EXAMPLES:
-- "AI in Healthcare: 5 Breakthrough Applications in 2025" (53 chars)
-- "Climate Summit 2025: Key Agreements & Next Steps" (51 chars)
-- "New Study Links Sleep Quality to Heart Health" (47 chars)
+GOOD EXAMPLES FOR STUDENTS:
+- "IOE Entrance Exam: Complete Preparation Guide 2025" (52 chars)
+- "How to Choose College in Nepal: 7 Key Factors" (48 chars)
+- "SEE Exam Tips: Score 3.6+ GPA in 90 Days" (42 chars)
+- "Engineering Careers in Nepal: Salary & Scope" (46 chars)
 
 BAD EXAMPLES:
-- "This New AI Technology Will Change Everything Forever" (clickbait, vague)
-- "The Most Important Healthcare Innovation You Need to Know About Right Now" (too long, clickbait)
-- "Article About Climate Change Conference" (boring, not specific)
+- "You Won't Believe These College Selection Secrets!" (clickbait, unprofessional)
+- "The Ultimate Comprehensive Guide to Preparing for Engineering Entrance Examinations in Nepal" (too long, will be cut off)
+- "Article About Studying" (boring, vague, no keyword)
+- "Everything Students Need to Know Right Now" (vague, no specific value)
 
 OUTPUT FORMAT:
 Just the meta title, nothing else. No quotes, no explanations.""")
@@ -55,37 +56,42 @@ Just the meta title, nothing else. No quotes, no explanations.""")
 # ============================================================================
 
 META_DESCRIPTION_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an SEO expert specializing in news article meta descriptions.
+    ("system", """You are an SEO expert specializing in educational blog meta descriptions for students in Nepal.
 Your task is to create compelling descriptions that:
-- Are 150-160 characters (strict limit)
-- Summarize the article's value proposition
+- Are 120-155 characters (strict limit for optimal mobile + desktop display)
+- Summarize the article's practical value for students
 - Include primary and secondary keywords naturally
-- Encourage clicks from search results
-- Are factual and accurate"""),
-    ("human", """Create an optimized meta description for this article:
+- Encourage clicks from students searching for help
+- Are clear, helpful, and action-oriented"""),
+    ("human", """Create an optimized meta description for this educational blog article:
 
 HEADLINE: {headline}
 META TITLE: {meta_title}
 ARTICLE SUMMARY: {summary}
 PRIMARY KEYWORD: {primary_keyword}
 SECONDARY KEYWORDS: {secondary_keywords}
+TARGET AUDIENCE: Students in Nepal (high school, college, aspiring professionals)
 
 REQUIREMENTS:
-- Character count: 150-160 (STRICT - longer descriptions get truncated)
-- Include primary keyword ({primary_keyword})
+- Character count: 120-155 (STRICT - longer descriptions get truncated in Google search)
+- Include primary keyword ({primary_keyword}) naturally
 - Include 1-2 secondary keywords if they fit naturally
-- Summarize what readers will learn
-- Use active voice
-- Include a subtle call-to-action if space permits
-- Make every word count
+- Summarize what students will learn or gain
+- Use active, encouraging language ("Learn", "Discover", "Master", "Get")
+- Include a clear benefit or outcome for students
+- Mention Nepal context if relevant
+- Include subtle call-to-action if space permits ("Start now", "Read more", "Get started")
+- Make every word count - no filler
 
-GOOD EXAMPLES:
-- "Discover how AI is transforming healthcare in 2025. Explore 5 breakthrough applications, expert insights, and real-world impact on patient care." (151 chars)
-- "Climate Summit 2025 results: 190 countries agree on carbon reduction targets. Learn about key commitments, implementation timeline, and next steps." (156 chars)
+GOOD EXAMPLES FOR STUDENTS:
+- "Master IOE entrance exam prep with proven strategies, practice questions & tips. Score higher in Nepal's top engineering entrance." (132 chars)
+- "Choose the right college in Nepal with our 7-factor guide. Compare programs, fees, placements & campus life. Make smart decisions." (135 chars)
+- "Get 3.6+ GPA in SEE with effective study tips, time management & exam strategies. Proven methods for Nepali students. Start today!" (134 chars)
 
 BAD EXAMPLES:
-- "This article talks about AI in healthcare and how it's being used." (vague, wastes characters, no keywords)
-- "An extremely comprehensive and detailed guide to understanding the revolutionary applications of artificial intelligence in modern healthcare systems" (too long, keyword stuffing)
+- "This article talks about IOE exam preparation and studying." (vague, wastes characters, no value proposition)
+- "An extremely comprehensive and ultimate detailed guide to understanding and mastering all aspects of engineering entrance examination preparation for students" (too long, keyword stuffing, will be cut off)
+- "Read this article to learn stuff." (vague, no keywords, unprofessional)
 
 OUTPUT FORMAT:
 Just the meta description, nothing else. No quotes, no explanations.""")
@@ -96,58 +102,85 @@ Just the meta description, nothing else. No quotes, no explanations.""")
 # ============================================================================
 
 KEYWORDS_EXTRACTION_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an SEO keyword analyst for a news publication.
-Your task is to extract the most relevant keywords and phrases for article optimization."""),
-    ("human", """Extract SEO keywords from this article:
+    ("system", """You are an SEO keyword analyst specializing in educational content for students in Nepal.
+Your task is to extract the most relevant keywords and phrases that students use when searching for educational information."""),
+    ("human", """Extract SEO keywords from this educational blog article:
 
 HEADLINE: {headline}
 CONTENT: {content}
 CATEGORY: {category}
+TARGET AUDIENCE: Students in Nepal
 
-Extract 3 types of keywords:
+Extract 3 types of keywords based on student search behavior:
 
 1. **PRIMARY KEYWORD** (1 phrase):
-   - The main topic (2-4 words)
+   - The main topic students are searching for (2-5 words)
    - What the article is fundamentally about
    - Should appear in URL, title, first paragraph
+   - Think: "What would a student type in Google?"
 
 2. **SECONDARY KEYWORDS** (3-5 phrases):
-   - Related topics covered in the article
-   - Subtopics and important concepts
-   - Long-tail variations
+   - Related topics students want to learn about
+   - Subtopics and important concepts covered
+   - Long-tail variations students might search
+   - Include Nepal-specific terms if relevant
 
 3. **LSI KEYWORDS** (5-7 phrases):
-   - Latent Semantic Indexing - related terms
-   - Words/phrases that commonly appear with the main topic
-   - Help search engines understand context
+   - Latent Semantic Indexing - related terms students use
+   - Words/phrases that commonly appear with the main topic in student searches
+   - Help Google understand educational context
+   - Include Nepal education system terms if relevant
 
-EXAMPLES:
+EXAMPLES FOR EDUCATIONAL CONTENT:
 
-For an article about "AI in Healthcare Diagnosis":
+For an article about "IOE Entrance Exam Preparation":
 
-PRIMARY: "AI healthcare diagnosis"
+PRIMARY: "IOE entrance exam preparation"
 
 SECONDARY:
-- "medical AI applications"
-- "machine learning radiology"
-- "AI diagnostic accuracy"
-- "healthcare artificial intelligence"
+- "IOE entrance exam syllabus"
+- "engineering entrance Nepal"
+- "IOE exam study tips"
+- "best books for IOE entrance"
+- "IOE entrance mock test"
 
 LSI:
-- "patient care technology"
-- "medical imaging analysis"
-- "clinical decision support"
-- "diagnostic algorithms"
-- "healthcare automation"
-- "medical data analysis"
+- "Tribhuvan University engineering"
+- "entrance exam strategy"
+- "Nepal engineering colleges"
+- "IOE preparation course"
+- "entrance exam practice questions"
+- "engineering career Nepal"
+- "college admission Nepal"
+
+For an article about "How to Choose College in Nepal":
+
+PRIMARY: "how to choose college in Nepal"
+
+SECONDARY:
+- "best colleges in Nepal"
+- "college selection tips"
+- "Nepal college comparison"
+- "choosing right degree"
+
+LSI:
+- "higher education Nepal"
+- "college admission process"
+- "university programs Nepal"
+- "career guidance students"
+- "college fees Nepal"
+- "campus facilities"
+- "placement records"
 
 OUTPUT FORMAT (JSON):
 {{
     "primary_keyword": "...",
     "secondary_keywords": ["...", "...", "..."],
     "lsi_keywords": ["...", "...", "...", "..."],
-    "recommended_slug": "ai-healthcare-diagnosis-2025",
-    "focus_keyphrases": ["AI in healthcare", "medical diagnosis AI", "healthcare technology"]
+    "recommended_slug": "ioe-entrance-exam-preparation-guide",
+    "focus_keyphrases": ["IOE entrance exam", "engineering entrance Nepal", "exam preparation tips"],
+    "nepal_specific_keywords": ["SEE exam", "TU colleges", "Kathmandu University"],
+    "student_search_intent": "informational/how-to/exam-prep/career-guidance"
 }}
 
 Extract keywords NOW:""")
