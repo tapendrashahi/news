@@ -35,6 +35,7 @@ from decimal import Decimal
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain.schema import HumanMessage, SystemMessage
 
 # Django imports
@@ -122,22 +123,58 @@ class AINewsOrchestrator:
         self.pipeline_start_time = None
     
     def _load_default_config(self) -> Dict[str, Any]:
-        """Load default configuration from settings or environment."""
+        """Load default configuration from database or fallback to environment."""
+        from news.ai_models import AIGenerationConfig
+        
+        try:
+            # Try to get the default config from database
+            default_config = AIGenerationConfig.objects.filter(
+                is_default=True,
+                enabled=True
+            ).first()
+            
+            if default_config:
+                logger.info(f"Loaded config from database: {default_config.name} ({default_config.ai_provider}/{default_config.model_name})")
+                return {
+                    'openai_api_key': os.getenv('OPENAI_API_KEY', ''),
+                    'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
+                    'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
+                    'groq_api_key': os.getenv('GROQ_API_KEY', ''),
+                    'default_provider': default_config.ai_provider,
+                    'default_model': default_config.model_name,
+                    'temperature': float(default_config.temperature),
+                    'max_tokens': int(default_config.max_tokens),
+                    'max_retries': int(default_config.max_retries),
+                    'quality_thresholds': {
+                        'max_ai_score': 50.0,
+                        'max_plagiarism': 5.0,
+                        'min_seo_score': 75.0,
+                        'min_readability': 60.0,
+                        'max_bias_score': 20.0,
+                        'min_fact_check': 80.0,
+                    }
+                }
+        except Exception as e:
+            logger.warning(f"Failed to load config from database: {e}")
+        
+        # Fallback to environment/hardcoded defaults
+        logger.info("Using fallback configuration")
         return {
             'openai_api_key': os.getenv('OPENAI_API_KEY', ''),
             'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
             'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
-            'default_provider': 'google',  # Changed to Gemini
-            'default_model': 'gemini-exp-1206',  # Gemini 3 Pro (experimental release)
+            'groq_api_key': os.getenv('GROQ_API_KEY', ''),
+            'default_provider': 'google',
+            'default_model': 'gemini-exp-1206',
             'temperature': 0.7,
-            'max_tokens': 32000,  # Gemini 3 supports very large context
+            'max_tokens': 32000,
             'max_retries': 3,
             'quality_thresholds': {
                 'max_ai_score': 50.0,
                 'max_plagiarism': 5.0,
                 'min_seo_score': 75.0,
                 'min_readability': 60.0,
-                'max_bias_score': 20.0,  # AI Analitica standard
+                'max_bias_score': 20.0,
                 'min_fact_check': 80.0,
             }
         }
@@ -145,7 +182,7 @@ class AINewsOrchestrator:
     def _init_llms(self):
         """Initialize Language Model instances."""
         try:
-            # Primary model: Gemini for content generation
+            # Primary model: Based on provider selection
             provider = self.config.get('default_provider', 'google')
             
             if provider == 'google' and self.config.get('gemini_api_key'):
@@ -156,6 +193,14 @@ class AINewsOrchestrator:
                     google_api_key=self.config['gemini_api_key']
                 )
                 logger.info(f"Primary LLM: Gemini ({self.config['default_model']})")
+            elif provider == 'groq' and self.config.get('groq_api_key'):
+                self.llm_primary = ChatGroq(
+                    model=self.config['default_model'],
+                    temperature=self.config['temperature'],
+                    max_tokens=self.config['max_tokens'],
+                    groq_api_key=self.config['groq_api_key']
+                )
+                logger.info(f"Primary LLM: Groq ({self.config['default_model']})")
             elif provider == 'openai' and self.config.get('openai_api_key'):
                 self.llm_primary = ChatOpenAI(
                     model=self.config.get('default_model', 'gpt-4-turbo-preview'),
@@ -164,6 +209,13 @@ class AINewsOrchestrator:
                     openai_api_key=self.config['openai_api_key']
                 )
                 logger.info(f"Primary LLM: OpenAI ({self.config['default_model']})")
+            elif provider == 'anthropic' and self.config.get('anthropic_api_key'):
+                self.llm_primary = ChatAnthropic(
+                    model=self.config.get('default_model', 'claude-3-5-sonnet-20241022'),
+                    temperature=self.config['temperature'],
+                    anthropic_api_key=self.config['anthropic_api_key']
+                )
+                logger.info(f"Primary LLM: Claude ({self.config['default_model']})")
             else:
                 raise ValueError(f"Invalid provider '{provider}' or missing API key")
             
@@ -1000,17 +1052,14 @@ The image should visually represent the main topic while maintaining a professio
     
     async def _load_article(self, article_id: str):
         """Load article from database."""
-        # TODO: Implement async database access
-        # For now, return mock object
-        class MockArticle:
-            id = article_id
-            keyword = type('obj', (object,), {'keyword': 'AI in Healthcare'})()
-            target_word_count = 1500
-            template_type = 'analysis'
-            focus_keywords = []
-            retry_count = 0
+        from news.ai_models import AIArticle
+        from asgiref.sync import sync_to_async
         
-        return MockArticle()
+        @sync_to_async
+        def load_from_db():
+            return AIArticle.objects.select_related('keyword').get(id=article_id)
+        
+        return await load_from_db()
     
     async def _update_article_status(self, article_id: str, **kwargs):
         """Update article status in database."""
@@ -1050,6 +1099,7 @@ The image should visually represent the main topic while maintaining a professio
         """Save final article data to database."""
         from news.ai_models import AIArticle
         from asgiref.sync import sync_to_async
+        import markdown
         
         logger.info(f"Saving article data for {article_id}")
         
@@ -1070,7 +1120,22 @@ The image should visually represent the main topic while maintaining a professio
                 article.content_json = context['content_generation']
                 content_source = 'content_generation'
             
-            article.raw_content = final_content
+            # Convert Markdown to HTML for publishing
+            if final_content:
+                html_content = markdown.markdown(
+                    final_content,
+                    extensions=[
+                        'markdown.extensions.extra',      # Tables, footnotes, etc.
+                        'markdown.extensions.nl2br',      # Convert newlines to <br>
+                        'markdown.extensions.sane_lists', # Better list handling
+                        'markdown.extensions.toc',        # Table of contents
+                        'markdown.extensions.codehilite', # Code syntax highlighting
+                        'markdown.extensions.fenced_code', # Fenced code blocks
+                    ]
+                )
+                article.raw_content = html_content
+            else:
+                article.raw_content = final_content
             
             # Debug logging
             logger.info(f"Content saved from: {content_source}")
@@ -1144,11 +1209,12 @@ The image should visually represent the main topic while maintaining a professio
         start_index = stage_names.index(failed_stage)
         
         # Execute from failed stage onwards
-        context = {}
+        context = {'article_id': article_id}
         for stage_name in stage_names[start_index:]:
             logger.info(f"Executing stage: {stage_name}")
             stage_func = self.stages[stage_name]
-            context = await stage_func(article_id, context)
+            result = await stage_func(article, context)
+            context[stage_name] = result
         
         return context
     

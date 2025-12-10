@@ -495,6 +495,7 @@ class AIGenerationConfig(models.Model):
         OPENAI = 'openai', 'OpenAI'
         ANTHROPIC = 'anthropic', 'Anthropic (Claude)'
         GOOGLE = 'google', 'Google (Gemini)'
+        GROQ = 'groq', 'Groq (Ultra-Fast)'
     
     # Identification
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1025,16 +1025,15 @@ class ScrapedArticleViewSet(viewsets.ModelViewSet):
                 category = article.category.lower() if article.category else 'politics'
                 
                 # Create keyword source from this article
-                keyword, created = KeywordSource.objects.get_or_create(
+                # Always create a new keyword for scraped articles to avoid confusion
+                keyword = KeywordSource.objects.create(
                     keyword=article.title[:255],
-                    defaults={
-                        'source': 'scraper',
-                        'category': category,
-                        'status': KeywordSource.Status.APPROVED,
-                        'approved_by': request.user,
-                        'approved_at': timezone.now(),
-                        'notes': f'From scraped article: {article.source_url}'
-                    }
+                    source='scraper',
+                    category=category,
+                    status=KeywordSource.Status.APPROVED,
+                    approved_by=request.user,
+                    approved_at=timezone.now(),
+                    notes=f'From scraped article: {article.source_url}'
                 )
                 
                 # Create AI article for generation

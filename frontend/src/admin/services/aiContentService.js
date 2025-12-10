@@ -24,7 +24,14 @@ export const getGenerationQueue = (params) => api.get('/admin/ai/articles/', { p
 
 // Configs
 export const getConfigs = () => api.get('/admin/ai/configs/')
-export const updateConfig = (id, data) => api.patch(`/admin/ai/configs/${id}/`, data)
+export const createConfig = (data) => api.post('/admin/ai/configs/', data)
+export const updateConfig = (id, data) => {
+  if (id) {
+    return api.patch(`/admin/ai/configs/${id}/`, data)
+  } else {
+    return createConfig(data)
+  }
+}
 
 // News Source Configurations
 export const getNewsSources = (params) => api.get('/admin/ai/news-sources/', { params })
@@ -63,6 +70,7 @@ export default {
 	publishArticle,
 	getGenerationQueue,
 	getConfigs,
+	createConfig,
 	updateConfig,
 	getNewsSources,
 	getNewsSource,

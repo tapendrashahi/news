@@ -21,15 +21,23 @@ const AISettings = () => {
   const fetchConfigs = async () => {
     try {
       const response = await getConfigs()
-      setConfigs(response.data)
-      // Load the first config as general settings
-      if (response.data.length > 0) {
-        const config = response.data[0]
+      console.log('Fetched configs response:', response.data)
+      
+      // Handle both array response and paginated response
+      const configsData = Array.isArray(response.data) ? response.data : (response.data.results || [])
+      
+      setConfigs(configsData)
+      
+      // Load the default config settings
+      if (configsData.length > 0) {
+        const defaultConfig = configsData.find(c => c.is_default) || configsData[0]
+        console.log('Loading config into form:', defaultConfig)
+        
         setGeneralSettings({
-          ai_provider: config.ai_provider || 'google',
-          model_name: config.model_name || 'gemini-exp-1206',
-          temperature: config.temperature || aiModelsConfig.defaultSettings.temperature.default,
-          max_tokens: config.max_tokens || aiModelsConfig.defaultSettings.maxTokens.default
+          ai_provider: defaultConfig.ai_provider || 'google',
+          model_name: defaultConfig.model_name || 'gemini-exp-1206',
+          temperature: parseFloat(defaultConfig.temperature) || aiModelsConfig.defaultSettings.temperature.default,
+          max_tokens: parseInt(defaultConfig.max_tokens) || aiModelsConfig.defaultSettings.maxTokens.default
         })
       }
     } catch (error) {
@@ -41,19 +49,112 @@ const AISettings = () => {
 
   const handleUpdateConfig = async (id, data) => {
     try {
-      await updateConfig(id, data)
-      fetchConfigs()
+      const response = await updateConfig(id, data)
+      // Update configs state with the returned data
+      setConfigs(prevConfigs => 
+        prevConfigs.map(c => c.id === id ? response.data : c)
+      )
+      // Update general settings to reflect the saved values
+      setGeneralSettings(prev => ({
+        ...prev,
+        ...data
+      }))
       alert('Settings updated successfully')
+      return response
     } catch (error) {
       console.error('Failed to update config:', error)
       alert('Failed to update settings')
+      throw error
     }
   }
 
   const handleSaveGeneral = async () => {
-    if (configs.length > 0) {
-      await handleUpdateConfig(configs[0].id, generalSettings)
+    try {
+      const dataToSave = {
+        ai_provider: generalSettings.ai_provider,
+        model_name: generalSettings.model_name,
+        temperature: parseFloat(generalSettings.temperature),
+        max_tokens: parseInt(generalSettings.max_tokens)
+      }
+      
+      console.log('Saving data:', dataToSave)
+      console.log('Configs available:', configs)
+      console.log('Configs is array?', Array.isArray(configs))
+      console.log('Configs length:', configs?.length)
+      
+      if (Array.isArray(configs) && configs.length > 0) {
+        // Find the default config or use the first one
+        const defaultConfig = configs.find(c => c.is_default) || configs[0]
+        console.log('Updating config:', defaultConfig.id, defaultConfig.name)
+        // Update existing config
+        await handleUpdateConfig(defaultConfig.id, dataToSave)
+      } else {
+        console.log('No configs found, creating new one')
+        // Create new config if none exists - include all required fields
+        const timestamp = Date.now()
+        const newConfig = {
+          name: `Default Configuration ${timestamp}`,
+          description: 'Default AI generation configuration',
+          template_type: 'analysis',
+          ...dataToSave,
+          system_prompt: 'You are AI Analitica, an unbiased news AI assistant committed to delivering balanced, fact-based journalism.',
+          user_prompt_template: 'Write a comprehensive, balanced news article about {keyword}. Target word count: {word_count} words. Ensure multiple perspectives and fact-based analysis.',
+          enabled: true,
+          is_default: true
+        }
+        const response = await updateConfig('', newConfig) // POST request when no ID
+        console.log('Config created:', response.data)
+        
+        // Update state with the new config
+        setConfigs([response.data])
+        setGeneralSettings({
+          ai_provider: response.data.ai_provider,
+          model_name: response.data.model_name,
+          temperature: parseFloat(response.data.temperature),
+          max_tokens: parseInt(response.data.max_tokens)
+        })
+        alert('Settings saved successfully')
+      }
+    } catch (error) {
+      console.error('Failed to save settings:', error)
+      console.error('Error response:', error.response?.data)
+      
+      // Extract detailed error messages
+      const errorData = error.response?.data || {}
+      let errorMsg = ''
+      
+      if (typeof errorData === 'object') {
+        // Check for field-specific errors
+        const fieldErrors = Object.entries(errorData)
+          .filter(([key]) => key !== 'detail')
+          .map(([field, messages]) => {
+            const msg = Array.isArray(messages) ? messages.join(', ') : messages
+            return `${field}: ${msg}`
+          })
+        
+        if (fieldErrors.length > 0) {
+          errorMsg = fieldErrors.join('\n')
+        } else {
+          errorMsg = errorData.detail || JSON.stringify(errorData)
+        }
+      } else {
+        errorMsg = String(errorData)
+      }
+      
+      alert('Failed to save settings:\n' + (errorMsg || error.message))
     }
+  }
+
+  const handleProviderChange = (newProvider) => {
+    // Get the first model of the new provider
+    const providerModels = getModelOptions(newProvider)
+    const defaultModel = providerModels.find(m => m.recommended) || providerModels[0]
+    
+    setGeneralSettings({
+      ...generalSettings, 
+      ai_provider: newProvider,
+      model_name: defaultModel ? defaultModel.value : generalSettings.model_name
+    })
   }
 
   const getModelOptions = (provider) => {
@@ -96,7 +197,7 @@ const AISettings = () => {
               <label>Default AI Provider</label>
               <select 
                 value={generalSettings.ai_provider}
-                onChange={(e) => setGeneralSettings({...generalSettings, ai_provider: e.target.value})}
+                onChange={(e) => handleProviderChange(e.target.value)}
               >
                 {getProviderOptions().map(provider => (
                   <option key={provider.value} value={provider.value}>{provider.label}</option>
