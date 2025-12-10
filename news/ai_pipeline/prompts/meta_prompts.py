@@ -5,7 +5,7 @@ Educational Content SEO Focused on Nepal
 Optimized for student search intent and Google ranking
 """
 
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 # ============================================================================
 # META TITLE GENERATION

@@ -36,7 +36,7 @@ from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 # Django imports
 from django.conf import settings
@@ -185,20 +185,42 @@ class AINewsOrchestrator:
         }
     
     def _init_llms(self):
-        """Initialize Language Model instances."""
+        """Initialize Language Model instances with automatic fallback."""
+        primary_initialized = False
+        provider = self.config.get('default_provider', 'google')
+        
+        # Try to initialize primary LLM with fallback logic
         try:
-            # Primary model: Based on provider selection
-            provider = self.config.get('default_provider', 'google')
-            
             if provider == 'google' and self.config.get('gemini_api_key'):
-                self.llm_primary = ChatGoogleGenerativeAI(
-                    model=self.config['default_model'],
+                try:
+                    self.llm_primary = ChatGoogleGenerativeAI(
+                        model=self.config['default_model'],
+                        temperature=self.config['temperature'],
+                        max_output_tokens=self.config['max_tokens'],
+                        google_api_key=self.config['gemini_api_key']
+                    )
+                    logger.info(f"Primary LLM: Gemini ({self.config['default_model']})")
+                    primary_initialized = True
+                except Exception as gemini_error:
+                    logger.error(f"Gemini initialization failed: {gemini_error}")
+                    if "expired" in str(gemini_error).lower() or "invalid" in str(gemini_error).lower():
+                        logger.warning("Gemini API key expired or invalid, falling back to Groq")
+                    else:
+                        logger.warning(f"Gemini error, falling back to Groq: {gemini_error}")
+                        
+            if not primary_initialized and self.config.get('groq_api_key'):
+                # Fallback to Groq
+                logger.info("Falling back to Groq API")
+                self.llm_primary = ChatGroq(
+                    model='llama-3.3-70b-versatile',
                     temperature=self.config['temperature'],
-                    max_output_tokens=self.config['max_tokens'],
-                    google_api_key=self.config['gemini_api_key']
+                    max_tokens=min(self.config['max_tokens'], 32000),
+                    groq_api_key=self.config['groq_api_key']
                 )
-                logger.info(f"Primary LLM: Gemini ({self.config['default_model']})")
-            elif provider == 'groq' and self.config.get('groq_api_key'):
+                logger.info(f"Primary LLM: Groq (llama-3.3-70b-versatile) [FALLBACK]")
+                primary_initialized = True
+                
+            if not primary_initialized and provider == 'groq' and self.config.get('groq_api_key'):
                 self.llm_primary = ChatGroq(
                     model=self.config['default_model'],
                     temperature=self.config['temperature'],
@@ -206,7 +228,9 @@ class AINewsOrchestrator:
                     groq_api_key=self.config['groq_api_key']
                 )
                 logger.info(f"Primary LLM: Groq ({self.config['default_model']})")
-            elif provider == 'openai' and self.config.get('openai_api_key'):
+                primary_initialized = True
+                
+            if not primary_initialized and provider == 'openai' and self.config.get('openai_api_key'):
                 self.llm_primary = ChatOpenAI(
                     model=self.config.get('default_model', 'gpt-4-turbo-preview'),
                     temperature=self.config['temperature'],
@@ -214,15 +238,19 @@ class AINewsOrchestrator:
                     openai_api_key=self.config['openai_api_key']
                 )
                 logger.info(f"Primary LLM: OpenAI ({self.config['default_model']})")
-            elif provider == 'anthropic' and self.config.get('anthropic_api_key'):
+                primary_initialized = True
+                
+            if not primary_initialized and provider == 'anthropic' and self.config.get('anthropic_api_key'):
                 self.llm_primary = ChatAnthropic(
                     model=self.config.get('default_model', 'claude-3-5-sonnet-20241022'),
                     temperature=self.config['temperature'],
                     anthropic_api_key=self.config['anthropic_api_key']
                 )
                 logger.info(f"Primary LLM: Claude ({self.config['default_model']})")
-            else:
-                raise ValueError(f"Invalid provider '{provider}' or missing API key")
+                primary_initialized = True
+                
+            if not primary_initialized:
+                raise ValueError(f"Failed to initialize any LLM provider. Tried: {provider}")
             
             # Secondary model: Claude for cross-validation and bias checking
             if self.config.get('anthropic_api_key'):
@@ -472,7 +500,7 @@ class AINewsOrchestrator:
         
         content = context.get('humanization', {}).get('content', '')
         title = context.get('content_generation', {}).get('title', '')
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         
         suggestions = yoast.optimize_content(
             content=content,
@@ -574,8 +602,11 @@ class AINewsOrchestrator:
         logger.info(f"Starting pipeline for article {article_id} from stage: {start_stage}")
         
         try:
-            # Load article from database
+            # Load article from database (includes keyword via select_related)
             article = await self._load_article(article_id)
+            
+            # Extract all needed data from article to avoid async DB queries later
+            article_data = await self._extract_article_data(article)
             
             # Update status
             await self._update_article_status(
@@ -585,7 +616,14 @@ class AINewsOrchestrator:
             )
             
             # Execute pipeline stages sequentially
-            context = {'article_id': article_id}
+            context = {
+                'article_id': article_id,
+                'keyword': article_data['keyword'],
+                'template_type': article_data['template_type'],
+                'target_word_count': article_data['target_word_count'],
+                'focus_keywords': article_data['focus_keywords'],
+                'related_keywords': article_data['related_keywords'],
+            }
             
             # Skip stages before start_stage
             stage_names = list(self.stages.keys())
@@ -594,10 +632,11 @@ class AINewsOrchestrator:
             for i, (stage_name, stage_func) in enumerate(self.stages.items()):
                 # Skip stages before the start_stage
                 if i < start_index:
-                    logger.info(f"Skipping stage: {stage_name}")
+                    logger.info(f"⏭️  [DEBUG] Skipping stage: {stage_name}")
                     continue
                     
-                logger.info(f"Executing stage: {stage_name}")
+                logger.info(f"🔄 [DEBUG] ========== Starting Stage: {stage_name.upper()} ==========")
+                logger.info(f"🔄 [DEBUG] Article: {context.get('keyword')}")
                 
                 # Create workflow log entry
                 log_id = await self._create_workflow_log(
@@ -607,11 +646,21 @@ class AINewsOrchestrator:
                 try:
                     # Execute stage
                     stage_start = datetime.now()
+                    logger.info(f"▶️  [DEBUG] Executing {stage_name}...")
+                    
                     result = await stage_func(article, context)
                     stage_duration = (datetime.now() - stage_start).total_seconds()
                     
+                    logger.info(f"✓ [DEBUG] {stage_name} completed in {stage_duration:.2f}s")
+                    logger.info(f"✓ [DEBUG] Result keys: {list(result.keys()) if isinstance(result, dict) else 'non-dict'}")
+                    
                     # Update context with stage results
                     context[stage_name] = result
+                    
+                    # Save intermediate data for critical stages
+                    if stage_name in ['research', 'outline', 'content_generation', 'humanization']:
+                        logger.info(f"💾 [DEBUG] Saving intermediate data for {stage_name}...")
+                        await self._save_intermediate_data(article_id, stage_name, result, context)
                     
                     # Log success
                     await self._complete_workflow_log(
@@ -624,7 +673,8 @@ class AINewsOrchestrator:
                         workflow_stage=stage_name
                     )
                     
-                    logger.info(f"Stage {stage_name} completed in {stage_duration:.2f}s")
+                    logger.info(f"✅ [DEBUG] Stage {stage_name} COMPLETE")
+                    logger.info(f"✅ [DEBUG] ================================================\n")
                     
                     # Check for SEO refinement after SEO optimization stage
                     if stage_name == 'seo_optimization':
@@ -660,24 +710,53 @@ class AINewsOrchestrator:
                             logger.info(f"SEO refinement skipped: {reason}")
                     
                 except Exception as e:
-                    logger.error(f"Stage {stage_name} failed: {e}")
+                    import traceback
+                    error_type = type(e).__name__
+                    error_msg = str(e)
+                    tb = traceback.format_exc()
+                    
+                    logger.error(f"❌ [DEBUG] ========== STAGE FAILED: {stage_name.upper()} ==========")
+                    logger.error(f"❌ [DEBUG] Error Type: {error_type}")
+                    logger.error(f"❌ [DEBUG] Error Message: {error_msg}")
+                    logger.error(f"❌ [DEBUG] Traceback:\n{tb}")
+                    logger.error(f"❌ [DEBUG] =====================================================")
                     
                     # Log failure
-                    await self._fail_workflow_log(log_id, str(e))
+                    await self._fail_workflow_log(log_id, error_msg)
                     
-                    # Update article as failed
+                    # Update article as failed with detailed error
                     await self._update_article_status(
                         article_id,
                         status='failed',
                         workflow_stage=stage_name,
-                        error=str(e)
                     )
                     
-                    # Check if we should retry
-                    article = await self._load_article(article_id)
-                    if article.retry_count < self.config['max_retries']:
-                        logger.info(f"Retrying article {article_id} (attempt {article.retry_count + 1})")
-                        return await self.retry_article(article_id, stage_name)
+                    # Save detailed error to database
+                    try:
+                        from news.ai_models import AIArticle
+                        from asgiref.sync import sync_to_async
+                        
+                        @sync_to_async
+                        def save_error():
+                            article = AIArticle.objects.get(id=article_id)
+                            article.last_error = f"{error_type} at {stage_name}: {error_msg}\n\nTraceback:\n{tb}"[:5000]
+                            article.failed_stage = stage_name
+                            
+                            if not article.error_log:
+                                article.error_log = []
+                            article.error_log.append({
+                                'timestamp': datetime.now().isoformat(),
+                                'stage': stage_name,
+                                'error_type': error_type,
+                                'error_message': error_msg,
+                                'traceback': tb[:2000]
+                            })
+                            article.save()
+                        
+                        await save_error()
+                        logger.info(f"✓ [DEBUG] Error details saved to database")
+                    except Exception as save_error:
+                        logger.error(f"❌ [DEBUG] Failed to save error to database: {save_error}")
                     
                     raise
             
@@ -722,7 +801,7 @@ class AINewsOrchestrator:
         - Available data and sources
         - Potential perspectives to cover
         """
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         
         prompt = f"""Analyze this keyword for news article generation: "{keyword}"
 
@@ -764,7 +843,7 @@ Format as JSON with these keys: angle, audience, questions, data_needed, perspec
         - Expert opinions and quotes
         - Multiple perspectives
         """
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         analysis = context.get('keyword_analysis', {}).get('keyword_analysis', {})
         
         logger.info(f"Researching: {keyword}")
@@ -796,15 +875,15 @@ Format as JSON with these keys: angle, audience, questions, data_needed, perspec
         - Clear sections for data and analysis
         - Proper heading hierarchy
         """
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         analysis = context.get('keyword_analysis', {}).get('keyword_analysis', {})
         research = context.get('research', {}).get('research_data', {})
         
         prompt = f"""Create a detailed outline for an unbiased news analysis article about: "{keyword}"
 
 Article Requirements:
-- Target Word Count: {article.target_word_count} words
-- Template: {article.template_type}
+- Target Word Count: {context.get('target_word_count', 1500)} words
+- Template: {context.get('template_type', 'analysis')}
 - Must present multiple perspectives objectively
 - Must include data and statistics
 - Must cite all factual claims
@@ -848,7 +927,7 @@ Format as JSON with: headline, lead, sections (array of {{title, subsections, co
         - Neutral language
         - Proper citations
         """
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         outline = context.get('outline', {}).get('outline', {})
         research = context.get('research', {}).get('research_data', {})
         
@@ -859,8 +938,8 @@ Format as JSON with: headline, lead, sections (array of {{title, subsections, co
         prompt = f"""Generate a comprehensive news article based on the following:
 
 KEYWORD: {keyword}
-WORD COUNT TARGET: {article.target_word_count}
-TEMPLATE TYPE: {article.template_type}
+WORD COUNT TARGET: {context.get('target_word_count', 1500)}
+TEMPLATE TYPE: {context.get('template_type', 'analysis')}
 
 OUTLINE:
 {outline}
@@ -868,7 +947,7 @@ OUTLINE:
 RESEARCH DATA:
 {research}
 
-FOCUS KEYWORDS: {article.focus_keywords or [keyword]}
+FOCUS KEYWORDS: {context.get('focus_keywords') or [keyword]}
 
 Please generate a well-structured, objective news article following AI Analitica standards.
 """
@@ -1070,22 +1149,332 @@ Return the improved article maintaining the same structure and all citations."""
     
     async def _check_plagiarism(self, article, context: Dict) -> Dict[str, Any]:
         """
-        Stage 7: Check for plagiarism.
+        Stage 7: Check for plagiarism using Codequiry API.
         
-        Critical for AI Analitica - all content must be original analysis.
+        Critical for educational content - all content must be original.
+        Automatically rewrites plagiarized sections if threshold exceeded.
         """
+        from .plagiarism_checker import get_plagiarism_checker
+        from .prompts.plagiarism_prompts import (
+            PLAGIARISM_REWRITE_PROMPT,
+            PLAGIARISM_SECTION_REWRITE_PROMPT
+        )
+        
         content = context.get('humanization', {}).get('content', '')
+        title = context.get('content_generation', {}).get('title', context.get('keyword'))
         
-        # TODO: Integrate with Copyscape or similar API
-        # Placeholder implementation
+        # Load plagiarism configuration
+        plagiarism_config = self._load_plagiarism_config()
         
-        plagiarism_score = 2.5  # Simulated percentage
+        if not plagiarism_config.get('enabled', True):
+            logger.info("Plagiarism check disabled")
+            return {
+                'plagiarism_score': 0.0,
+                'passed': True,
+                'checked': False,
+                'message': 'Plagiarism check disabled in configuration'
+            }
         
+        # Get plagiarism checker
+        checker = get_plagiarism_checker()
+        threshold = plagiarism_config.get('threshold', 5.0)
+        check_web = plagiarism_config.get('checkOptions', {}).get('checkWeb', {}).get('enabled', True)
+        check_database = plagiarism_config.get('checkOptions', {}).get('checkDatabase', {}).get('enabled', True)
+        
+        # Perform plagiarism check
+        logger.info(f"Checking plagiarism with threshold {threshold}%")
+        result = checker.check_plagiarism(
+            content=content,
+            title=title,
+            threshold=threshold,
+            check_web=check_web,
+            check_database=check_database
+        )
+        
+        # Handle check error
+        if result.error:
+            logger.error(f"Plagiarism check error: {result.error}")
+            return {
+                'plagiarism_score': 0.0,
+                'passed': True,
+                'checked': False,
+                'error': result.error
+            }
+        
+        # Log plagiarism result
+        logger.info(
+            f"Plagiarism check complete: {result.overall_score:.2f}% "
+            f"(threshold: {threshold}%, sources: {result.sources_found})"
+        )
+        
+        # If plagiarism is below threshold, pass
+        if not result.is_plagiarized:
+            return {
+                'plagiarism_score': result.overall_score,
+                'passed': True,
+                'checked': True,
+                'sources_found': result.sources_found,
+                'report_url': result.report_url
+            }
+        
+        # Plagiarism detected - check if auto-rewrite is enabled
+        auto_rewrite = plagiarism_config.get('checkOptions', {}).get('autoRewrite', {}).get('enabled', True)
+        
+        if not auto_rewrite:
+            logger.warning(f"Plagiarism detected ({result.overall_score}%) but auto-rewrite disabled")
+            return {
+                'plagiarism_score': result.overall_score,
+                'passed': False,
+                'checked': True,
+                'sources_found': result.sources_found,
+                'matches': result.matches,
+                'report_url': result.report_url,
+                'message': 'Plagiarism detected but auto-rewrite disabled'
+            }
+        
+        # Attempt to rewrite plagiarized content
+        max_retries = plagiarism_config.get('maxRetries', 3)
+        rewrite_strategy = plagiarism_config.get('rewriteStrategy', {})
+        
+        for attempt in range(max_retries):
+            logger.info(f"Plagiarism rewrite attempt {attempt + 1}/{max_retries}")
+            
+            try:
+                # Determine rewrite strategy
+                rewrite_sections = rewrite_strategy.get('rewriteSections', {}).get('enabled', True)
+                rewrite_entire = rewrite_strategy.get('rewriteEntireArticle', {}).get('enabled', False)
+                
+                if rewrite_entire:
+                    # Rewrite entire article
+                    rewritten_content = await self._rewrite_entire_article_for_plagiarism(
+                        article, context, result, plagiarism_config
+                    )
+                elif rewrite_sections:
+                    # Rewrite only plagiarized sections
+                    rewritten_content = await self._rewrite_plagiarized_sections(
+                        article, context, result, plagiarism_config
+                    )
+                else:
+                    logger.error("No rewrite strategy enabled")
+                    break
+                
+                # Re-check plagiarism on rewritten content
+                logger.info("Re-checking plagiarism after rewrite")
+                recheck_result = checker.check_plagiarism(
+                    content=rewritten_content,
+                    title=title,
+                    threshold=threshold,
+                    check_web=check_web,
+                    check_database=check_database
+                )
+                
+                if recheck_result.error:
+                    logger.error(f"Plagiarism recheck error: {recheck_result.error}")
+                    break
+                
+                logger.info(
+                    f"Plagiarism recheck: {recheck_result.overall_score:.2f}% "
+                    f"(was {result.overall_score:.2f}%)"
+                )
+                
+                # If rewrite successful, update context and return
+                if not recheck_result.is_plagiarized:
+                    context['humanization']['content'] = rewritten_content
+                    context['plagiarism_rewrite'] = {
+                        'original_score': result.overall_score,
+                        'final_score': recheck_result.overall_score,
+                        'attempts': attempt + 1,
+                        'strategy': 'entire_article' if rewrite_entire else 'sections'
+                    }
+                    
+                    logger.info(f"Plagiarism resolved after {attempt + 1} attempt(s)")
+                    return {
+                        'plagiarism_score': recheck_result.overall_score,
+                        'passed': True,
+                        'checked': True,
+                        'rewritten': True,
+                        'original_score': result.overall_score,
+                        'rewrite_attempts': attempt + 1,
+                        'sources_found': recheck_result.sources_found
+                    }
+                
+                # Update result for next attempt
+                result = recheck_result
+                
+            except Exception as e:
+                logger.error(f"Plagiarism rewrite attempt {attempt + 1} failed: {str(e)}")
+                continue
+        
+        # Max retries reached without success
+        logger.error(f"Failed to resolve plagiarism after {max_retries} attempts")
         return {
-            'plagiarism_score': plagiarism_score,
-            'passed': plagiarism_score < self.config['quality_thresholds']['max_plagiarism'],
-            'matched_sources': []
+            'plagiarism_score': result.overall_score,
+            'passed': False,
+            'checked': True,
+            'rewritten': True,
+            'rewrite_failed': True,
+            'rewrite_attempts': max_retries,
+            'sources_found': result.sources_found,
+            'matches': result.matches,
+            'report_url': result.report_url
         }
+    
+    def _load_plagiarism_config(self) -> Dict:
+        """Load plagiarism check configuration"""
+        import json
+        import os
+        from django.conf import settings
+        
+        config_path = os.path.join(settings.BASE_DIR, 'plagiarism_config.json')
+        
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                return config.get('plagiarism_check', {})
+        
+        # Default configuration
+        return {
+            'enabled': True,
+            'threshold': 5.0,
+            'maxRetries': 3,
+            'checkOptions': {
+                'checkWeb': {'enabled': True},
+                'checkDatabase': {'enabled': True},
+                'autoRewrite': {'enabled': True}
+            },
+            'rewriteStrategy': {
+                'rewriteSections': {'enabled': True},
+                'rewriteEntireArticle': {'enabled': False},
+                'maintainSEO': {'enabled': True},
+                'maintainNepalContext': {'enabled': True}
+            }
+        }
+    
+    async def _rewrite_plagiarized_sections(
+        self,
+        article,
+        context: Dict,
+        plagiarism_result,
+        config: Dict
+    ) -> str:
+        """
+        Rewrite specific plagiarized sections while maintaining overall content.
+        
+        Args:
+            article: AIArticle instance
+            context: Pipeline context
+            plagiarism_result: PlagiarismResult with matches
+            config: Plagiarism configuration
+            
+        Returns:
+            Rewritten content with original sections replaced
+        """
+        from .prompts.plagiarism_prompts import PLAGIARISM_REWRITE_PROMPT
+        
+        content = context.get('humanization', {}).get('content', '')
+        keyword = context.get('keyword')
+        
+        # Extract plagiarized sections info
+        from .plagiarism_checker import get_plagiarism_checker
+        checker = get_plagiarism_checker()
+        plagiarized_sections = checker.get_plagiarized_sections(plagiarism_result.matches)
+        
+        # Build plagiarized sections summary
+        sections_text = "\n\n".join([
+            f"SECTION {i+1}:\n"
+            f"Text: {section['text']}\n"
+            f"Source: {section['source']}\n"
+            f"Similarity: {section['similarity']}%"
+            for i, section in enumerate(plagiarized_sections[:5])  # Limit to top 5
+        ])
+        
+        # Prepare rewrite prompt
+        prompt_vars = {
+            'content': content,
+            'plagiarism_score': plagiarism_result.overall_score,
+            'threshold': plagiarism_result.threshold,
+            'sources_found': plagiarism_result.sources_found,
+            'plagiarized_sections': sections_text or "See plagiarism report for details",
+            'primary_keyword': keyword,
+            'secondary_keywords': ', '.join(context.get('related_keywords', []) or []),
+        }
+        
+        # Generate rewritten content
+        rewrite_prompt = PLAGIARISM_REWRITE_PROMPT.format_messages(**prompt_vars)
+        
+        response = await self._invoke_llm(
+            self.llm_primary,
+            system=rewrite_prompt[0].content,
+            prompt=rewrite_prompt[1].content
+        )
+        
+        # Parse response
+        rewrite_data = self._parse_json_response(response)
+        rewritten_content = rewrite_data.get('rewritten_content', content)
+        
+        logger.info(f"Rewrote {len(plagiarized_sections)} plagiarized sections")
+        return rewritten_content
+    
+    async def _rewrite_entire_article_for_plagiarism(
+        self,
+        article,
+        context: Dict,
+        plagiarism_result,
+        config: Dict
+    ) -> str:
+        """
+        Rewrite entire article to ensure complete originality.
+        
+        Args:
+            article: AIArticle instance
+            context: Pipeline context
+            plagiarism_result: PlagiarismResult
+            config: Plagiarism configuration
+            
+        Returns:
+            Completely rewritten original content
+        """
+        from .prompts.plagiarism_prompts import PLAGIARISM_FULL_ARTICLE_REWRITE_PROMPT
+        
+        content = context.get('humanization', {}).get('content', '')
+        title = context.get('content_generation', {}).get('title', '')
+        keyword = context.get('keyword')
+        
+        # Prepare rewrite prompt
+        prompt_vars = {
+            'content': content,
+            'plagiarism_score': plagiarism_result.overall_score,
+            'threshold': plagiarism_result.threshold,
+            'sources_found': plagiarism_result.sources_found,
+            'title': title,
+            'primary_keyword': keyword,
+            'secondary_keywords': ', '.join(context.get('related_keywords', []) or []),
+            'word_count': len(content.split())
+        }
+        
+        # Generate completely rewritten content
+        rewrite_prompt = PLAGIARISM_FULL_ARTICLE_REWRITE_PROMPT.format_messages(**prompt_vars)
+        
+        response = await self._invoke_llm(
+            self.llm_primary,
+            system=rewrite_prompt[0].content,
+            prompt=rewrite_prompt[1].content
+        )
+        
+        # Parse response
+        rewrite_data = self._parse_json_response(response)
+        rewritten_content = rewrite_data.get('content', content)
+        
+        # Update title if provided
+        if rewrite_data.get('title'):
+            context['content_generation']['title'] = rewrite_data['title']
+        
+        # Update meta description if provided
+        if rewrite_data.get('meta_description'):
+            context['meta_generation']['meta_description'] = rewrite_data['meta_description']
+        
+        logger.info("Rewrote entire article for plagiarism elimination")
+        return rewritten_content
     
     async def _check_bias(self, article, context: Dict) -> Dict[str, Any]:
         """
@@ -1190,7 +1579,7 @@ Format as JSON with: total_claims, cited_claims, uncited_claims (array of {{clai
         Checks that complex issues are covered from different angles.
         """
         content = context.get('humanization', {}).get('content', '')
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         
         prompt = f"""Analyze this article about "{keyword}" for perspective diversity:
 
@@ -1236,7 +1625,7 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
         
         content = context.get('humanization', {}).get('content', '')
         title = context.get('content_generation', {}).get('title', '')
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         meta_description = context.get('meta_generation', {}).get('meta_description', '')
         
         # Get YoastSEO service
@@ -1290,7 +1679,7 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
         """
         title = context.get('content_generation', {}).get('title', '')
         content = context.get('seo_optimization', {}).get('optimized_content', '')
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         
         # TODO: Implement meta generation chain
         # Placeholder implementation
@@ -1310,7 +1699,7 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
         Supports multiple providers: Google (Imagen), Hugging Face (FLUX, SDXL, etc.), OpenAI (DALL-E)
         """
         title = context.get('content_generation', {}).get('title', '')
-        keyword = article.keyword.keyword
+        keyword = context.get('keyword')
         outline = context.get('outline', {}).get('outline', {})
         
         if not title:
@@ -1629,8 +2018,10 @@ The image should visually represent the main topic while maintaining a professio
     # Helper Methods
     # ========================================================================
     
-    async def _invoke_llm(self, llm, system: str, prompt: str) -> str:
-        """Invoke language model with system and user prompts."""
+    async def _invoke_llm(self, llm, system: str, prompt: str, retry_count: int = 0) -> str:
+        """Invoke language model with system and user prompts, with automatic fallback."""
+        max_retries = 2
+        
         try:
             messages = [
                 SystemMessage(content=system),
@@ -1638,8 +2029,41 @@ The image should visually represent the main topic while maintaining a professio
             ]
             response = await llm.ainvoke(messages)
             return response.content
+            
         except Exception as e:
-            logger.error(f"LLM invocation failed: {e}")
+            error_str = str(e).lower()
+            
+            # Check if it's an API key/quota issue
+            if any(keyword in error_str for keyword in ['expired', 'invalid', 'quota', 'rate limit', '429', '403', '401']):
+                logger.error(f"API error detected: {e}")
+                
+                # Try to fall back to Groq if not already using it
+                if retry_count < max_retries and self.config.get('groq_api_key'):
+                    if not isinstance(llm, ChatGroq):
+                        logger.warning("Primary API failed, falling back to Groq")
+                        try:
+                            fallback_llm = ChatGroq(
+                                model='llama-3.3-70b-versatile',
+                                temperature=self.config.get('temperature', 0.7),
+                                max_tokens=min(self.config.get('max_tokens', 32000), 32000),
+                                groq_api_key=self.config['groq_api_key']
+                            )
+                            return await self._invoke_llm(fallback_llm, system, prompt, retry_count + 1)
+                        except Exception as fallback_error:
+                            logger.error(f"Fallback to Groq also failed: {fallback_error}")
+                            raise
+                    else:
+                        logger.error("Already using Groq, no fallback available")
+                        raise
+                else:
+                    logger.error(f"Max retries ({max_retries}) reached or no fallback available")
+                    raise
+            else:
+                # Non-API errors, re-raise immediately
+                logger.error(f"LLM invocation failed with non-API error: {e}")
+                raise
+        except Exception as e:
+            logger.error(f"Unexpected error in _invoke_llm: {e}", exc_info=True)
             raise
     
     def _parse_json_response(self, response: str) -> Dict[str, Any]:
@@ -1738,6 +2162,22 @@ The image should visually represent the main topic while maintaining a professio
         
         return await load_from_db()
     
+    async def _extract_article_data(self, article):
+        """Extract article data to avoid async DB queries later."""
+        from asgiref.sync import sync_to_async
+        
+        @sync_to_async
+        def extract_data():
+            return {
+                'keyword': article.keyword.keyword,
+                'template_type': article.template_type,
+                'target_word_count': article.target_word_count,
+                'focus_keywords': article.focus_keywords or [],
+                'related_keywords': article.keyword.related_keywords or [],
+            }
+        
+        return await extract_data()
+    
     async def _update_article_status(self, article_id: str, **kwargs):
         """Update article status in database."""
         from news.ai_models import AIArticle
@@ -1771,6 +2211,52 @@ The image should visually represent the main topic while maintaining a professio
         logger.error(f"Failing log {log_id}: {error}")
         # Simplified logging - just log to console
         pass
+    
+    async def _save_intermediate_data(self, article_id: str, stage_name: str, result: Dict, context: Dict):
+        """Save intermediate data after critical stages to prevent data loss."""
+        from news.ai_models import AIArticle
+        from asgiref.sync import sync_to_async
+        
+        logger.info(f"Saving intermediate data for stage: {stage_name}")
+        
+        @sync_to_async
+        def save_data():
+            article = AIArticle.objects.get(id=article_id)
+            
+            if stage_name == 'research':
+                # Save research data
+                research_data = result.get('research_data', {})
+                article.research_data = research_data
+                logger.info(f"Saved research data: {research_data.get('source_count', 0)} sources")
+                
+            elif stage_name == 'outline':
+                # Save outline
+                outline_data = result.get('outline', {})
+                article.outline = outline_data
+                logger.info(f"Saved outline with {len(outline_data.get('sections', []))} sections")
+                
+            elif stage_name == 'content_generation':
+                # Save raw content
+                content = result.get('content', '')
+                article.raw_content = content
+                article.actual_word_count = result.get('word_count', 0)
+                logger.info(f"Saved content: {len(content)} chars, {article.actual_word_count} words")
+                
+            elif stage_name == 'humanization':
+                # Update with humanized content
+                humanized_content = result.get('content', '')
+                if humanized_content:
+                    article.raw_content = humanized_content
+                    logger.info(f"Updated with humanized content: {len(humanized_content)} chars")
+            
+            article.save()
+            logger.info(f"✅ Intermediate data saved for {stage_name}")
+        
+        try:
+            await save_data()
+        except Exception as e:
+            logger.error(f"Failed to save intermediate data for {stage_name}: {e}")
+            # Don't raise - continue pipeline even if save fails
     
     async def _save_article_data(self, article_id: str, context: Dict, quality_scores: Dict):
         """Save final article data to database."""

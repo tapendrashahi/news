@@ -5,7 +5,7 @@ Educational Content SEO Focused on Nepal
 Optimized for Google ranking and student discoverability
 """
 
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 # ============================================================================
 # SEO ANALYSIS PROMPT

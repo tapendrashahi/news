@@ -22,6 +22,8 @@ from .api_admin import (
     analytics,
     # SEO Refinement
     seo_refinement_config,
+    # Plagiarism Check
+    plagiarism_config,
     # ViewSets
     NewsAdminViewSet,
     TeamAdminViewSet,
@@ -81,5 +83,6 @@ urlpatterns = [
     path('admin/dashboard/stats/', dashboard_stats, name='admin-dashboard-stats'),
     path('admin/reports/analytics/', analytics, name='admin-analytics'),
     path('admin/seo-refinement-config/', seo_refinement_config, name='admin-seo-refinement-config'),
+    path('admin/plagiarism-config/', plagiarism_config, name='admin-plagiarism-config'),
     path('admin/', include(admin_router.urls)),
 ]

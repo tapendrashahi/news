@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getArticles, retryStage, cancelGeneration, startGeneration, deleteArticle } from '../../../services/aiContentService'
 import ArticleProgress from './ArticleProgress'
+import DebugModal from './DebugModal'
 import './GenerationQueue.css'
 
 const GenerationQueue = () => {
@@ -9,6 +10,7 @@ const GenerationQueue = () => {
   const [filter, setFilter] = useState('all') // Show all by default so filters work
   const [selectedArticle, setSelectedArticle] = useState(null)
   const [openMenuId, setOpenMenuId] = useState(null)
+  const [debugArticle, setDebugArticle] = useState(null)
   const [stats, setStats] = useState({
     total: 0,
     queued: 0,
@@ -364,8 +366,18 @@ const GenerationQueue = () => {
                   </button>
                 )}
                 {article.status === 'failed' && (
-                  <button className="btn btn-sm btn-warning" onClick={() => handleRetry(article.id, article.workflow_stage)}>
-                    🔄 Retry
+                  <>
+                    <button className="btn btn-sm btn-warning" onClick={() => handleRetry(article.id, article.workflow_stage)}>
+                      🔄 Retry
+                    </button>
+                    <button className="btn btn-sm btn-error" onClick={() => setDebugArticle(article)}>
+                      🐛 Debug
+                    </button>
+                  </>
+                )}
+                {article.status === 'generating' && (
+                  <button className="btn btn-sm btn-info" onClick={() => setDebugArticle(article)}>
+                    🐛 Debug
                   </button>
                 )}
                 {(article.status === 'queued' || article.status === 'generating') && (
@@ -405,6 +417,13 @@ const GenerationQueue = () => {
         <ArticleProgress
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
+        />
+      )}
+      
+      {debugArticle && (
+        <DebugModal
+          article={debugArticle}
+          onClose={() => setDebugArticle(null)}
         />
       )}
     </div>

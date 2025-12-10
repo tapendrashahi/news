@@ -620,6 +620,25 @@
   background: #dc2626;
 }
 
+.btn-error {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #991b1b;
+}
+
+.btn-error:hover {
+  background: #b91c1c;
+}
+
+.btn-info {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #2563eb;
+}
+
 .error-message {
   margin-top: 12px;
   padding: 8px 12px;
