@@ -497,6 +497,7 @@ class AIGenerationConfig(models.Model):
         GOOGLE = 'google', 'Google (Gemini)'
         GROQ = 'groq', 'Groq (Ultra-Fast)'
         NATURALWRITE = 'naturalwrite', 'NaturalWrite (Humanizer)'
+        HUGGINGFACE = 'huggingface', 'Hugging Face (Models)'
     
     # Identification
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
