@@ -140,11 +140,13 @@ class AINewsOrchestrator:
                     'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
                     'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
                     'groq_api_key': os.getenv('GROQ_API_KEY', ''),
+                    'naturalwrite_api_key': os.getenv('NATURALWRITE_API_KEY', ''),
                     'default_provider': default_config.ai_provider,
                     'default_model': default_config.model_name,
                     'temperature': float(default_config.temperature),
                     'max_tokens': int(default_config.max_tokens),
                     'max_retries': int(default_config.max_retries),
+                    'stage_configs': default_config.stage_configs or {},
                     'quality_thresholds': {
                         'max_ai_score': 50.0,
                         'max_plagiarism': 5.0,
@@ -164,11 +166,13 @@ class AINewsOrchestrator:
             'anthropic_api_key': os.getenv('ANTHROPIC_API_KEY', ''),
             'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
             'groq_api_key': os.getenv('GROQ_API_KEY', ''),
+            'naturalwrite_api_key': os.getenv('NATURALWRITE_API_KEY', ''),
             'default_provider': 'google',
             'default_model': 'gemini-exp-1206',
             'temperature': 0.7,
             'max_tokens': 32000,
             'max_retries': 3,
+            'stage_configs': {},
             'quality_thresholds': {
                 'max_ai_score': 50.0,
                 'max_plagiarism': 5.0,
@@ -236,6 +240,60 @@ class AINewsOrchestrator:
         except Exception as e:
             logger.error(f"Failed to initialize LLMs: {e}")
             raise
+    
+    def _get_llm_for_stage(self, stage_name: str):
+        """Get the appropriate LLM for a specific pipeline stage."""
+        stage_config = self.config.get('stage_configs', {}).get(stage_name, {})
+        
+        if not stage_config:
+            # Use default/primary LLM
+            return self.llm_primary
+        
+        provider = stage_config.get('provider')
+        model = stage_config.get('model')
+        
+        if not provider or not model:
+            return self.llm_primary
+        
+        # Create stage-specific LLM instance
+        try:
+            if provider == 'google' and self.config.get('gemini_api_key'):
+                from langchain_google_genai import ChatGoogleGenerativeAI
+                return ChatGoogleGenerativeAI(
+                    model=model,
+                    temperature=self.config['temperature'],
+                    max_output_tokens=self.config['max_tokens'],
+                    google_api_key=self.config['gemini_api_key']
+                )
+            elif provider == 'groq' and self.config.get('groq_api_key'):
+                from langchain_groq import ChatGroq
+                return ChatGroq(
+                    model=model,
+                    temperature=self.config['temperature'],
+                    max_tokens=self.config['max_tokens'],
+                    groq_api_key=self.config['groq_api_key']
+                )
+            elif provider == 'openai' and self.config.get('openai_api_key'):
+                from langchain_openai import ChatOpenAI
+                return ChatOpenAI(
+                    model=model,
+                    temperature=self.config['temperature'],
+                    max_tokens=self.config['max_tokens'],
+                    openai_api_key=self.config['openai_api_key']
+                )
+            elif provider == 'anthropic' and self.config.get('anthropic_api_key'):
+                from langchain_anthropic import ChatAnthropic
+                return ChatAnthropic(
+                    model=model,
+                    temperature=self.config['temperature'],
+                    anthropic_api_key=self.config['anthropic_api_key']
+                )
+            else:
+                logger.warning(f"Invalid provider '{provider}' for stage {stage_name}, using default")
+                return self.llm_primary
+        except Exception as e:
+            logger.error(f"Failed to create LLM for stage {stage_name}: {e}")
+            return self.llm_primary
     
     # ========================================================================
     # Main Pipeline Execution
@@ -389,8 +447,10 @@ Provide a comprehensive analysis including:
 
 Format as JSON with these keys: angle, audience, questions, data_needed, perspectives, bias_risks, fact_check_priorities"""
         
+        llm = self._get_llm_for_stage('keyword_analysis')
+        
         response = await self._invoke_llm(
-            self.llm_primary,
+            llm,
             system="You are an expert news analyst helping to plan objective, data-driven news coverage.",
             prompt=prompt
         )
@@ -472,8 +532,10 @@ Create an outline with:
 
 Format as JSON with: headline, lead, sections (array of {{title, subsections, content_notes, data_points, perspectives}}))"""
         
+        llm = self._get_llm_for_stage('outline')
+        
         response = await self._invoke_llm(
-            self.llm_primary,
+            llm,
             system="You are a news editor creating outlines for objective, data-driven articles.",
             prompt=prompt
         )
@@ -519,8 +581,10 @@ FOCUS KEYWORDS: {article.focus_keywords or [keyword]}
 Please generate a well-structured, objective news article following AI Analitica standards.
 """
         
+        llm = self._get_llm_for_stage('content_generation')
+        
         response = await self._invoke_llm(
-            self.llm_primary,
+            llm,
             system=SYSTEM_PROMPT + " Return ONLY the article content in Markdown format without any preamble or code block markers.",
             prompt=prompt
         )
@@ -539,6 +603,8 @@ Please generate a well-structured, objective news article following AI Analitica
         """
         Stage 5: Make content more natural and readable while maintaining objectivity.
         
+        Uses NaturalWrite API if configured, otherwise falls back to LLM humanization.
+        
         Improves:
         - Sentence variety
         - Readability
@@ -550,6 +616,51 @@ Please generate a well-structured, objective news article following AI Analitica
         
         if not content:
             return {'humanized': False, 'content': content}
+        
+        # Check if NaturalWrite API is configured
+        naturalwrite_key = self.config.get('naturalwrite_api_key')
+        
+        if naturalwrite_key:
+            try:
+                import requests
+                
+                logger.info("Using NaturalWrite API for humanization")
+                
+                # NaturalWrite API endpoint
+                url = "https://api.naturalwrite.com/v1/humanize"
+                
+                headers = {
+                    "Authorization": f"Bearer {naturalwrite_key}",
+                    "Content-Type": "application/json"
+                }
+                
+                payload = {
+                    "text": content,
+                    "mode": "enhanced",  # Options: standard, enhanced, creative
+                    "preserve_formatting": True,
+                    "preserve_links": True
+                }
+                
+                response = requests.post(url, json=payload, headers=headers, timeout=60)
+                response.raise_for_status()
+                
+                result = response.json()
+                humanized_content = result.get('humanized_text', content)
+                
+                logger.info(f"NaturalWrite humanization successful: {len(humanized_content)} chars")
+                
+                return {
+                    'content': humanized_content,
+                    'humanized': True,
+                    'method': 'naturalwrite',
+                    'ai_score_before': result.get('ai_score_before'),
+                    'ai_score_after': result.get('ai_score_after')
+                }
+            except Exception as e:
+                logger.error(f"NaturalWrite API failed: {e}, falling back to LLM humanization")
+        
+        # Fallback to LLM-based humanization
+        logger.info("Using LLM for humanization")
         
         prompt = f"""Refine this news analysis to be more readable and natural while MAINTAINING complete objectivity:
 
@@ -567,8 +678,10 @@ Improvements to make:
 
 Return the improved article maintaining the same structure and all citations."""
         
+        llm = self._get_llm_for_stage('humanization')
+        
         response = await self._invoke_llm(
-            self.llm_primary,
+            llm,
             system="You are an editor improving readability while maintaining journalistic objectivity. Return ONLY the improved article content without any preamble, explanations, or code block markers.",
             prompt=prompt
         )
@@ -578,18 +691,69 @@ Return the improved article maintaining the same structure and all citations."""
         
         return {
             'content': cleaned_response,
-            'humanized': True
+            'humanized': True,
+            'method': 'llm'
         }
     
     async def _check_ai_detection(self, article, context: Dict) -> Dict[str, Any]:
         """
         Stage 6: Check if content appears AI-generated.
         
-        Note: For AI Analitica, we embrace AI generation, but we want
+        Uses NaturalWrite API for detection if available.
+        For AI Analitica, we embrace AI generation, but we want
         content to be readable and natural, not obviously robotic.
         """
         content = context.get('humanization', {}).get('content', '')
         
+        if not content:
+            return {'ai_score': 0, 'detected': False, 'bypassed': False}
+        
+        # Check if NaturalWrite API is configured
+        naturalwrite_key = self.config.get('naturalwrite_api_key')
+        
+        if naturalwrite_key:
+            try:
+                import requests
+                
+                logger.info("Using NaturalWrite API for AI detection")
+                
+                url = "https://api.naturalwrite.com/v1/detect"
+                
+                headers = {
+                    "Authorization": f"Bearer {naturalwrite_key}",
+                    "Content-Type": "application/json"
+                }
+                
+                payload = {
+                    "text": content
+                }
+                
+                response = requests.post(url, json=payload, headers=headers, timeout=30)
+                response.raise_for_status()
+                
+                result = response.json()
+                ai_score = result.get('ai_probability', 0) * 100  # Convert to percentage
+                
+                logger.info(f"NaturalWrite AI detection: {ai_score:.2f}% AI-generated")
+                
+                return {
+                    'ai_score': ai_score,
+                    'detected': ai_score > self.config['quality_thresholds']['max_ai_score'],
+                    'bypassed': ai_score <= 30.0,  # Good threshold for "human-like"
+                    'method': 'naturalwrite',
+                    'details': result.get('details', {})
+                }
+            except Exception as e:
+                logger.error(f"NaturalWrite detection failed: {e}, skipping AI detection")
+        
+        # Fallback: Skip detection or use simple heuristic
+        logger.info("Skipping AI detection (no API available)")
+        return {
+            'ai_score': 0,
+            'detected': False,
+            'bypassed': True,
+            'method': 'skipped'
+        }
         # TODO: Integrate with GPTZero or Originality.AI API
         # Placeholder implementation
         

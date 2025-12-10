@@ -496,6 +496,7 @@ class AIGenerationConfig(models.Model):
         ANTHROPIC = 'anthropic', 'Anthropic (Claude)'
         GOOGLE = 'google', 'Google (Gemini)'
         GROQ = 'groq', 'Groq (Ultra-Fast)'
+        NATURALWRITE = 'naturalwrite', 'NaturalWrite (Humanizer)'
     
     # Identification
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -611,6 +612,13 @@ class AIGenerationConfig(models.Model):
     max_retries = models.IntegerField(
         default=3,
         validators=[MinValueValidator(0), MaxValueValidator(10)]
+    )
+    
+    # Per-Stage AI Configuration (JSON field storing provider/model for each stage)
+    stage_configs = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Per-stage AI provider and model configuration. Format: {'outline': {'provider': 'groq', 'model': 'llama-3.1-8b-instant'}, ...}"
     )
     
     # Status
