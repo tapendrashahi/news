@@ -181,6 +181,37 @@
         }
       ],
       "imageModels": []
+    },
+    {
+      "id": "naturalwrite",
+      "name": "NaturalWrite (Humanizer)",
+      "models": [
+        {
+          "value": "humanize-standard",
+          "label": "Humanize (Standard)",
+          "description": "Standard humanization for AI-generated content",
+          "maxTokens": 10000,
+          "contextWindow": 10000,
+          "recommended": true
+        },
+        {
+          "value": "humanize-enhanced",
+          "label": "Humanize (Enhanced)",
+          "description": "Advanced humanization with better AI bypass",
+          "maxTokens": 10000,
+          "contextWindow": 10000,
+          "recommended": false
+        },
+        {
+          "value": "humanize-creative",
+          "label": "Humanize (Creative)",
+          "description": "Creative humanization with natural variations",
+          "maxTokens": 10000,
+          "contextWindow": 10000,
+          "recommended": false
+        }
+      ],
+      "imageModels": []
     }
   ],
   "defaultSettings": {
