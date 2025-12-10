@@ -95,7 +95,7 @@ Added **NaturalWrite provider** with 3 models:
 Your `.env` file needs:
 ```env
 NATURALWRITE_API_KEY=your_naturalwrite_api_key_here
-GEMINI_API_KEY=your_gemini_api_key_here  
+GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
