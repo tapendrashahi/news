@@ -141,6 +141,7 @@ class AINewsOrchestrator:
                     'gemini_api_key': os.getenv('GEMINI_API_KEY', ''),
                     'groq_api_key': os.getenv('GROQ_API_KEY', ''),
                     'naturalwrite_api_key': os.getenv('NATURALWRITE_API_KEY', ''),
+                    'hf_api_key': os.getenv('HF_API_KEY', ''),
                     'default_provider': default_config.ai_provider,
                     'default_model': default_config.model_name,
                     'temperature': float(default_config.temperature),
@@ -963,9 +964,9 @@ Format as JSON with: perspectives_covered (array), perspectives_missing (array),
     
     async def _generate_image(self, article, context: Dict) -> Dict[str, Any]:
         """
-        Stage 13: Generate featured image with Google Imagen 3.
+        Stage 13: Generate featured image for article.
         
-        Creates professional, news-appropriate imagery using Gemini's image generation.
+        Supports multiple providers: Google (Imagen), Hugging Face (FLUX, SDXL, etc.), OpenAI (DALL-E)
         """
         title = context.get('content_generation', {}).get('title', '')
         keyword = article.keyword.keyword
@@ -990,86 +991,257 @@ Style Requirements:
 
 The image should visually represent the main topic while maintaining a professional, credible news publication appearance."""
 
+        # Get image generation stage config
+        stage_config = self.config.get('stage_configs', {}).get('image_generation', {})
+        provider = stage_config.get('provider', 'google')  # Default to Google
+        model = stage_config.get('model', 'imagen-3.0-generate-001')
+        
+        logger.info(f"Image generation using: {provider} / {model}")
+
         try:
-            # Use Google Generative AI for image generation
-            if not self.config.get('gemini_api_key'):
-                logger.warning("Gemini API key not configured, skipping image generation")
-                return {
-                    'image_generated': False,
-                    'image_url': '',
-                    'image_prompt': prompt_template,
-                    'alt_text': title,
-                    'error': 'No API key configured'
-                }
-            
-            # Import Gemini image generation
-            import google.generativeai as genai
-            import requests
-            import base64
             from io import BytesIO
             from PIL import Image as PILImage
             from django.core.files.base import ContentFile
+            from asgiref.sync import sync_to_async
             
-            # Configure Gemini
-            genai.configure(api_key=self.config['gemini_api_key'])
+            if provider == 'huggingface':
+                # ========== HUGGING FACE IMAGE GENERATION ==========
+                hf_api_key = self.config.get('hf_api_key')
+                
+                if not hf_api_key:
+                    logger.warning("Hugging Face API key not configured")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': 'No HF API key configured'
+                    }
+                
+                import requests
+                
+                logger.info(f"Generating image with Hugging Face model: {model}")
+                
+                # Hugging Face Inference API
+                api_url = f"https://api-inference.huggingface.co/models/{model}"
+                headers = {"Authorization": f"Bearer {hf_api_key}"}
+                
+                # Simplified prompt for better results
+                simple_prompt = f"{title}. {keyword}"
+                
+                response = requests.post(
+                    api_url,
+                    headers=headers,
+                    json={"inputs": simple_prompt},
+                    timeout=60
+                )
+                
+                if response.status_code == 200:
+                    # Load image from response
+                    img_buffer = BytesIO(response.content)
+                    pil_image = PILImage.open(img_buffer)
+                    
+                    # Resize to 16:9 if needed
+                    target_width = 1920
+                    target_height = 1080
+                    pil_image = pil_image.resize((target_width, target_height), PILImage.Resampling.LANCZOS)
+                    
+                    # Save to Django file
+                    image_filename = f"ai_article_{article.id}.png"
+                    final_buffer = BytesIO()
+                    pil_image.save(final_buffer, format='PNG', quality=95)
+                    final_buffer.seek(0)
+                    
+                    @sync_to_async
+                    def save_image():
+                        from news.ai_models import AIArticle
+                        art = AIArticle.objects.get(id=article.id)
+                        art.image.save(image_filename, ContentFile(final_buffer.read()), save=True)
+                        return art.image.url
+                    
+                    image_url = await save_image()
+                    
+                    logger.info(f"✅ Image generated successfully with Hugging Face: {image_url}")
+                    
+                    return {
+                        'image_generated': True,
+                        'image_url': image_url,
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'provider': 'huggingface',
+                        'model': model
+                    }
+                else:
+                    error_msg = response.text
+                    logger.error(f"Hugging Face API error: {response.status_code} - {error_msg}")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': f"HF API error: {error_msg[:100]}"
+                    }
             
-            # Use Imagen 3 model for image generation
-            model = genai.GenerativeModel('imagen-3.0-generate-001')
+            elif provider == 'google':
+                # ========== GOOGLE IMAGEN GENERATION ==========
+                gemini_api_key = self.config.get('gemini_api_key')
+                
+                if not gemini_api_key:
+                    logger.warning("Gemini API key not configured")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': 'No Gemini API key configured'
+                    }
+                
+                import google.generativeai as genai
+                
+                # Configure Gemini
+                genai.configure(api_key=gemini_api_key)
+                
+                # Use specified Imagen model
+                imagen_model = genai.GenerativeModel(model)
+                
+                logger.info(f"Generating image with Google Imagen: {model}")
+                
+                response = imagen_model.generate_images(
+                    prompt=prompt_template,
+                    number_of_images=1,
+                    safety_filter_level="block_some",
+                    person_generation="allow_adult",
+                    aspect_ratio="16:9",
+                )
+                
+                if response.images:
+                    generated_image = response.images[0]
+                    
+                    # Save image
+                    image_filename = f"ai_article_{article.id}.png"
+                    image_path = f"ai_generated/{image_filename}"
+                    img_buffer = BytesIO()
+                    generated_image._pil_image.save(img_buffer, format='PNG', quality=95)
+                    img_buffer.seek(0)
+                    
+                    @sync_to_async
+                    def save_image():
+                        from news.ai_models import AIArticle
+                        art = AIArticle.objects.get(id=article.id)
+                        art.image.save(image_filename, ContentFile(img_buffer.read()), save=True)
+                        return art.image.url
+                    
+                    image_url = await save_image()
+                    
+                    logger.info(f"✅ Image generated successfully with Google Imagen: {image_url}")
+                    
+                    return {
+                        'image_generated': True,
+                        'image_url': image_url,
+                        'image_local_path': image_path,
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'provider': 'google',
+                        'model': model
+                    }
+                else:
+                    logger.warning("No images generated from Imagen")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': 'No images returned from API'
+                    }
             
-            # Generate image
-            logger.info(f"Generating image with prompt: {prompt_template[:100]}...")
-            
-            response = model.generate_images(
-                prompt=prompt_template,
-                number_of_images=1,
-                safety_filter_level="block_some",
-                person_generation="allow_adult",
-                aspect_ratio="16:9",
-            )
-            
-            # Get the first generated image
-            if response.images:
-                generated_image = response.images[0]
+            elif provider == 'openai':
+                # ========== OPENAI DALL-E GENERATION ==========
+                openai_api_key = self.config.get('openai_api_key')
                 
-                # Save image to media directory
-                image_filename = f"ai_article_{article.id}.png"
-                image_path = f"ai_generated/{image_filename}"
+                if not openai_api_key:
+                    logger.warning("OpenAI API key not configured")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': 'No OpenAI API key configured'
+                    }
                 
-                # Convert PIL Image to Django file
-                img_buffer = BytesIO()
-                generated_image._pil_image.save(img_buffer, format='PNG', quality=95)
-                img_buffer.seek(0)
+                import requests
                 
-                # Save to article
-                from asgiref.sync import sync_to_async
+                logger.info(f"Generating image with OpenAI DALL-E: {model}")
                 
-                @sync_to_async
-                def save_image():
-                    from news.ai_models import AIArticle
-                    art = AIArticle.objects.get(id=article.id)
-                    art.image.save(image_filename, ContentFile(img_buffer.read()), save=True)
-                    return art.image.url
-                
-                image_url = await save_image()
-                
-                logger.info(f"✅ Image generated successfully: {image_url}")
-                
-                return {
-                    'image_generated': True,
-                    'image_url': image_url,
-                    'image_local_path': image_path,
-                    'image_prompt': prompt_template,
-                    'alt_text': title,
-                    'model': 'imagen-3.0'
+                api_url = "https://api.openai.com/v1/images/generations"
+                headers = {
+                    "Authorization": f"Bearer {openai_api_key}",
+                    "Content-Type": "application/json"
                 }
+                
+                # DALL-E 3 parameters
+                payload = {
+                    "model": model,
+                    "prompt": prompt_template[:1000],  # DALL-E has prompt limits
+                    "n": 1,
+                    "size": "1792x1024",  # Closest to 16:9
+                    "quality": "hd" if "dall-e-3" in model else "standard",
+                    "style": "natural"
+                }
+                
+                response = requests.post(api_url, headers=headers, json=payload, timeout=60)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    image_url_remote = result['data'][0]['url']
+                    
+                    # Download and save image
+                    img_response = requests.get(image_url_remote)
+                    img_buffer = BytesIO(img_response.content)
+                    pil_image = PILImage.open(img_buffer)
+                    
+                    image_filename = f"ai_article_{article.id}.png"
+                    final_buffer = BytesIO()
+                    pil_image.save(final_buffer, format='PNG', quality=95)
+                    final_buffer.seek(0)
+                    
+                    @sync_to_async
+                    def save_image():
+                        from news.ai_models import AIArticle
+                        art = AIArticle.objects.get(id=article.id)
+                        art.image.save(image_filename, ContentFile(final_buffer.read()), save=True)
+                        return art.image.url
+                    
+                    image_url = await save_image()
+                    
+                    logger.info(f"✅ Image generated successfully with DALL-E: {image_url}")
+                    
+                    return {
+                        'image_generated': True,
+                        'image_url': image_url,
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'provider': 'openai',
+                        'model': model
+                    }
+                else:
+                    error_msg = response.text
+                    logger.error(f"OpenAI API error: {response.status_code} - {error_msg}")
+                    return {
+                        'image_generated': False,
+                        'image_url': '',
+                        'image_prompt': prompt_template,
+                        'alt_text': title,
+                        'error': f"OpenAI API error: {error_msg[:100]}"
+                    }
+            
             else:
-                logger.warning("No images generated from Imagen")
+                logger.error(f"Unsupported image provider: {provider}")
                 return {
                     'image_generated': False,
                     'image_url': '',
                     'image_prompt': prompt_template,
                     'alt_text': title,
-                    'error': 'No images returned from API'
+                    'error': f'Unsupported provider: {provider}'
                 }
                 
         except Exception as e:

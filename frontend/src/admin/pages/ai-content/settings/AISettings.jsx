@@ -6,6 +6,7 @@ import './AISettings.css'
 const AISettings = () => {
   const [configs, setConfigs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [savingStages, setSavingStages] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
   
   // Pipeline stages configuration
@@ -121,13 +122,22 @@ const AISettings = () => {
   }
 
   const handleSaveStageConfigs = async () => {
+    if (savingStages) return // Prevent multiple simultaneous saves
+    
+    setSavingStages(true)
     try {
       if (Array.isArray(configs) && configs.length > 0) {
         const defaultConfig = configs.find(c => c.is_default) || configs[0]
         await handleUpdateConfig(defaultConfig.id, { stage_configs: stageConfigs })
+        console.log('Stage configs saved successfully:', stageConfigs)
+      } else {
+        alert('No configuration found. Please save general settings first.')
       }
     } catch (error) {
       console.error('Error saving stage configs:', error)
+      alert('Failed to save stage settings. Please try again.')
+    } finally {
+      setSavingStages(false)
     }
   }
 
@@ -157,11 +167,25 @@ const AISettings = () => {
     return providerData ? providerData.models : []
   }
 
+  const getImageModelOptions = (provider) => {
+    const providerData = aiModelsConfig.providers.find(p => p.id === provider)
+    return providerData ? providerData.imageModels : []
+  }
+
   const getProviderOptions = () => {
     return aiModelsConfig.providers.map(provider => ({
       value: provider.id,
       label: provider.name
     }))
+  }
+
+  const getImageProviderOptions = () => {
+    return aiModelsConfig.providers
+      .filter(p => p.imageModels && p.imageModels.length > 0)
+      .map(provider => ({
+        value: provider.id,
+        label: provider.name
+      }))
   }
 
   const clearStageConfig = (stageId) => {
@@ -272,8 +296,12 @@ const AISettings = () => {
                   Customize AI provider and model for each pipeline stage. Leave empty to use default settings.
                 </p>
               </div>
-              <button className="btn btn-primary" onClick={handleSaveStageConfigs}>
-                Save Stage Settings
+              <button 
+                className="btn btn-primary" 
+                onClick={handleSaveStageConfigs}
+                disabled={savingStages}
+              >
+                {savingStages ? 'Saving...' : 'Save Stage Settings'}
               </button>
             </div>
             
@@ -301,7 +329,7 @@ const AISettings = () => {
                     </div>
                     
                     {/* Only show config for LLM-based stages */}
-                    {!['research', 'plagiarism_check', 'image_generation'].includes(stage.id) && (
+                    {!['research', 'plagiarism_check'].includes(stage.id) && stage.id !== 'image_generation' && (
                       <div className="stage-config">
                         <div className="form-row">
                           <div className="form-group">
@@ -355,7 +383,62 @@ const AISettings = () => {
                       </div>
                     )}
                     
-                    {['research', 'plagiarism_check', 'image_generation'].includes(stage.id) && (
+                    {/* Image generation stage with special image model selection */}
+                    {stage.id === 'image_generation' && (
+                      <div className="stage-config">
+                        <div className="form-row">
+                          <div className="form-group">
+                            <label>Image Provider</label>
+                            <select 
+                              value={stageConfig.provider || ''}
+                              onChange={(e) => {
+                                const newProvider = e.target.value
+                                if (newProvider) {
+                                  const models = getImageModelOptions(newProvider)
+                                  const defaultModel = models.find(m => m.recommended) || models[0]
+                                  handleStageConfigChange(stage.id, 'provider', newProvider)
+                                  handleStageConfigChange(stage.id, 'model', defaultModel?.value || '')
+                                } else {
+                                  clearStageConfig(stage.id)
+                                }
+                              }}
+                            >
+                              <option value="">Use Default (Google Imagen)</option>
+                              {getImageProviderOptions().map(provider => (
+                                <option key={provider.value} value={provider.value}>
+                                  {provider.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          
+                          {stageConfig.provider && (
+                            <div className="form-group">
+                              <label>Image Model</label>
+                              <select 
+                                value={stageConfig.model || ''}
+                                onChange={(e) => handleStageConfigChange(stage.id, 'model', e.target.value)}
+                              >
+                                {getImageModelOptions(stageConfig.provider).map(model => (
+                                  <option key={model.value} value={model.value}>
+                                    {model.label}
+                                    {model.recommended && ' ⭐'}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {!hasConfig && (
+                          <div className="default-indicator">
+                            Using default: <strong>Google</strong> / <strong>imagen-3.0-generate-001</strong>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {['research', 'plagiarism_check'].includes(stage.id) && (
                       <div className="non-llm-stage">
                         <em>This stage does not use an LLM</em>
                       </div>

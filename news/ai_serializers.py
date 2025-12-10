@@ -419,6 +419,7 @@ class AIGenerationConfigSerializer(serializers.ModelSerializer):
             'min_readability_score', 'max_bias_score',
             'auto_humanize', 'auto_rewrite_plagiarism', 'auto_publish',
             'max_retries', 'enabled', 'is_default', 'version',
+            'stage_configs',
             'created_at', 'updated_at', 'created_by', 'usage_count'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'created_by', 'usage_count']

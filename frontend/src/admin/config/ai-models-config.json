@@ -212,6 +212,49 @@
         }
       ],
       "imageModels": []
+    },
+    {
+      "id": "huggingface",
+      "name": "Hugging Face (Models)",
+      "models": [],
+      "imageModels": [
+        {
+          "value": "black-forest-labs/FLUX.1-dev",
+          "label": "FLUX.1-dev (Fast)",
+          "description": "Fast, high-quality image generation from Black Forest Labs",
+          "recommended": true
+        },
+        {
+          "value": "black-forest-labs/FLUX.1-schnell",
+          "label": "FLUX.1-schnell (Ultra-Fast)",
+          "description": "Ultra-fast variant optimized for speed",
+          "recommended": false
+        },
+        {
+          "value": "stabilityai/stable-diffusion-xl-base-1.0",
+          "label": "Stable Diffusion XL",
+          "description": "High-quality SDXL model for detailed images",
+          "recommended": false
+        },
+        {
+          "value": "runwayml/stable-diffusion-v1-5",
+          "label": "Stable Diffusion 1.5",
+          "description": "Classic SD model, fast and reliable",
+          "recommended": false
+        },
+        {
+          "value": "prompthero/openjourney",
+          "label": "OpenJourney",
+          "description": "Artistic style image generation",
+          "recommended": false
+        },
+        {
+          "value": "SG161222/Realistic_Vision_V5.1_noVAE",
+          "label": "Realistic Vision 5.1",
+          "description": "Photorealistic image generation",
+          "recommended": false
+        }
+      ]
     }
   ],
   "defaultSettings": {
@@ -223,11 +266,11 @@
       "description": "Lower = more focused, Higher = more creative"
     },
     "maxTokens": {
-      "min": 1000,
+      "min": 100,
       "max": 32000,
       "default": 8000,
       "step": 100,
-      "description": "Maximum length of generated content"
+      "description": "Controls the maximum length of AI-generated responses. Higher values allow longer articles but may increase costs and generation time. 1 token ≈ 0.75 words. Example: 8000 tokens ≈ 6000 words"
     }
   },
   "qualityThresholds": {
